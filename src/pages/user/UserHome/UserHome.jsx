@@ -17,6 +17,7 @@ import {
   FaClock,
 } from "react-icons/fa";
 import FindTutorMenu from "../../../components/common/FindTutorMenu/FindTutorMenu";
+import Footer from "../../../components/common/Footer/Footer";
 
 function UserHome() {
   const tutors = [
@@ -308,7 +309,11 @@ function UserHome() {
         </div>
 
         <FindTutorMenu />
+
+
+       
       </div>
+       <Footer />
     </div>
   );
 }
