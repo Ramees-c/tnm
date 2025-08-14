@@ -6,7 +6,8 @@ const Slider = ({
   slidesToShow = 3,
   infinite = true,
   autoSlide = true,
-  autoSlideInterval = 5000, // default 5 seconds
+  autoSlideInterval = 5000,
+  slideBtnHide,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchPosition, setTouchPosition] = useState(null);
@@ -159,17 +160,21 @@ const Slider = ({
         <>
           <button
             onClick={prevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-all duration-200 focus:outline-none"
+            className={`absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-primary hover:bg-secondary p-2 rounded-full shadow-lg transition-all duration-200 focus:outline-none ${
+              slideBtnHide ? "hidden" : "hidden lg:block"
+            }`}
             aria-label="Previous slide"
           >
-            <FiChevronLeft className="w-5 h-5 text-gray-700" />
+            <FiChevronLeft className="w-5 h-5 text-white" />
           </button>
           <button
             onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-all duration-200 focus:outline-none"
+            className={`absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-primary hover:bg-secondary p-2 rounded-full shadow-lg transition-all duration-200 focus:outline-none ${
+              slideBtnHide ? "hidden" : "hidden lg:block"
+            }`}
             aria-label="Next slide"
           >
-            <FiChevronRight className="w-5 h-5 text-gray-700" />
+            <FiChevronRight className="w-5 h-5 text-white" />
           </button>
         </>
       )}

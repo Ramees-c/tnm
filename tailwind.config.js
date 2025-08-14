@@ -6,6 +6,7 @@ export default {
     extend: {
       colors: {
         primary: "#15536c",
+        secondary: "#5b8d46",
         customBlack: "#282C35",
         para: "#797672",
       },

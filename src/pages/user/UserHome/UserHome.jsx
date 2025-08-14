@@ -6,6 +6,7 @@ import SubHeader from "../../../components/common/Subheader/SubHeader";
 import Slider from "../../../components/common/Slider/Slider";
 import CategoryCard from "../../../components/common/CategoryCard/CategoryCard";
 import FeatureCard from "../../../components/common/FeatureCard/FeatureCard";
+import TestimonialCard from "../../../components/common/TestimonialCard/TestimonialCard";
 
 import {
   FaGraduationCap,
@@ -15,6 +16,7 @@ import {
   FaMobileAlt,
   FaClock,
 } from "react-icons/fa";
+import FindTutorMenu from "../../../components/common/FindTutorMenu/FindTutorMenu";
 
 function UserHome() {
   const tutors = [
@@ -171,6 +173,33 @@ function UserHome() {
     },
   ];
 
+  const testimonials = [
+    {
+      id: 1,
+      name: "Sarah Johnson",
+      position: "Student, Class 12",
+      text: "Tutilon completely transformed my learning experience. The interactive lessons and expert teachers helped me score 95% in my board exams! fdsgfadsgsdgsdgfsadg",
+      rating: 5,
+      avatar: "https://randomuser.me/api/portraits/women/43.jpg",
+    },
+    {
+      id: 2,
+      name: "Raj Patel",
+      position: "BTech Student",
+      text: "The quality of courses is exceptional. I was able to land an internship at a top tech company thanks to the skills I learned here.",
+      rating: 4,
+      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+    },
+    {
+      id: 3,
+      name: "Priya Sharma",
+      position: "Parent",
+      text: "My child's grades improved significantly after joining Tutilon. The teachers are patient and explain concepts very clearly.",
+      rating: 5,
+      avatar: "https://randomuser.me/api/portraits/women/65.jpg",
+    },
+  ];
+
   return (
     <div>
       <Userheader />
@@ -252,6 +281,33 @@ function UserHome() {
             </div>
           ))}
         </div>
+
+        <SubHeader
+          tagline="Testimonials"
+          title=" What Our Students Say"
+          description="Hear from our community of learners about their experiences"
+        />
+
+        {/* Testimonial Cards - Grid Layout */}
+        <div>
+          <Slider
+            slidesToShow={2}
+            autoSlide={true}
+            autoSlideInterval={5000}
+            slideBtnHide={true}
+          >
+            {testimonials.map((testimonial) => (
+              <div className="flex justify-center">
+                <TestimonialCard
+                  key={testimonial.id}
+                  testimonial={testimonial}
+                />
+              </div>
+            ))}
+          </Slider>
+        </div>
+
+        <FindTutorMenu />
       </div>
     </div>
   );

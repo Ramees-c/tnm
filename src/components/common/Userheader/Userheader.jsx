@@ -1,4 +1,5 @@
 import { useState } from "react";
+import logo from "../../../assets/images/logo/tnmlogo.png"
 import {
   FaBars,
   FaTimes,
@@ -18,9 +19,9 @@ function Userheader() {
   const toggleSideMenu = () => setIsSideMenuOpen(!isSideMenuOpen);
 
   return (
-    <header className="sticky top-0 z-50 bg-white py-5">
+    <header className="sticky top-0 z-40 bg-white py-5">
       {/* Main Navigation */}
-      <nav className="container mx-auto ">
+      <nav className="container mx-auto">
         <div className="flex justify-between items-center">
           {/* Logo and Search (Left Side) */}
           <div className="flex items-center space-x-20 w-full md:w-auto">
@@ -33,9 +34,9 @@ function Userheader() {
               </button>
               <a href="/" className="flex items-center">
                 <img
-                  src="assets/img/logo.png"
+                  src={logo}
                   alt="Logo"
-                  className="h-8 md:h-10"
+                  className="h-10 md:h-20"
                 />
               </a>
             </div>
@@ -938,8 +939,9 @@ function Userheader() {
         </div>
 
         {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white shadow-lg rounded-md mt-2 p-4">
+        <div>
+          {isMenuOpen && (
+          <div className="md:hidden shadow-lg rounded-md mt-2 p-4 bg-white">
             <div className="mb-4">
               <form className="flex items-center">
                 <input
@@ -1048,11 +1050,12 @@ function Userheader() {
             </ul>
           </div>
         )}
+        </div>
       </nav>
 
       {/* Side Menu */}
       {isSideMenuOpen && (
-        <div className="fixed inset-y-0 right-0 w-[24vw] bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out translate-x-0">
+        <div className="fixed inset-y-0 right-0 w-[24vw] bg-white shadow-lg z-30 transform transition-transform duration-300 ease-in-out translate-x-0">
           <div className="p-6 h-full overflow-y-auto">
             <button
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
@@ -1173,7 +1176,7 @@ function Userheader() {
       {/* Overlay */}
       {(isMenuOpen || isSideMenuOpen) && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          className="fixed inset-0 bg-black bg-opacity-50 -z-20 md:z-20"
           onClick={() => {
             if (isMenuOpen) setIsMenuOpen(false);
             if (isSideMenuOpen) setIsSideMenuOpen(false);

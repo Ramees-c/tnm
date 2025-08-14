@@ -4,11 +4,11 @@ function CategoryCard({ image, title, count }) {
   return (
     <div className="group relative overflow-hidden rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100">
       {/* Image Container with Gradient Overlay */}
-      <div className="relative h-48 overflow-hidden">
+      <div className="relative h-full overflow-hidden">
         <img
           src={image}
           alt={title}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          className="w-full h-56 lg:h-48 object-cover transition-transform duration-500 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
       </div>
