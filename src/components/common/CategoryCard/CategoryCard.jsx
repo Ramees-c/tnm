@@ -8,7 +8,7 @@ function CategoryCard({ image, title, count }) {
         <img
           src={image}
           alt={title}
-          className="w-full  object-cover transition-transform duration-500 group-hover:scale-110"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
       </div>

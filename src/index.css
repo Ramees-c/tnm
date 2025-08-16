@@ -2,17 +2,3 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Change default option styles globally */
-select option {
-  @apply bg-white rounded-md; /* background and text color */
-}
-
-/* Optional hover/focus styles (works best in Firefox) */
-select option:hover {
-  @apply bg-teal-500 text-white;
-}
-
-/* Style the placeholder-like option */
-select option[value=""] {
-  @apply text-gray-400;
-}

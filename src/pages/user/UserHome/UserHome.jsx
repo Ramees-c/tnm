@@ -8,7 +8,7 @@ import CategoryCard from "../../../components/common/CategoryCard/CategoryCard";
 import FeatureCard from "../../../components/common/FeatureCard/FeatureCard";
 import TestimonialCard from "../../../components/common/TestimonialCard/TestimonialCard";
 
-import testimonialImg from "../../../assets/images/testimonial-image.jpg"
+import testimonialImg from "../../../assets/images/testimonial-image.jpg";
 
 import {
   FaGraduationCap,
@@ -96,64 +96,147 @@ function UserHome() {
       id: 1,
       title: "Class 9 Tutilon",
       image:
-        "https://images.unsplash.com/photo-1588072432836-e10032774350?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+        "https://plus.unsplash.com/premium_photo-1681248156502-745ab87474d8?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGNsYXNzJTIwdHR1dGlvbnxlbnwwfHwwfHx8MA%3D%3D",
       count: 42,
     },
     {
       id: 2,
       title: "Class 10 Tutilon",
       image:
-        "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+        "https://images.unsplash.com/photo-1636772523547-5577d04e8dc1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fGNsYXNzJTIwdHR1dGlvbnxlbnwwfHwwfHx8MA%3D%3D",
       count: 56,
     },
     {
       id: 3,
       title: "Class 11 Tutilon",
       image:
-        "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+        "https://plus.unsplash.com/premium_photo-1681297117877-00d5ee51c156?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NTd8fGNsYXNzJTIwdHR1dGlvbnxlbnwwfHwwfHx8MA%3D%3D",
       count: 38,
     },
     {
       id: 4,
       title: "Class 12 Tutilon",
       image:
-        "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+        "https://images.unsplash.com/photo-1563394867331-e687a36112fd?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NjB8fGNsYXNzJTIwdHR1dGlvbnxlbnwwfHwwfHx8MA%3D%3D",
       count: 61,
     },
     {
       id: 5,
       title: "BTech Tutilon",
       image:
-        "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+        "https://plus.unsplash.com/premium_photo-1705267936187-aceda1a6c1a6?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NzN8fGNsYXNzJTIwdHR1dGlvbnxlbnwwfHwwfHx8MA%3D%3D",
       count: 89,
     },
     {
       id: 6,
       title: "Nursery-KG Tutilon",
       image:
-        "https://images.unsplash.com/photo-1605106702734-205df224ecce?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+        "https://media.istockphoto.com/id/1351409521/photo/teacher-assisting-student-in-classroom.webp?a=1&b=1&s=612x612&w=0&k=20&c=JXQ549mC3P035drHR-U1omX78GNtw_qkyDLwBz86o08=",
       count: 27,
+    },
+  ];
+
+  const languages = [
+    {
+      id: 1,
+      title: "IELTS Coaching",
+      image:
+        "https://images.unsplash.com/photo-1660927059794-152d06e11016?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aWVsdHN8ZW58MHx8MHx8fDA%3D",
+      count: 78,
+    },
+    {
+      id: 2,
+      title: "Spoken English",
+      image:
+        "https://plus.unsplash.com/premium_photo-1682088176629-0f48d58a614c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8U3Bva2VuJTIwRW5nbGlzaHxlbnwwfHwwfHx8MA%3D%3D",
+      count: 112,
+    },
+    {
+      id: 3,
+      title: "Business English",
+      image:
+        "https://plus.unsplash.com/premium_photo-1661382100492-91afa67e11c6?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8QnVzaW5lc3MlMjBFbmdsaXNofGVufDB8fDB8fHww",
+      count: 65,
+    },
+    {
+      id: 4,
+      title: "English for Kids",
+      image:
+        "https://media.istockphoto.com/id/171346513/photo/learn-word.webp?a=1&b=1&s=612x612&w=0&k=20&c=3kNyy40mN06SpLjoDyn4Q7KZcoxtFlMpVJpmpi3DzZg=",
+      count: 89,
+    },
+    {
+      id: 5,
+      title: "Hindi Language",
+      image:
+        "https://media.istockphoto.com/id/1344732501/photo/teacher-teaching-and-writing-on-board.webp?a=1&b=1&s=612x612&w=0&k=20&c=Kr7GB7fr6eocZbGr3KOOm7hWrL4QxkWzWt5jPpzLHgQ=",
+      count: 54,
     },
     {
       id: 6,
-      title: "Nursery-KG Tutilon",
+      title: "German Language",
       image:
-        "https://images.unsplash.com/photo-1605106702734-205df224ecce?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-      count: 27,
+        "https://images.unsplash.com/photo-1527866959252-deab85ef7d1b?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8Z2VybWFuJTIwbGFuZ3VhZ2V8ZW58MHx8MHx8fDA%3D",
+      count: 93,
+    },
+  ];
+
+  const hobbies = [
+    {
+      id: 1,
+      title: "Photography",
+      image:
+        "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGhvdG9ncmFwaHl8ZW58MHx8MHx8fDA%3D",
+      count: 124,
+    },
+    {
+      id: 2,
+      title: "Painting",
+      image:
+        "https://images.unsplash.com/photo-1579965342575-16428a7c8881?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGFpbnRpbmd8ZW58MHx8MHx8fDA%3D",
+      count: 87,
+    },
+    {
+      id: 3,
+      title: "Gardening",
+      image:
+        "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Z2FyZGVuaW5nfGVufDB8fDB8fHww",
+      count: 92,
+    },
+    {
+      id: 4,
+      title: "Cooking",
+      image:
+        "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y29va2luZ3xlbnwwfHwwfHx8MA%3D%3D",
+      count: 156,
+    },
+    {
+      id: 5,
+      title: "Music",
+      image:
+        "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bXVzaWN8ZW58MHx8MHx8fDA%3D",
+      count: 203,
     },
     {
       id: 6,
-      title: "Nursery-KG Tutilon",
+      title: "Yoga",
       image:
-        "https://images.unsplash.com/photo-1605106702734-205df224ecce?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-      count: 27,
+        "https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8eW9nYXxlbnwwfHwwfHx8MA%3D%3D",
+      count: 118,
     },
     {
-      id: 6,
-      title: "Nursery-KG Tutilon",
+      id: 7,
+      title: "Reading",
       image:
-        "https://images.unsplash.com/photo-1605106702734-205df224ecce?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-      count: 27,
+        "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cmVhZGluZ3xlbnwwfHwwfHx8MA%3D%3D",
+      count: 145,
+    },
+    {
+      id: 8,
+      title: "Cycling",
+      image:
+        "https://media.istockphoto.com/id/179251545/photo/pretty-woman-riding-a-bicycle.webp?a=1&b=1&s=612x612&w=0&k=20&c=lZUe6C8E3Ko-tC6Cv9d3-8xU6wRBrEnRhM3wwEFv4As=",
+      count: 76,
     },
   ];
 
@@ -268,12 +351,12 @@ function UserHome() {
             <h1 className="text-2xl font-medium mb-5">Languages</h1>
             {/* Categories Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-2">
-              {categories.map((category) => (
+              {languages.map((language) => (
                 <CategoryCard
-                  key={category.id}
-                  image={category.image}
-                  title={category.title}
-                  count={category.count}
+                  key={language.id}
+                  image={language.image}
+                  title={language.title}
+                  count={language.count}
                 />
               ))}
             </div>
@@ -282,12 +365,12 @@ function UserHome() {
             <h1 className="text-2xl font-medium mb-5">Hobbies</h1>
             {/* Categories Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-2">
-              {categories.map((category) => (
+              {hobbies.map((hobbie) => (
                 <CategoryCard
-                  key={category.id}
-                  image={category.image}
-                  title={category.title}
-                  count={category.count}
+                  key={hobbie.id}
+                  image={hobbie.image}
+                  title={hobbie.title}
+                  count={hobbie.count}
                 />
               ))}
             </div>
@@ -314,37 +397,36 @@ function UserHome() {
           description="Hear from our community of learners about their experiences"
         />
         {/* Testimonial Cards - Grid Layout */}
-       <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-10">
-        <div>
-           <img src={testimonialImg} alt="" className="w-full h-auto object-cover" />
+        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-10">
+          <div>
+            <img
+              src={testimonialImg}
+              alt=""
+              className="w-full h-auto object-cover"
+            />
+          </div>
+          <div>
+            <Slider
+              slidesToShow={1}
+              autoSlide={true}
+              autoSlideInterval={5000}
+              slideBtnHide={true}
+            >
+              {testimonials.map((testimonial) => (
+                <div className="flex justify-center">
+                  <TestimonialCard
+                    key={testimonial.id}
+                    testimonial={testimonial}
+                  />
+                </div>
+              ))}
+            </Slider>
+          </div>
         </div>
-         <div>
-          
-
-          <Slider
-            slidesToShow={1}
-            autoSlide={true}
-            autoSlideInterval={5000}
-            slideBtnHide={true}
-          >
-            {testimonials.map((testimonial) => (
-              <div className="flex justify-center">
-                <TestimonialCard
-                  key={testimonial.id}
-                  testimonial={testimonial}
-                />
-              </div>
-            ))}
-          </Slider>
-        </div>
-       </div>
 
         <FindTutorMenu />
-
-
-       
       </div>
-       <Footer />
+      <Footer />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import logo from "../../../assets/images/logo/tnmlogo.png";
 import {
   FaBars,
@@ -10,6 +10,7 @@ import {
   FaLinkedinIn,
   FaBehance,
 } from "react-icons/fa";
+import { HiChevronDown } from "react-icons/hi";
 import DefaultButton from "../DefaultButton/DefaultButton";
 
 function Userheader() {
@@ -19,6 +20,12 @@ function Userheader() {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleSideMenu = () => setIsSideMenuOpen(!isSideMenuOpen);
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const [selected, setSelected] = useState("Login/Register");
+  const [isOpen, setIsOpen] = useState(false);
+
+  const options = ["Login/Register", "Tutor", "Student"];
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,6 +38,17 @@ function Userheader() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Close dropdown if click outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
@@ -349,15 +367,43 @@ function Userheader() {
               </li>
               <li className="text-lg font-medium">Contact</li>
             </ul>
-
-           
           </div>
 
           <div className="flex">
-            <DefaultButton buttonText="Login/Register" />
-             {/* Side Menu Toggle */}
+            <div className="relative w-48" ref={dropdownRef}>
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full px-3 py-2 border-2 border-primary rounded-md bg-white text-left cursor-pointer flex justify-between items-center"
+              >
+                {selected}
+                <HiChevronDown
+                  className={`w-5 h-5 ml-2 transition-transform duration-200 ${
+                    isOpen ? "rotate-180" : "rotate-0"
+                  }`}
+                />
+              </button>
+
+              {isOpen && (
+                <ul className="absolute w-full mt-1 border-2 border-primary rounded-md bg-white shadow-lg">
+                  {options.map((option) => (
+                    <li
+                      key={option}
+                      onClick={() => {
+                        setSelected(option);
+                        setIsOpen(false);
+                      }}
+                      className="px-3 py-2 hover:bg-primary hover:text-white cursor-pointer"
+                    >
+                      {option}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* Side Menu Toggle */}
             <button
-              className="ml-10 p-2 hover:text-blue-500"
+              className="ml-10 p-2 hover:text-blue-500 hidden lg:block"
               onClick={toggleSideMenu}
             >
               <div className="flex flex-col space-y-1">
