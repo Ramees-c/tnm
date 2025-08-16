@@ -7,6 +7,7 @@ import {
 } from "react-icons/fa6";
 
 import Footerlogo from "../../../assets/images/logo/tnmlogo.png";
+import DefaultButton from "../DefaultButton/DefaultButton";
 
 function Footer() {
   return (
@@ -23,8 +24,7 @@ function Footer() {
             />
           </div>
           <p className="text-sm mb-6">
-            There are many variations of passages of person available, but the
-            majority have suffered alteration in some form.
+           Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dignissimos repudiandae voluptatibus quia ullam magnam voluptatum.
           </p>
           <div className="flex gap-3">
             <a
@@ -114,18 +114,13 @@ function Footer() {
           <p className="text-sm mb-4">
             Join our subscribers list to get the latest news and special offers.
           </p>
-          <form className="flex mb-3">
+          <form className="flex flex-col mb-3">
             <input
               type="email"
               placeholder="Your Email"
-              className="flex-1 p-2 rounded-l-md border border-gray-300 focus:outline-none"
+              className="flex-1 p-2 rounded-md border border-gray-300 focus:outline-none text-black mb-3"
             />
-            <button
-              type="submit"
-              className="bg-teal-500 text-white px-4 rounded-r-md hover:bg-teal-600 transition"
-            >
-              Subscribe
-            </button>
+            <DefaultButton buttonText="Submit" buttonSmall={true} />
           </form>
         </div>
       </div>
@@ -134,7 +129,7 @@ function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row justify-between items-center text-sm">
         <p>
           © Copyright 2025. All Rights Reserved by{" "}
-          <span className="font-bold">validthemes</span>
+          <span className="font-bold">TNM</span>
         </p>
         <div className="flex gap-4 mt-2 md:mt-0">
           <a href="#" className="hover:text-blue-600">

@@ -35,7 +35,7 @@ function UserHome() {
       courses: 8,
       price: 45,
       image:
-        "https://plus.unsplash.com/premium_photo-1688740375397-34605b6abe48?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mzd8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D",
+        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8cHJvZmlsZXxlbnwwfHwwfHx8MA%3D%3D",
     },
     {
       id: 2,
@@ -48,46 +48,95 @@ function UserHome() {
       courses: 5,
       price: 35,
       image:
-        "https://plus.unsplash.com/premium_photo-1689977807477-a579eda91fa2?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D",
+        "https://plus.unsplash.com/premium_photo-1689539137236-b68e436248de?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OTN8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D",
     },
     {
       id: 3,
-      name: "James Wilson",
-      specialization: "English Literature",
-      rating: 4.7,
-      bio: "MA in English Literature with expertise in creative writing and classic literature analysis.",
-      subjects: ["Literature", "Creative Writing", "Grammar", "Poetry"],
-      students: 892,
-      courses: 5,
-      price: 35,
+      name: "Aisha Khan",
+      specialization: "Physics Lecturer",
+      rating: 4.8,
+      bio: "MSc in Physics, specializing in Quantum Mechanics and Thermodynamics. Passionate about making physics fun and engaging.",
+      subjects: ["Quantum Mechanics", "Thermodynamics", "Optics", "Mechanics"],
+      students: 1023,
+      courses: 6,
+      price: 40,
       image:
-        "https://plus.unsplash.com/premium_photo-1689977807477-a579eda91fa2?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D",
+        "https://plus.unsplash.com/premium_photo-1688350808212-4e6908a03925?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTA1fHxwcm9maWxlfGVufDB8fDB8fHww",
     },
     {
       id: 4,
-      name: "James Wilson",
-      specialization: "English Literature",
-      rating: 4.7,
-      bio: "MA in English Literature with expertise in creative writing and classic literature analysis.",
-      subjects: ["Literature", "Creative Writing", "Grammar", "Poetry"],
-      students: 892,
-      courses: 5,
-      price: 35,
+      name: "Carlos Martinez",
+      specialization: "Chemistry Expert",
+      rating: 4.6,
+      bio: "PhD in Organic Chemistry with 8 years of research and teaching experience.",
+      subjects: ["Organic Chemistry", "Inorganic Chemistry", "Biochemistry"],
+      students: 765,
+      courses: 4,
+      price: 38,
       image:
-        "https://plus.unsplash.com/premium_photo-1689977807477-a579eda91fa2?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D",
+        "https://plus.unsplash.com/premium_photo-1690086519096-0594592709d3?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTQ5fHxwcm9maWxlfGVufDB8fDB8fHww",
     },
     {
       id: 5,
-      name: "James Wilson",
-      specialization: "English Literature",
-      rating: 4.7,
-      bio: "MA in English Literature with expertise in creative writing and classic literature analysis.",
-      subjects: ["Literature", "Creative Writing", "Grammar", "Poetry"],
-      students: 892,
-      courses: 5,
-      price: 35,
+      name: "Emily Zhang",
+      specialization: "Computer Science Instructor",
+      rating: 4.9,
+      bio: "BSc in Computer Science with expertise in web development, algorithms, and data structures.",
+      subjects: [
+        "Web Development",
+        "JavaScript",
+        "Algorithms",
+        "Data Structures",
+      ],
+      students: 1560,
+      courses: 9,
+      price: 50,
       image:
-        "https://plus.unsplash.com/premium_photo-1689977807477-a579eda91fa2?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D",
+        "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=600&auto=format&fit=crop&q=60",
+    },
+    {
+      id: 6,
+      name: "Liam O'Connor",
+      specialization: "History Professor",
+      rating: 4.5,
+      bio: "MA in World History, specializing in medieval and modern European history.",
+      subjects: [
+        "Medieval History",
+        "Modern History",
+        "World Wars",
+        "Ancient Civilizations",
+      ],
+      students: 678,
+      courses: 3,
+      price: 30,
+      image:
+        "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=600&auto=format&fit=crop&q=60",
+    },
+    {
+      id: 7,
+      name: "Sophia Roberts",
+      specialization: "Art & Design Teacher",
+      rating: 4.8,
+      bio: "BA in Fine Arts with 6 years of experience in teaching painting, sketching, and digital design.",
+      subjects: ["Painting", "Sketching", "Digital Art", "Graphic Design"],
+      students: 934,
+      courses: 7,
+      price: 42,
+      image:
+        "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&auto=format&fit=crop&q=60",
+    },
+    {
+      id: 8,
+      name: "Michael Anderson",
+      specialization: "Music Instructor",
+      rating: 4.7,
+      bio: "Diploma in Music Theory with 12 years of experience teaching piano and guitar.",
+      subjects: ["Piano", "Guitar", "Music Theory", "Songwriting"],
+      students: 512,
+      courses: 5,
+      price: 37,
+      image:
+        "https://images.unsplash.com/photo-1520975918318-3e1c9dcd99cc?w=600&auto=format&fit=crop&q=60",
     },
   ];
 
@@ -315,18 +364,20 @@ function UserHome() {
       <Hero />
 
       <div className="container">
-        <SubHeader
-          tagline=" Meet Our Experts"
-          title="Find Your Ideal Learning Partner"
-          description="Connect with top-rated tutors in various subjects tailored to your learning needs"
-        />
-        <Slider slidesToShow={3} autoSlide={true} autoSlideInterval={5000}>
-          {tutors.map((tutor) => (
-            <div key={tutor.id} className="flex justify-center items-center">
-              <TutorCard tutor={tutor} />
-            </div>
-          ))}
-        </Slider>
+        <div>
+          <SubHeader
+            tagline=" Meet Our Experts"
+            title="Find Your Ideal Learning Partner"
+            description="Connect with top-rated tutors in various subjects tailored to your learning needs"
+          />
+          <Slider slidesToShow={3} autoSlide={true} autoSlideInterval={5000}>
+            {tutors.map((tutor) => (
+              <div key={tutor.id} className="flex justify-center items-center">
+                <TutorCard tutor={tutor} />
+              </div>
+            ))}
+          </Slider>
+        </div>
         <SubHeader
           tagline="Lorem, ipsum dolor."
           title="Lorem ipsum dolor sit amet."

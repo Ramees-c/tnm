@@ -51,8 +51,8 @@ const Slider = ({
 
   // Calculate responsive slides to show
   const getSlidesToShow = () => {
-    if (sliderWidth < 640) return 1;
-    if (sliderWidth < 1024) return 1;
+    if (sliderWidth < 820) return 1;
+    if (sliderWidth < 1024) return 2;
     return slidesToShow;
   };
 
@@ -144,7 +144,7 @@ const Slider = ({
     >
       {/* Slides Container */}
       <div
-        className="flex transition-transform duration-300 ease-out"
+         className="flex transition-transform duration-300 ease-out"
         style={{
           transform: `translateX(-${currentIndex * (100 / visibleSlides)}%)`,
         }}
@@ -160,7 +160,7 @@ const Slider = ({
         <>
           <button
             onClick={prevSlide}
-            className={`absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-primary hover:bg-secondary p-2 rounded-full shadow-lg transition-all duration-200 focus:outline-none ${
+            className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-primary hover:bg-secondary p-2 rounded-full shadow-lg transition-all duration-200 focus:outline-none ${
               slideBtnHide ? "hidden" : "hidden lg:block"
             }`}
             aria-label="Previous slide"
@@ -169,7 +169,7 @@ const Slider = ({
           </button>
           <button
             onClick={nextSlide}
-            className={`absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-primary hover:bg-secondary p-2 rounded-full shadow-lg transition-all duration-200 focus:outline-none ${
+            className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-primary hover:bg-secondary p-2 rounded-full shadow-lg transition-all duration-200 focus:outline-none ${
               slideBtnHide ? "hidden" : "hidden lg:block"
             }`}
             aria-label="Next slide"

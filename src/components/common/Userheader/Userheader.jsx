@@ -21,10 +21,9 @@ function Userheader() {
   const toggleSideMenu = () => setIsSideMenuOpen(!isSideMenuOpen);
   const [isScrolled, setIsScrolled] = useState(false);
 
-  const [selected, setSelected] = useState("Login/Register");
   const [isOpen, setIsOpen] = useState(false);
 
-  const options = ["Login/Register", "Tutor", "Student"];
+  const options = ["Tutor", "Student"];
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -63,7 +62,7 @@ function Userheader() {
           {/* Logo and Search (Left Side) */}
           <div className="flex items-center space-x-20 w-full md:w-auto">
             <div className="flex items-center">
-              <button className="md:hidden mr-4" onClick={toggleMenu}>
+              <button className="lg:hidden mr-4" onClick={toggleMenu}>
                 {isMenuOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
               </button>
               <a href="/" className="flex items-center">
@@ -73,7 +72,7 @@ function Userheader() {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center">
+          <div className="hidden lg:flex items-center">
             <ul className="flex items-center justify-center space-x-16">
               <li className="text-lg font-medium">Home</li>
               <li className="text-lg font-medium">About</li>
@@ -370,12 +369,12 @@ function Userheader() {
           </div>
 
           <div className="flex">
-            <div className="relative w-32 lg:w-40" ref={dropdownRef}>
+            <div className="relative w-36 lg:w-40" ref={dropdownRef}>
               <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-full px-3 py-2 border-2 border-primary rounded-md bg-white text-left cursor-pointer flex justify-between items-center text-xs xl:text-md"
               >
-                {selected}
+                Login/Register
                 <HiChevronDown
                   className={`w-5 h-5 ml-2 transition-transform duration-200 ${
                     isOpen ? "rotate-180" : "rotate-0"
@@ -389,10 +388,9 @@ function Userheader() {
                     <li
                       key={option}
                       onClick={() => {
-                        setSelected(option);
                         setIsOpen(false);
                       }}
-                      className="px-3 py-2 hover:bg-primary hover:text-white cursor-pointer"
+                      className="px-3 py-2 hover:bg-primary hover:text-white cursor-pointer text-xs xl:text-md"
                     >
                       {option}
                     </li>
@@ -418,7 +416,7 @@ function Userheader() {
         {/* Mobile Menu */}
         <div>
           {isMenuOpen && (
-            <div className="fixed inset-y-0 left-0 w-[80%] bg-white shadow-lg z-30 transform transition-transform duration-300 ease-in-out translate-x-0">
+            <div className="fixed inset-y-0 left-0 w-[60%] bg-white shadow-lg z-30 transform transition-transform duration-300 ease-in-out translate-x-0">
               <div className="p-6 h-full overflow-y-auto">
                 <button
                   className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
@@ -429,58 +427,16 @@ function Userheader() {
 
                 <div className="mb-8">
                   <div className="logo mb-6">
-                    <img
-                      src="assets/img/logo-light.png"
-                      alt="Logo"
-                      className="h-10"
-                    />
+                    <img src={logo} alt="Logo" className="h-16" />
                   </div>
-                  <p className="text-gray-600 mb-6">
-                    Arrived compass prepare an on as. Reasonable particular on
-                    my it in sympathize. Size now easy eat hand how.
-                  </p>
                 </div>
 
                 <div className="mb-8">
                   <ul className="space-y-4">
-                    <li className="flex items-start">
-                      <div>
-                        <p className="text-sm text-gray-500">Address</p>
-                        <p className="text-gray-700">California, TX 70240</p>
-                      </div>
-                    </li>
-                    <li className="flex items-start">
-                      <div>
-                        <p className="text-sm text-gray-500">Email</p>
-                        <p className="text-gray-700">support@validtheme.com</p>
-                      </div>
-                    </li>
-                    <li className="flex items-start">
-                      <div>
-                        <p className="text-sm text-gray-500">Contact</p>
-                        <p className="text-gray-700">+44-20-7328-4499</p>
-                      </div>
-                    </li>
+                    <li className="text-lg font-medium">Home</li>
+                    <li className="text-lg font-medium">About</li>
+                    <li className="text-lg font-medium">Contact</li>
                   </ul>
-                </div>
-
-                <div className="mb-8">
-                  <h4 className="text-lg font-bold mb-4">Get Subscribed!</h4>
-                  <form>
-                    <div className="flex">
-                      <input
-                        type="email"
-                        placeholder="Enter your e-mail"
-                        className="flex-1 px-4 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                      <button
-                        type="submit"
-                        className="bg-blue-500 text-white px-4 py-2 hover:bg-blue-600 transition"
-                      >
-                        {/* <FaLongArrowRight /> */}
-                      </button>
-                    </div>
-                  </form>
                 </div>
 
                 <div>
@@ -527,15 +483,11 @@ function Userheader() {
 
             <div className="mb-8">
               <div className="logo mb-6">
-                <img
-                  src="assets/img/logo-light.png"
-                  alt="Logo"
-                  className="h-10"
-                />
+                <img src={logo} alt="Logo" className="h-16" />
               </div>
               <p className="text-gray-600 mb-6">
-                Arrived compass prepare an on as. Reasonable particular on my it
-                in sympathize. Size now easy eat hand how.
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus
+                natus vel blanditiis quisquam nam nobis!
               </p>
             </div>
 
@@ -544,41 +496,22 @@ function Userheader() {
                 <li className="flex items-start">
                   <div>
                     <p className="text-sm text-gray-500">Address</p>
-                    <p className="text-gray-700">California, TX 70240</p>
+                    <p className="text-gray-700">Kannur, Kerala</p>
                   </div>
                 </li>
                 <li className="flex items-start">
                   <div>
                     <p className="text-sm text-gray-500">Email</p>
-                    <p className="text-gray-700">support@validtheme.com</p>
+                    <p className="text-gray-700">example@gmail.com</p>
                   </div>
                 </li>
                 <li className="flex items-start">
                   <div>
                     <p className="text-sm text-gray-500">Contact</p>
-                    <p className="text-gray-700">+44-20-7328-4499</p>
+                    <p className="text-gray-700">+12-34-5678-9101</p>
                   </div>
                 </li>
               </ul>
-            </div>
-
-            <div className="mb-8">
-              <h4 className="text-lg font-bold mb-4">Get Subscribed!</h4>
-              <form>
-                <div className="flex">
-                  <input
-                    type="email"
-                    placeholder="Enter your e-mail"
-                    className="flex-1 px-4 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <button
-                    type="submit"
-                    className="bg-blue-500 text-white px-4 py-2 hover:bg-blue-600 transition"
-                  >
-                    {/* <FaLongArrowRight /> */}
-                  </button>
-                </div>
-              </form>
             </div>
 
             <div>
