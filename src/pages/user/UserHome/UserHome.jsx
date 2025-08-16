@@ -336,7 +336,7 @@ function UserHome() {
           <div className="mb-16">
             <h1 className="text-2xl font-medium mb-5">Tution</h1>
             {/* Categories Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 2xl:grid-cols-6 gap-2">
               {categories.map((category) => (
                 <CategoryCard
                   key={category.id}
@@ -350,7 +350,7 @@ function UserHome() {
           <div className="mb-16">
             <h1 className="text-2xl font-medium mb-5">Languages</h1>
             {/* Categories Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2">
               {languages.map((language) => (
                 <CategoryCard
                   key={language.id}
@@ -364,7 +364,7 @@ function UserHome() {
           <div className="mb-16">
             <h1 className="text-2xl font-medium mb-5">Hobbies</h1>
             {/* Categories Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2">
               {hobbies.map((hobbie) => (
                 <CategoryCard
                   key={hobbie.id}
@@ -383,7 +383,7 @@ function UserHome() {
           description=" Discover the advantages that make our platform the best choice for your educational journey"
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-8">
           {benefits.map((item) => (
             <div>
               <FeatureCard benefits={item} />

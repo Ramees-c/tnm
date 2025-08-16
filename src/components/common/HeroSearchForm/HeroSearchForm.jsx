@@ -27,7 +27,7 @@ function HeroSearchForm() {
           onChange={(e) => setClassValue(e.target.value)}
           className="w-full bg-white focus:outline-none text-gray-700 rounded-md cursor-pointer bg-red"
         >
-          <option value="">Select Class</option>
+          <option value="">Class</option>
           <option value="Class 10">Class 10</option>
           <option value="Class 11">Class 11</option>
           <option value="Class 12">Class 12</option>
@@ -41,7 +41,7 @@ function HeroSearchForm() {
           onChange={(e) => setSubjectValue(e.target.value)}
           className="w-full bg-white focus:outline-none text-gray-700 rounded-md cursor-pointer"
         >
-          <option value="">Select Subject</option>
+          <option value="">Subject</option>
           <option value="Math">Math</option>
           <option value="Science">Science</option>
           <option value="English">English</option>
