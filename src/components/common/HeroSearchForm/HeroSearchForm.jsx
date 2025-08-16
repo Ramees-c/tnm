@@ -52,7 +52,7 @@ function HeroSearchForm() {
       <div className="flex items-center py-1 md:py-3">
         <input
           type="text"
-          placeholder="Enter Pincode"
+          placeholder="Pincode"
           value={pincode}
           onChange={(e) => setPincode(e.target.value)}
           className="w-full bg-white focus:outline-none text-gray-700 rounded-md"
@@ -63,7 +63,7 @@ function HeroSearchForm() {
       <div className="flex items-center md:px-1 py-1 md:py-3">
         <input
           type="text"
-          placeholder="Enter Location"
+          placeholder="Location"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           className="w-full bg-white focus:outline-none text-gray-700 rounded-md"

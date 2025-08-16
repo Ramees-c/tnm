@@ -370,10 +370,10 @@ function Userheader() {
           </div>
 
           <div className="flex">
-            <div className="relative w-48" ref={dropdownRef}>
+            <div className="relative w-32 lg:w-40" ref={dropdownRef}>
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full px-3 py-2 border-2 border-primary rounded-md bg-white text-left cursor-pointer flex justify-between items-center"
+                className="w-full px-3 py-2 border-2 border-primary rounded-md bg-white text-left cursor-pointer flex justify-between items-center text-xs xl:text-md"
               >
                 {selected}
                 <HiChevronDown

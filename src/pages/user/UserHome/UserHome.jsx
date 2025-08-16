@@ -336,7 +336,7 @@ function UserHome() {
           <div className="mb-16">
             <h1 className="text-2xl font-medium mb-5">Tution</h1>
             {/* Categories Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 2xl:grid-cols-6 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2">
               {categories.map((category) => (
                 <CategoryCard
                   key={category.id}
@@ -397,7 +397,7 @@ function UserHome() {
           description="Hear from our community of learners about their experiences"
         />
         {/* Testimonial Cards - Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-5">
           <div>
             <img
               src={testimonialImg}

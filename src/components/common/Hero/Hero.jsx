@@ -28,12 +28,12 @@ function Hero() {
                   alt="Discover"
                   className="mr-3 w-10 hidden lg:block animate-bounce-slow"
                 />
-                <span className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-sm lg:text-md">
+                <span className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-sm xl:text-md">
                   Discover 20,000+ World-Class Courses
                 </span>
               </h4>
 
-              <h2 className="text-4xl md:text-5xl lg:text-7xl font-bold mb-6 text-white leading-tight">
+              <h2 className="text-4xl md:text-3xl xl:text-5xl 2xl:text-7xl font-bold mb-6 text-white leading-tight">
                 Learn <span className="text-secondary">Smarter</span>,<br />
                 Achieve <span className="text-accent">Knowledge</span>
               </h2>
