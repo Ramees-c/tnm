@@ -14,7 +14,7 @@ function TutorCard({ tutor }) {
 
   return (
     <div
-      className={`relative bg-white rounded-md shadow-lg overflow-hidden transition-all duration-300 w-[400px] ${
+      className={`relative bg-white rounded-md shadow-lg overflow-hidden transition-all duration-300 xl:w-[370px] 2xl:w-[400px] ${
         isHovered ? "shadow-xl -translate-y-1" : "shadow-md"
       }`}
       onMouseEnter={() => setIsHovered(true)}
