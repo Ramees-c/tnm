@@ -8,6 +8,8 @@ import CategoryCard from "../../../components/common/CategoryCard/CategoryCard";
 import FeatureCard from "../../../components/common/FeatureCard/FeatureCard";
 import TestimonialCard from "../../../components/common/TestimonialCard/TestimonialCard";
 
+import testimonialImg from "../../../assets/images/testimonial-image.jpg"
+
 import {
   FaGraduationCap,
   FaChalkboardTeacher,
@@ -18,6 +20,7 @@ import {
 } from "react-icons/fa";
 import FindTutorMenu from "../../../components/common/FindTutorMenu/FindTutorMenu";
 import Footer from "../../../components/common/Footer/Footer";
+import TopHeader from "../../../components/common/TopHeader/TopHeader";
 
 function UserHome() {
   const tutors = [
@@ -131,6 +134,27 @@ function UserHome() {
         "https://images.unsplash.com/photo-1605106702734-205df224ecce?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
       count: 27,
     },
+    {
+      id: 6,
+      title: "Nursery-KG Tutilon",
+      image:
+        "https://images.unsplash.com/photo-1605106702734-205df224ecce?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+      count: 27,
+    },
+    {
+      id: 6,
+      title: "Nursery-KG Tutilon",
+      image:
+        "https://images.unsplash.com/photo-1605106702734-205df224ecce?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+      count: 27,
+    },
+    {
+      id: 6,
+      title: "Nursery-KG Tutilon",
+      image:
+        "https://images.unsplash.com/photo-1605106702734-205df224ecce?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+      count: 27,
+    },
   ];
 
   const benefits = [
@@ -203,6 +227,7 @@ function UserHome() {
 
   return (
     <div>
+      <TopHeader />
       <Userheader />
       <Hero />
 
@@ -228,7 +253,7 @@ function UserHome() {
           <div className="mb-16">
             <h1 className="text-2xl font-medium mb-5">Tution</h1>
             {/* Categories Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-2">
               {categories.map((category) => (
                 <CategoryCard
                   key={category.id}
@@ -242,7 +267,7 @@ function UserHome() {
           <div className="mb-16">
             <h1 className="text-2xl font-medium mb-5">Languages</h1>
             {/* Categories Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-2">
               {categories.map((category) => (
                 <CategoryCard
                   key={category.id}
@@ -256,7 +281,7 @@ function UserHome() {
           <div className="mb-16">
             <h1 className="text-2xl font-medium mb-5">Hobbies</h1>
             {/* Categories Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-2">
               {categories.map((category) => (
                 <CategoryCard
                   key={category.id}
@@ -275,7 +300,7 @@ function UserHome() {
           description=" Discover the advantages that make our platform the best choice for your educational journey"
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-8">
           {benefits.map((item) => (
             <div>
               <FeatureCard benefits={item} />
@@ -288,11 +313,16 @@ function UserHome() {
           title=" What Our Students Say"
           description="Hear from our community of learners about their experiences"
         />
-
         {/* Testimonial Cards - Grid Layout */}
+       <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-10">
         <div>
+           <img src={testimonialImg} alt="" className="w-full h-auto object-cover" />
+        </div>
+         <div>
+          
+
           <Slider
-            slidesToShow={2}
+            slidesToShow={1}
             autoSlide={true}
             autoSlideInterval={5000}
             slideBtnHide={true}
@@ -307,6 +337,7 @@ function UserHome() {
             ))}
           </Slider>
         </div>
+       </div>
 
         <FindTutorMenu />
 

@@ -10,7 +10,7 @@ import Footerlogo from "../../../assets/images/logo/tnmlogo.png";
 
 function Footer() {
   return (
-    <footer className="bg-customBlack text-white">
+    <footer className="bg-primary/60 text-white">
       {/* Top Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 md:grid-cols-4 gap-10 border-b border-gray-300">
         {/* Logo & About */}

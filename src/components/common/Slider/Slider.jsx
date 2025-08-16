@@ -52,7 +52,7 @@ const Slider = ({
   // Calculate responsive slides to show
   const getSlidesToShow = () => {
     if (sliderWidth < 640) return 1;
-    if (sliderWidth < 1024) return 2;
+    if (sliderWidth < 1024) return 1;
     return slidesToShow;
   };
 

@@ -11,6 +11,7 @@ import {
   FaChevronRight,
 } from "react-icons/fa";
 import DefaultButton from "../DefaultButton/DefaultButton";
+import HeroSearchForm from "../HeroSearchForm/HeroSearchForm";
 
 function Hero() {
   return (
@@ -42,9 +43,7 @@ function Hero() {
                 our revolutionary online education platform.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <DefaultButton buttonText="Find the Right Tutor for You" />
-              </div>
+              <HeroSearchForm />
             </div>
           </div>
 

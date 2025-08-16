@@ -14,13 +14,13 @@ function TutorCard({ tutor }) {
 
   return (
     <div
-      className={`relative bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 w-[400px] ${
+      className={`relative bg-white rounded-md shadow-lg overflow-hidden transition-all duration-300 w-[400px] ${
         isHovered ? "shadow-xl -translate-y-1" : "shadow-md"
       }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Favorite Button */}
+      
 
       {/* Tutor Image */}
       <div className="relative overflow-hidden">
