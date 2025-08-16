@@ -86,7 +86,7 @@ function Userheader() {
                     {/* Column 1 */}
                     <div>
                       <h4 className="font-bold mb-3 text-gray-800">
-                        Main Layouts
+                       Lorem, ipsum.
                       </h4>
                       <ul className="space-y-3">
                         <li>
@@ -94,7 +94,7 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            Main Home
+                           Lorem, ipsum.
                           </a>
                         </li>
                         <li>
@@ -102,7 +102,7 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            Digital Course Hub
+                            Lorem, ipsum.
                           </a>
                         </li>
                         <li>
@@ -110,7 +110,7 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            Online Academy
+                            Lorem, ipsum.
                           </a>
                         </li>
                         <li>
@@ -118,7 +118,7 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            Distance Learning
+                            Lorem, ipsum.
                           </a>
                         </li>
                       </ul>
@@ -127,7 +127,7 @@ function Userheader() {
                     {/* Column 2 */}
                     <div>
                       <h4 className="font-bold mb-3 text-gray-800">
-                        Education Types
+                       Lorem, ipsum.
                       </h4>
                       <ul className="space-y-3">
                         <li>
@@ -135,7 +135,7 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            Digital Education
+                           Lorem, ipsum.
                           </a>
                         </li>
                         <li>
@@ -143,7 +143,7 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            Remote Training
+                            Lorem, ipsum.
                           </a>
                         </li>
                         <li>
@@ -151,7 +151,7 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            University Classic
+                            Lorem, ipsum.
                           </a>
                         </li>
                         <li>
@@ -159,16 +159,16 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            Kindergarten
+                            Lorem, ipsum.
                           </a>
                         </li>
                       </ul>
                     </div>
 
                     {/* Column 3 */}
-                    <div>
+                   <div>
                       <h4 className="font-bold mb-3 text-gray-800">
-                        Specialized
+                       Lorem, ipsum.
                       </h4>
                       <ul className="space-y-3">
                         <li>
@@ -176,7 +176,7 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            Professional Courses
+                           Lorem, ipsum.
                           </a>
                         </li>
                         <li>
@@ -184,7 +184,7 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            Language Learning
+                            Lorem, ipsum.
                           </a>
                         </li>
                         <li>
@@ -192,7 +192,7 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            STEM Education
+                            Lorem, ipsum.
                           </a>
                         </li>
                         <li>
@@ -200,14 +200,14 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            Vocational Training
+                            Lorem, ipsum.
                           </a>
                         </li>
                       </ul>
                     </div>
                     <div>
                       <h4 className="font-bold mb-3 text-gray-800">
-                        Specialized
+                       Lorem, ipsum.
                       </h4>
                       <ul className="space-y-3">
                         <li>
@@ -215,7 +215,7 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            Professional Courses
+                           Lorem, ipsum.
                           </a>
                         </li>
                         <li>
@@ -223,7 +223,7 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            Language Learning
+                            Lorem, ipsum.
                           </a>
                         </li>
                         <li>
@@ -231,7 +231,7 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            STEM Education
+                            Lorem, ipsum.
                           </a>
                         </li>
                         <li>
@@ -239,14 +239,53 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            Vocational Training
+                            Lorem, ipsum.
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                   <div>
+                      <h4 className="font-bold mb-3 text-gray-800">
+                       Lorem, ipsum.
+                      </h4>
+                      <ul className="space-y-3">
+                        <li>
+                          <a
+                            href="#"
+                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
+                          >
+                           Lorem, ipsum.
+                          </a>
+                        </li>
+                        <li>
+                          <a
+                            href="#"
+                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
+                          >
+                            Lorem, ipsum.
+                          </a>
+                        </li>
+                        <li>
+                          <a
+                            href="#"
+                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
+                          >
+                            Lorem, ipsum.
+                          </a>
+                        </li>
+                        <li>
+                          <a
+                            href="#"
+                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
+                          >
+                            Lorem, ipsum.
                           </a>
                         </li>
                       </ul>
                     </div>
                     <div>
                       <h4 className="font-bold mb-3 text-gray-800">
-                        Specialized
+                       Lorem, ipsum.
                       </h4>
                       <ul className="space-y-3">
                         <li>
@@ -254,7 +293,7 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            Professional Courses
+                           Lorem, ipsum.
                           </a>
                         </li>
                         <li>
@@ -262,7 +301,7 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            Language Learning
+                            Lorem, ipsum.
                           </a>
                         </li>
                         <li>
@@ -270,7 +309,7 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            STEM Education
+                            Lorem, ipsum.
                           </a>
                         </li>
                         <li>
@@ -278,14 +317,14 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            Vocational Training
+                            Lorem, ipsum.
                           </a>
                         </li>
                       </ul>
                     </div>
                     <div>
                       <h4 className="font-bold mb-3 text-gray-800">
-                        Specialized
+                       Lorem, ipsum.
                       </h4>
                       <ul className="space-y-3">
                         <li>
@@ -293,7 +332,7 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            Professional Courses
+                           Lorem, ipsum.
                           </a>
                         </li>
                         <li>
@@ -301,7 +340,7 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            Language Learning
+                            Lorem, ipsum.
                           </a>
                         </li>
                         <li>
@@ -309,7 +348,7 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            STEM Education
+                            Lorem, ipsum.
                           </a>
                         </li>
                         <li>
@@ -317,46 +356,7 @@ function Userheader() {
                             href="#"
                             className="hover:text-blue-500 transition-colors duration-200 block py-1"
                           >
-                            Vocational Training
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                    <div>
-                      <h4 className="font-bold mb-3 text-gray-800">
-                        Specialized
-                      </h4>
-                      <ul className="space-y-3">
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Professional Courses
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Language Learning
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            STEM Education
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Vocational Training
+                            Lorem, ipsum.
                           </a>
                         </li>
                       </ul>
@@ -546,7 +546,7 @@ function Userheader() {
       {/* Overlay */}
       {(isMenuOpen || isSideMenuOpen) && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 -z-20 md:z-20"
+          className="fixed inset-0 bg-black bg-opacity-50 z-20"
           onClick={() => {
             if (isMenuOpen) setIsMenuOpen(false);
             if (isSideMenuOpen) setIsSideMenuOpen(false);
