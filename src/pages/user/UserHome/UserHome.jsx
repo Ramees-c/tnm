@@ -18,6 +18,7 @@ import {
   FaMobileAlt,
   FaClock,
 } from "react-icons/fa";
+import { FaUserGraduate, FaLightbulb } from "react-icons/fa";
 import FindTutorMenu from "../../../components/common/FindTutorMenu/FindTutorMenu";
 import Footer from "../../../components/common/Footer/Footer";
 import TopHeader from "../../../components/common/TopHeader/TopHeader";
@@ -359,7 +360,7 @@ function UserHome() {
 
   return (
     <div>
-      <TopHeader />
+      {/* <TopHeader /> */}
       <Userheader />
       <Hero />
 
@@ -428,19 +429,86 @@ function UserHome() {
           </div>
         </div>
 
-        <SubHeader
-          tagline="Why Choose Us"
-          title="Benefits of Learning With TNM"
-          description=" Discover the advantages that make our platform the best choice for your educational journey"
-        />
+        {/* <div className="">
+          <SubHeader
+            tagline="Why Choose Us"
+            title="Benefits of Learning With TNM"
+            description=" Discover the advantages that make our platform the best choice for your educational journey"
+          />
 
-        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-8">
-          {benefits.map((item) => (
-            <div>
-              <FeatureCard benefits={item} />
+          <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-8">
+            {benefits.map((item) => (
+              <div>
+                <FeatureCard benefits={item} />
+              </div>
+            ))}
+          </div>
+        </div> */}
+
+        <section className="bg-green-400 text-white py-12 px-4 md:px-12 rounded-md">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-end">
+            {/* Left Content */}
+            <div className="space-y-6">
+              {/* Heading */}
+              <div>
+                <span className="text-sm font-semibold text-white uppercase tracking-wide border px-3 py-1 rounded">
+                  Our Advantages
+                </span>
+                <h2 className="text-3xl md:text-4xl font-bold text-white mt-3">
+                  Over 16 years in distant <br /> learning for skills
+                </h2>
+              </div>
+
+              {/* Feature Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {/* Card 1 */}
+                <div className="bg-orange-500 text-white p-6 rounded-md shadow-md">
+                  <FaUserGraduate className="text-3xl mb-4" />
+                  <h3 className="text-lg font-semibold">Academic Excellence</h3>
+                  <p className="text-sm mt-2">
+                    Absolute required of reserved in offering no. How sense
+                    found our those gay again.
+                  </p>
+                </div>
+
+                {/* Card 2 */}
+                <div className="bg-sky-500 text-white p-6 rounded-md shadow-md">
+                  <FaLightbulb className="text-3xl mb-4" />
+                  <h3 className="text-lg font-semibold">Innovative Learning</h3>
+                  <p className="text-sm mt-2">
+                    Absolute required of reserved in offering no. How sense
+                    found our those gay again.
+                  </p>
+                </div>
+                <div className="bg-teal-500 text-white p-6 rounded-md shadow-md">
+                  <FaLightbulb className="text-3xl mb-4" />
+                  <h3 className="text-lg font-semibold">Innovative Learning</h3>
+                  <p className="text-sm mt-2">
+                    Absolute required of reserved in offering no. How sense
+                    found our those gay again.
+                  </p>
+                </div>
+                <div className="bg-purple-500 text-white p-6 rounded-md shadow-md">
+                  <FaLightbulb className="text-3xl mb-4" />
+                  <h3 className="text-lg font-semibold">Innovative Learning</h3>
+                  <p className="text-sm mt-2">
+                    Absolute required of reserved in offering no. How sense
+                    found our those gay again.
+                  </p>
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
+
+            {/* Right Image */}
+            <div className="flex justify-center">
+              <img
+                src="https://plus.unsplash.com/premium_photo-1663126288619-f8ef33cd006b?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NTd8fGVkdWNhdGlvbnxlbnwwfHwwfHx8MA%3D%3D"
+                alt="Student"
+                className="rounded-lg shadow-lg object-cover w-full"
+              />
+            </div>
+          </div>
+        </section>
 
         <SubHeader
           tagline="Testimonials"
