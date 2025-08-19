@@ -1,6 +1,6 @@
+import { useEffect } from "react";
 import { FiHome, FiUser, FiBook, FiStar, FiMail, FiX } from "react-icons/fi";
-
-import logo from "../../../assets/images/logo/tnmlogo.png"
+import logo from "../../../assets/images/logo/tnmlogo.png";
 
 const MobileSidebar = ({ isOpen, onClose }) => {
   // Navigation items with React Icons
@@ -12,32 +12,44 @@ const MobileSidebar = ({ isOpen, onClose }) => {
     { name: "Contact", icon: <FiMail className="text-primary" /> },
   ];
 
+  // Disable body scroll when sidebar is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+
+    // Cleanup function
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isOpen]);
+
   return (
     <>
       {/* Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-60 lg:hidden"
           onClick={onClose}
         />
       )}
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full w-64 bg-white z-50 shadow-xl transform transition-transform duration-300 ease-in-out lg:hidden ${
+        className={`fixed top-0 left-0 h-[100vh] w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:hidden ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Sidebar Header */}
         <div className="flex justify-between items-center p-4 border-b border-gray-200">
           <div className="flex items-center">
-            <div className="flex items-center">
-              <img
-                src={logo}
-                alt="Company Logo"
-                className="w-16 object-contain"
-              />
-            </div>
+            <img
+              src={logo}
+              alt="Company Logo"
+              className="w-16 object-contain"
+            />
           </div>
           <button
             onClick={onClose}
@@ -49,7 +61,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
         </div>
 
         {/* Navigation Items */}
-        <nav className="p-4">
+        <nav className="p-4 overflow-y-auto h-[calc(100vh-80px)]">
           <ul className="space-y-1">
             {navItems.map((item, index) => (
               <li key={index}>
