@@ -362,7 +362,9 @@ function UserHome() {
     <div>
       {/* <TopHeader /> */}
       <Userheader />
-      <Hero />
+      <div>
+        <Hero />
+      </div>
 
       <div className="container">
         <div>

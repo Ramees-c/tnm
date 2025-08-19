@@ -4,6 +4,8 @@ import shapeIcon from "../../../assets/images/91.png";
 import shapeIcon2 from "../../../assets/images/92.png";
 import bannerImg from "../../../assets/images/1.png";
 
+import herobg from "../../../assets/images/hero.jpg"
+
 import {
   FaStar,
   FaStarHalfAlt,
@@ -16,7 +18,10 @@ import HeroSearchForm from "../HeroSearchForm/HeroSearchForm";
 function Hero() {
   return (
     // Header section start
-    <div className="relative w-full bg-primary overflow-hidden flex items-center">
+    <div
+      className="relative w-full overflow-hidden flex items-center bg-cover bg-center"
+      style={{ backgroundImage: `url(${herobg})` }}
+    >
       <div className="container">
         <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
           {/* Left Content - Text Area */}

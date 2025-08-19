@@ -26,19 +26,44 @@ function Userheader() {
 
   const [isOpen, setIsOpen] = useState(false);
 
+  const [scrollY, setScrollY] = useState(0);
+  const [showHeader, setShowHeader] = useState(true);
+
   const options = ["Tutor", "Student"];
   const dropdownRef = useRef(null);
 
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     if (window.scrollY > 10) {
+  //       setIsScrolled(true);
+  //     } else {
+  //       setIsScrolled(false);
+  //     }
+  //   };
+
+  //   window.addEventListener("scroll", handleScroll);
+  //   return () => window.removeEventListener("scroll", handleScroll);
+  // }, []);
+
   useEffect(() => {
+    let lastScrollY = window.scrollY;
+
     const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY < lastScrollY || currentScrollY < 50) {
+        // scrolling up
+        setShowHeader(true);
       } else {
-        setIsScrolled(false);
+        // scrolling down
+        setShowHeader(false);
       }
+
+      lastScrollY = currentScrollY;
     };
 
     window.addEventListener("scroll", handleScroll);
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -55,8 +80,8 @@ function Userheader() {
 
   return (
     <header
-      className={`sticky top-0 z-40 bg-white py-3 transition-shadow duration-300 ${
-        isScrolled ? "shadow-sm" : "shadow-none"
+      className={`sticky top-0 left-0 w-full z-40 bg-white py-3 transition-transform duration-300 shadow-sm ${
+        showHeader ? "translate-y-0" : "-translate-y-full"
       }`}
     >
       {/* Main Navigation */}
