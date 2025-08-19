@@ -20,7 +20,7 @@ function HeroSearchForm() {
           value={courseName}
           onChange={(e) => setCourseName(e.target.value)}
           placeholder="Enter Course Name"
-          className="w-full px-4 py-2 pr-28 h-[60px] rounded-md outline-none border"
+          className="w-full px-4 py-2 pr-28 lg:h-[60px] rounded-md outline-none border"
         />
 
         {/* Search Button */}
