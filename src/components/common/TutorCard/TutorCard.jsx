@@ -14,7 +14,7 @@ function TutorCard({ tutor }) {
 
   return (
     <div
-  className={`relative bg-white rounded-md shadow-lg overflow-hidden transition-all duration-300 md:w-[390px] lg:w-[390px] xl:w-[350px] 2xl:w-[400px] xl:h-[600px] 2xl:h-[580px] ${
+  className={`relative bg-white rounded-md shadow-lg overflow-hidden transition-all duration-300 w-[340px] md:w-[390px] lg:w-[390px] xl:w-[350px] 2xl:w-[400px] xl:h-[600px] 2xl:h-[580px] ${
     isHovered ? "shadow-xl -translate-y-1" : "shadow-md"
   }`}
   onMouseEnter={() => setIsHovered(true)}

@@ -2,7 +2,7 @@ import React from "react";
 
 function CategoryCard({ image, title, count }) {
   return (
-    <div className="group relative overflow-hidden rounded-md shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 w-full lg:w-[220px] xl:w-[230px] h-56 lg:h-[140px]">
+    <div className="group relative overflow-hidden rounded-md shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 w-[250px] lg:w-[220px] xl:w-[230px] h-40 lg:h-[140px]">
       {/* Image Container with Gradient Overlay */}
       <div className="relative h-full overflow-hidden">
         <img
