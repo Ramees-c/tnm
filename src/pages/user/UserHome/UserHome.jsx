@@ -564,7 +564,7 @@ function UserHome() {
             <img
               src={testimonialImg}
               alt=""
-              className="w-full h-auto object-cover"
+              className="w-full h-auto object-cover rounded-md"
             />
           </div>
           <div>
@@ -586,7 +586,14 @@ function UserHome() {
           </div>
         </div>
 
-        <FindTutorMenu />
+        <div>
+          <SubHeader
+            tagline="Find Tutor"
+            title="Find a Tutor for Anything!"
+            description="Discover expert tutors for all subjects, languages, hobbies, and exam preparation"
+          />
+          <FindTutorMenu />
+        </div>
       </div>
       <Footer />
     </div>
