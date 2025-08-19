@@ -485,7 +485,7 @@ function UserHome() {
         </div> */}
 
         <section className="bg-green-400 text-white py-12 px-4 md:px-12 rounded-md">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-10 items-end">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-10 items-center">
             {/* Left Content */}
             <div className="space-y-6">
               {/* Heading */}

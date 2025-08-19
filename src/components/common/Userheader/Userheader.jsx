@@ -10,12 +10,15 @@ import {
   FaLinkedinIn,
   FaBehance,
 } from "react-icons/fa";
+import { FiChevronDown } from "react-icons/fi";
 import { HiChevronDown } from "react-icons/hi";
 import DefaultButton from "../DefaultButton/DefaultButton";
+import MobileSidebar from "../MobileSidebar/MobileSidebar";
 
 function Userheader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleSideMenu = () => setIsSideMenuOpen(!isSideMenuOpen);
@@ -62,7 +65,10 @@ function Userheader() {
           {/* Logo and Search (Left Side) */}
           <div className="flex items-center space-x-20 w-full md:w-auto">
             <div className="flex items-center">
-              <button className="lg:hidden mr-4" onClick={toggleMenu}>
+              <button
+                className="lg:hidden mr-4"
+                onClick={() => setSidebarOpen(true)}
+              >
                 {isMenuOpen ? <FaTimes size={30} /> : <FaBars size={30} />}
               </button>
               <a href="/" className="flex items-center">
@@ -73,13 +79,14 @@ function Userheader() {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center ">
-            <ul className="flex items-center justify-center space-x-16 ">
-              <li className="text-lg font-medium font-montserrat">Home</li>
-              <li className="text-lg font-medium font-montserrat">About</li>
+            <ul className="flex items-center justify-center space-x-12 ">
+              <li className="text-md font-medium font-montserrat">Home</li>
+              <li className="text-md font-medium font-montserrat">About</li>
               {/* Demos Dropdown */}
               <li className="group relative">
-                <li className="flex items-center hover:text-primary cursor-pointer text-lg font-medium font-montserrat">
+                <li className="flex items-center hover:text-primary cursor-pointer text-md font-medium font-montserrat">
                   Find Tutors
+                  <FiChevronDown className="ml-2 text-lg" />
                 </li>
                 <div className="fixed right-0 mt-0 w-[95vw] max-w-[78.125vw] bg-white shadow-lg rounded-md p-4 hidden group-hover:block z-50 mr-10 ">
                   <div className="grid grid-cols-4 gap-6">
@@ -364,12 +371,12 @@ function Userheader() {
                   </div>
                 </div>
               </li>
-              <li className="text-lg font-medium font-montserrat">Blogs</li>
-              <li className="text-lg font-medium font-montserrat">Testimonials</li>
-              <li className="text-lg font-medium font-montserrat">Contact</li>
+              <li className="text-md font-medium font-montserrat">Blogs</li>
+              <li className="text-md font-medium font-montserrat">
+                Testimonials
+              </li>
+              <li className="text-md font-medium font-montserrat">Contact</li>
             </ul>
-
-             
           </div>
 
           <div className="flex">
@@ -400,18 +407,14 @@ function Userheader() {
             </div> */}
 
             <div>
-                <DefaultButton
-                  buttonText="Login/Register"
-                />
-              </div>
+              <DefaultButton buttonText="Login/Register" />
+            </div>
           </div>
-
-          
         </div>
 
         {/* Mobile Menu */}
         <div>
-          {isMenuOpen && (
+          {/* {isMenuOpen && (
             <div className="fixed inset-y-0 left-0 w-[60%] bg-white shadow-lg z-30 transform transition-transform duration-300 ease-in-out translate-x-0">
               <div className="p-6 h-full overflow-y-auto">
                 <button
@@ -462,12 +465,18 @@ function Userheader() {
                 </div>
               </div>
             </div>
-          )}
+
+          
+          )} */}
+          <MobileSidebar
+            isOpen={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+          />
         </div>
       </nav>
 
       {/* Overlay */}
-      {(isMenuOpen || isSideMenuOpen) && (
+      {/* {(isMenuOpen || isSideMenuOpen) && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-20"
           onClick={() => {
@@ -475,7 +484,7 @@ function Userheader() {
             if (isSideMenuOpen) setIsSideMenuOpen(false);
           }}
         ></div>
-      )}
+      )} */}
     </header>
   );
 }
