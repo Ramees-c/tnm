@@ -4,64 +4,6 @@ import DefaultButton from "../DefaultButton/DefaultButton";
 
 const menuData = [
   {
-    title: "Online Classes",
-    active: true,
-    columns: [
-      {
-        heading: "Tuitions",
-        icon: "📚",
-        links: [
-          "Class 12 Tuition",
-          "Class 11 Tuition",
-          "Class 10 Tuition",
-          "Class 9 Tuition",
-          "Class 8 Tuition",
-          "Class 7 Tuition",
-          "Class 6 Tuition",
-          "Class I-V Tuition",
-          "BCom Tuition",
-          "BTech Tuition",
-        ],
-      },
-      {
-        heading: "Languages",
-        icon: "🌎",
-        links: [
-          "Spoken English",
-          "French Language",
-          "Spanish Language",
-          "German Language",
-          "Hindi Language",
-          "IELTS",
-          "PTE",
-          "TOEFL",
-        ],
-      },
-      {
-        heading: "Hobbies",
-        icon: "🎨",
-        links: [
-          "Singing",
-          "Yoga",
-          "Dance",
-          "Guitar",
-          "Personality Development Training",
-        ],
-      },
-      {
-        heading: "More",
-        icon: "➕",
-        links: [
-          "Online Tuitions",
-          "Online Language Classes",
-          "Online Hobby Classes",
-          "Online IT Coaching",
-          "Online Exam Entrance Coaching",
-        ],
-      },
-    ],
-  },
-  {
     title: "Tuition",
     columns: [
       {
@@ -78,31 +20,6 @@ const menuData = [
           "Class I-V Tuition",
           "BCom Tuition",
           "BTech Tuition",
-        ],
-      },
-      {
-        heading: "Languages",
-        icon: "🗣️",
-        links: [
-          "Spoken English",
-          "French Language",
-          "Spanish Language",
-          "German Language",
-          "Hindi Language",
-          "IELTS",
-          "PTE",
-          "TOEFL",
-        ],
-      },
-      {
-        heading: "Hobbies",
-        icon: "🎭",
-        links: [
-          "Singing",
-          "Yoga",
-          "Dance",
-          "Guitar",
-          "Personality Development Training",
         ],
       },
     ],
