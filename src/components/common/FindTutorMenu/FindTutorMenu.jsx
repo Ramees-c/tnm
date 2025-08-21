@@ -20,6 +20,12 @@ const menuData = [
           "Class I-V Tuition",
           "BCom Tuition",
           "BTech Tuition",
+          "BA Tuition",
+          "BSc Tuition",
+          "BCA Tuition",
+          "BBA Tuition",
+          "MCA Tuition",
+          "MBA Tuition",
         ],
       },
     ],
@@ -36,12 +42,19 @@ const menuData = [
           "Spanish Language",
           "German Language",
           "Hindi Language",
+          "Japanese Language",
+          "Chinese Language",
+          "Korean Language",
+          "Russian Language",
+          "Portuguese Language",
+          "Italian Language",
+          "Arabic Language",
         ],
       },
       {
         heading: "Test Prep",
         icon: "📝",
-        links: ["IELTS", "PTE", "TOEFL", "GRE", "GMAT"],
+        links: ["IELTS", "PTE", "TOEFL", "GRE", "GMAT", "SAT", "ACT", "GMAT", "TOEIC"],
       },
     ],
   },
@@ -51,12 +64,12 @@ const menuData = [
       {
         heading: "Creative Arts",
         icon: "🎨",
-        links: ["Singing", "Dance", "Guitar", "Piano", "Painting"],
+        links: ["Singing", "Dance", "Guitar", "Piano", "Painting", "Drawing", "Photography", "Pottery", "Sculpting", "Calligraphy"],
       },
       {
         heading: "Wellness",
         icon: "🧘",
-        links: ["Yoga", "Meditation", "Zumba", "Pilates"],
+        links: ["Yoga", "Meditation", "Zumba", "Pilates", "Aerobics", "Karate", "Taekwondo", "Martial Arts", "Boxing"],
       },
     ],
   },
@@ -66,12 +79,12 @@ const menuData = [
       {
         heading: "Programming",
         icon: "💻",
-        links: ["Python", "JavaScript", "Java", "C++", "Web Development"],
+        links: ["Python", "JavaScript", "Java", "C++", "Web Development", "Mobile App Development", "Game Development", "Data Structures", "Algorithms"],
       },
       {
         heading: "Data Science",
         icon: "📊",
-        links: ["Machine Learning", "Data Analysis", "AI", "Big Data"],
+        links: ["Machine Learning", "Data Analysis", "AI", "Big Data", "Data Visualization", "Deep Learning", "Natural Language Processing", "Computer Vision"],
       },
     ],
   },
@@ -81,12 +94,12 @@ const menuData = [
       {
         heading: "Entrance Exams",
         icon: "🎯",
-        links: ["JEE", "NEET", "GATE", "CAT"],
+        links: ["JEE", "NEET", "GATE", "CAT", "UPSC", "SSC", "Bank PO", "Railway", "Defense", "CLAT", "NET", "SET"],
       },
       {
         heading: "Study Abroad",
         icon: "✈️",
-        links: ["SAT", "GRE", "GMAT", "TOEFL"],
+        links: ["SAT", "GRE", "GMAT", "TOEFL", "IELTS", "PTE", "Duolingo", "OET", "CELPIP"],
       },
     ],
   },
@@ -100,6 +113,9 @@ function FindTutorMenu() {
   const toggleMobileMenu = (index) => {
     setMobileOpenIndex(mobileOpenIndex === index ? null : index);
   };
+
+  // Function to determine if a column should use two columns
+  const shouldUseTwoColumns = (links) => links.length >= 8;
 
   return (
     <div className="w-full mx-auto px-4 pb-16">
@@ -136,30 +152,32 @@ function FindTutorMenu() {
                     {col.heading}
                   </h3>
                 </div>
-                <ul className="space-y-3">
-                  {col.links.map((link, i) => (
-                    <li
-                      key={i}
-                      className="relative"
-                      onMouseEnter={() => setHoveredLink(link)}
-                      onMouseLeave={() => setHoveredLink(null)}
-                    >
-                      <a
-                        href="#"
-                        className={`flex items-center py-1.5 px-2 rounded-md transition-all ${
-                          hoveredLink === link
-                            ? "bg-primary/10 text-primary font-medium pl-3"
-                            : "text-gray-600 hover:text-gray-800"
-                        }`}
+                <div className={`overflow-hidden ${shouldUseTwoColumns(col.links) ? 'h-72' : 'h-auto'}`}>
+                  <ul className={`space-y-3 ${shouldUseTwoColumns(col.links) ? 'columns-2 gap-4' : ''}`}>
+                    {col.links.map((link, i) => (
+                      <li
+                        key={i}
+                        className="relative break-inside-avoid"
+                        onMouseEnter={() => setHoveredLink(link)}
+                        onMouseLeave={() => setHoveredLink(null)}
                       >
-                        {hoveredLink === link && (
-                          <FiChevronRight className="mr-2 text-primary text-sm" />
-                        )}
-                        {link}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
+                        <a
+                          href="#"
+                          className={`flex items-center py-1.5 px-2 rounded-md transition-all ${
+                            hoveredLink === link
+                              ? "bg-primary/10 text-primary font-medium pl-3"
+                              : "text-gray-600 hover:text-gray-800"
+                          }`}
+                        >
+                          {hoveredLink === link && (
+                            <FiChevronRight className="mr-2 text-primary text-sm" />
+                          )}
+                          <span className="truncate">{link}</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             ))}
 
@@ -220,6 +238,7 @@ function FindTutorMenu() {
                         {col.heading}
                       </h3>
                     </div>
+                    {/* Removed columns-2 class for mobile view */}
                     <ul className="space-y-2 pl-8">
                       {col.links.map((link, linkIndex) => (
                         <li key={linkIndex}>
@@ -228,7 +247,7 @@ function FindTutorMenu() {
                             className="flex items-center py-1.5 text-gray-600 hover:text-primary transition-colors"
                           >
                             <FiChevronRight className="mr-2 text-primary text-xs" />
-                            {link}
+                            <span className="truncate">{link}</span>
                           </a>
                         </li>
                       ))}
@@ -245,9 +264,6 @@ function FindTutorMenu() {
                     Our education consultants can help you find the perfect
                     tutor.
                   </p>
-                  {/* <button className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md text-sm shadow-sm transition-colors">
-                    Get Free Consultation
-                  </button> */}
                   <DefaultButton buttonText="Get Free Consultation" />
                 </div>
               </div>

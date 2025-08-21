@@ -1,14 +1,35 @@
-import React from 'react'
-import './App.css'
+import React from "react";
+import "./App.css";
 
-import UserHome from "./pages/user/UserHome/UserHome"
+import UserHome from "./pages/user/UserHome/UserHome";
+import { Route, Routes } from "react-router-dom";
+import AboutPage from "./pages/user/AboutPage/AboutPage";
+import Userheader from "./components/common/Userheader/Userheader";
+import Footer from "./components/common/Footer/Footer";
+import TermsConditions from "./pages/user/TermsConditions/TermsConditions";
+import RefundPolicy from "./pages/user/RefundPolicy/RefundPolicy";
+import FaqPage from "./pages/user/FaqPage/FaqPage";
+import ContactPage from "./pages/user/ContactPage/ContactPage";
+import BlogPge from "./pages/user/BlogPage/BlogPge";
+import BlogSingle from "./pages/user/BlogSingle/BlogSingle";
 
 function App() {
   return (
     <div>
-     <UserHome />
+      <Userheader />
+      <Routes>
+        <Route path="/" element={<UserHome />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/terms" element={<TermsConditions />} />
+        <Route path="/refundPolicy" element={<RefundPolicy />} />
+        <Route path="/faq" element={<FaqPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/blog" element={<BlogPge />} />
+        <Route path="/blogSingle" element={<BlogSingle />} />
+      </Routes>
+      <Footer />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

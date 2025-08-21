@@ -5,11 +5,11 @@ import logo from "../../../assets/images/logo/tnmlogo.png";
 const MobileSidebar = ({ isOpen, onClose }) => {
   // Navigation items with React Icons
   const navItems = [
-    { name: "Home", icon: <FiHome className="text-primary" /> },
-    { name: "About", icon: <FiUser className="text-primary" /> },
-    { name: "Blogs", icon: <FiBook className="text-primary" /> },
-    { name: "Testimonials", icon: <FiStar className="text-primary" /> },
-    { name: "Contact", icon: <FiMail className="text-primary" /> },
+    { name: "Home", icon: <FiHome className="text-primary text-lg" /> },
+    { name: "About", icon: <FiUser className="text-primary text-lg" /> },
+    { name: "Blogs", icon: <FiBook className="text-primary text-lg" /> },
+    { name: "Testimonials", icon: <FiStar className="text-primary text-lg" /> },
+    { name: "Contact", icon: <FiMail className="text-primary text-lg" /> },
   ];
 
   // Disable body scroll when sidebar is open
@@ -72,7 +72,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
                   <span className="group-hover:scale-110 transition-transform">
                     {item.icon}
                   </span>
-                  <span className="ml-3 font-medium text-gray-700 group-hover:text-primary">
+                  <span className="ml-3 font-medium text-gray-700 group-hover:text-primary text-lg">
                     {item.name}
                   </span>
                 </a>

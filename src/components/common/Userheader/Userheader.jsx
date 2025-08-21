@@ -1,69 +1,27 @@
 import { useState, useEffect, useRef } from "react";
 import logo from "../../../assets/images/logo/tnmlogo.png";
-import {
-  FaBars,
-  FaTimes,
-  FaSearch,
-  //   FaLongArrowRight,
-  FaFacebookF,
-  FaTwitter,
-  FaLinkedinIn,
-  FaBehance,
-} from "react-icons/fa";
+import { FaBars, FaTimes } from "react-icons/fa";
 import { FiChevronDown } from "react-icons/fi";
-import { HiChevronDown } from "react-icons/hi";
 import DefaultButton from "../DefaultButton/DefaultButton";
 import MobileSidebar from "../MobileSidebar/MobileSidebar";
 
 function Userheader() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const toggleSideMenu = () => setIsSideMenuOpen(!isSideMenuOpen);
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  const [isOpen, setIsOpen] = useState(false);
-
-  const [scrollY, setScrollY] = useState(0);
   const [showHeader, setShowHeader] = useState(true);
-
-  const options = ["Tutor", "Student"];
+  const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // useEffect(() => {
-  //   const handleScroll = () => {
-  //     if (window.scrollY > 10) {
-  //       setIsScrolled(true);
-  //     } else {
-  //       setIsScrolled(false);
-  //     }
-  //   };
-
-  //   window.addEventListener("scroll", handleScroll);
-  //   return () => window.removeEventListener("scroll", handleScroll);
-  // }, []);
-
+  // Handle scroll to show/hide header
   useEffect(() => {
     let lastScrollY = window.scrollY;
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-
-      if (currentScrollY < lastScrollY || currentScrollY < 50) {
-        // scrolling up
-        setShowHeader(true);
-      } else {
-        // scrolling down
-        setShowHeader(false);
-      }
-
+      setShowHeader(currentScrollY < lastScrollY || currentScrollY < 50);
       lastScrollY = currentScrollY;
     };
 
     window.addEventListener("scroll", handleScroll);
-
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -87,14 +45,14 @@ function Userheader() {
       {/* Main Navigation */}
       <nav className="container mx-auto">
         <div className="flex justify-between items-center">
-          {/* Logo and Search (Left Side) */}
+          {/* Logo and Mobile Menu Button */}
           <div className="flex items-center space-x-20 w-full md:w-auto">
             <div className="flex items-center">
               <button
                 className="lg:hidden mr-4"
                 onClick={() => setSidebarOpen(true)}
               >
-                {isMenuOpen ? <FaTimes size={30} /> : <FaBars size={30} />}
+                <FaBars size={30} />
               </button>
               <a href="/" className="flex items-center">
                 <img src={logo} alt="Logo" className="h-10 md:h-20" />
@@ -104,15 +62,16 @@ function Userheader() {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center ">
-            <ul className="flex items-center justify-center space-x-12 ">
-              <li className="text-md font-medium font-montserrat">Home</li>
-              <li className="text-md font-medium font-montserrat">About</li>
-              {/* Demos Dropdown */}
+            <ul className="flex items-center justify-center space-x-9 xl:space-x-12 ">
+              <li className="text-sm xl:text-md font-medium font-montserrat">Home</li>
+              <li className="text-sm xl:text-md font-medium font-montserrat">About</li>
+
+              {/* Find Tutors Dropdown */}
               <li className="group relative">
-                <li className="flex items-center hover:text-primary cursor-pointer text-md font-medium font-montserrat">
+                <div className="flex items-center hover:text-primary cursor-pointer text-sm xl:text-md font-medium font-montserrat">
                   Find Tutors
                   <FiChevronDown className="ml-2 text-lg" />
-                </li>
+                </div>
                 <div className="fixed right-0 mt-0 w-[95vw] max-w-[78.125vw] bg-white shadow-lg rounded-md p-4 hidden group-hover:block z-50 mr-10 ">
                   <div className="grid grid-cols-4 gap-6">
                     {/* Column 1 */}
@@ -121,395 +80,63 @@ function Userheader() {
                         Lorem, ipsum.
                       </h4>
                       <ul className="space-y-3">
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
+                        {[...Array(4)].map((_, i) => (
+                          <li key={i}>
+                            <a
+                              href="#"
+                              className="hover:text-blue-500 transition-colors duration-200 block py-1"
+                            >
+                              Lorem, ipsum.
+                            </a>
+                          </li>
+                        ))}
                       </ul>
                     </div>
 
-                    {/* Column 2 */}
-                    <div>
-                      <h4 className="font-bold mb-3 text-gray-800">
-                        Lorem, ipsum.
-                      </h4>
-                      <ul className="space-y-3">
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-
-                    {/* Column 3 */}
-                    <div>
-                      <h4 className="font-bold mb-3 text-gray-800">
-                        Lorem, ipsum.
-                      </h4>
-                      <ul className="space-y-3">
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                    <div>
-                      <h4 className="font-bold mb-3 text-gray-800">
-                        Lorem, ipsum.
-                      </h4>
-                      <ul className="space-y-3">
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                    <div>
-                      <h4 className="font-bold mb-3 text-gray-800">
-                        Lorem, ipsum.
-                      </h4>
-                      <ul className="space-y-3">
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                    <div>
-                      <h4 className="font-bold mb-3 text-gray-800">
-                        Lorem, ipsum.
-                      </h4>
-                      <ul className="space-y-3">
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                    <div>
-                      <h4 className="font-bold mb-3 text-gray-800">
-                        Lorem, ipsum.
-                      </h4>
-                      <ul className="space-y-3">
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                          >
-                            Lorem, ipsum.
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
+                    {/* Repeat similar structure for other columns */}
+                    {[...Array(7)].map((_, colIndex) => (
+                      <div key={colIndex}>
+                        <h4 className="font-bold mb-3 text-gray-800">
+                          Lorem, ipsum.
+                        </h4>
+                        <ul className="space-y-3">
+                          {[...Array(4)].map((_, i) => (
+                            <li key={i}>
+                              <a
+                                href="#"
+                                className="hover:text-blue-500 transition-colors duration-200 block py-1"
+                              >
+                                Lorem, ipsum.
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </li>
-              <li className="text-md font-medium font-montserrat">Blogs</li>
-              <li className="text-md font-medium font-montserrat">
+
+              <li className="text-sm xl:text-md font-medium font-montserrat">Blogs</li>
+              <li className="text-sm xl:text-md font-medium font-montserrat">
                 Testimonials
               </li>
-              <li className="text-md font-medium font-montserrat">Contact</li>
+              <li className="text-sm xl:text-md font-medium font-montserrat">Contact</li>
             </ul>
           </div>
 
+          {/* Login/Register Button */}
           <div className="flex">
-            {/* <div className="relative w-36" ref={dropdownRef}>
-              <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="w-full px-3 py-2 border-2 border-primary rounded-md bg-white text-left cursor-pointer focus:outline-none flex justify-center items-center text-xs xl:text-md"
-              >
-                Login/Register
-              </button>
-
-             
-              {isOpen && (
-                <ul className="absolute w-full mt-1 border-2 border-primary rounded-md bg-white shadow-lg">
-                  {options.map((option) => (
-                    <li
-                      key={option}
-                      onClick={() => {
-                        setIsOpen(false);
-                      }}
-                      className="px-3 py-2 hover:bg-primary hover:text-white cursor-pointer text-xs xl:text-md"
-                    >
-                      {option}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div> */}
-
-            <div>
-              <DefaultButton buttonText="Login/Register" />
-            </div>
+            <DefaultButton buttonText="Login/Register" />
           </div>
         </div>
 
-        {/* Mobile Menu */}
-        <div>
-          {/* {isMenuOpen && (
-            <div className="fixed inset-y-0 left-0 w-[60%] bg-white shadow-lg z-30 transform transition-transform duration-300 ease-in-out translate-x-0">
-              <div className="p-6 h-full overflow-y-auto">
-                <button
-                  className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-                  onClick={toggleMenu}
-                >
-                  <FaTimes size={20} />
-                </button>
-
-                <div className="mb-8">
-                  <div className="logo mb-6">
-                    <img src={logo} alt="Logo" className="h-16" />
-                  </div>
-                </div>
-
-                <div className="mb-8">
-                  <ul className="space-y-4">
-                    <li className="text-lg font-medium">Home</li>
-                    <li className="text-lg font-medium">About</li>
-                    <li className="text-lg font-medium">Contact</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h4 className="text-lg font-bold mb-4">Follow Us</h4>
-                  <ul className="flex space-x-4">
-                    <li>
-                      <a href="#" className="text-gray-600 hover:text-blue-500">
-                        <FaFacebookF size={18} />
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#" className="text-gray-600 hover:text-blue-500">
-                        <FaTwitter size={18} />
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#" className="text-gray-600 hover:text-blue-500">
-                        <FaLinkedinIn size={18} />
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#" className="text-gray-600 hover:text-blue-500">
-                        <FaBehance size={18} />
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-          
-          )} */}
-          <MobileSidebar
-            isOpen={sidebarOpen}
-            onClose={() => setSidebarOpen(false)}
-          />
-        </div>
+        {/* Mobile Sidebar */}
+        <MobileSidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
       </nav>
-
-      {/* Overlay */}
-      {/* {(isMenuOpen || isSideMenuOpen) && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-20"
-          onClick={() => {
-            if (isMenuOpen) setIsMenuOpen(false);
-            if (isSideMenuOpen) setIsSideMenuOpen(false);
-          }}
-        ></div>
-      )} */}
     </header>
   );
 }

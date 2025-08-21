@@ -28,6 +28,7 @@ import { FaUserGraduate, FaLightbulb } from "react-icons/fa";
 import FindTutorMenu from "../../../components/common/FindTutorMenu/FindTutorMenu";
 import Footer from "../../../components/common/Footer/Footer";
 import TopHeader from "../../../components/common/TopHeader/TopHeader";
+import DefaultButton from "../../../components/common/DefaultButton/DefaultButton";
 
 function UserHome() {
   const features = [
@@ -393,7 +394,7 @@ function UserHome() {
   return (
     <div>
       {/* <TopHeader /> */}
-      <Userheader />
+     
       <div>
         <Hero />
       </div>
@@ -412,6 +413,9 @@ function UserHome() {
               </div>
             ))}
           </Slider>
+         <div className="text-center mt-5">
+           <DefaultButton buttonText="View All Tutors" />
+         </div>
         </div>
         <SubHeader
           tagline="Lorem, ipsum dolor."
@@ -529,18 +533,18 @@ function UserHome() {
               <div className="space-y-8">
                 {/* Heading */}
                 <div className="space-y-6">
-                  <div className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-semibold uppercase tracking-wide border border-white/30">
+                  <div className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-xs md:text-sm font-semibold uppercase tracking-wide border border-white/30">
                     <span className="w-2 h-2 bg-white rounded-full mr-2"></span>
                     Our Advantages
                   </div>
 
-                  <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
+                  <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold leading-tight">
                     Over 16 Years of Excellence in Online Education
                     
                     
                   </h2>
 
-                  <p className="text-lg text-green-100  leading-relaxed">
+                  <p className="text-md lg:text-lg text-green-100  leading-relaxed">
                     Join thousands of successful students who have transformed
                     their careers through our innovative distance learning
                     programs.
@@ -548,10 +552,10 @@ function UserHome() {
                 </div>
 
                 {/* CTA Button */}
-                <button className="w-full sm:w-auto bg-white text-green-600 px-8 py-4 rounded-md font-semibold hover:bg-green-50 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center mx-auto lg:mx-0">
+                <button className="w-full sm:w-auto bg-white text-green-600 px-6 py-2 md:px-8 md:py-4 rounded-md font-semibold hover:bg-green-50 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center mx-auto lg:mx-0">
                   Start Learning Today
                   <svg
-                    className="ml-2 w-5 h-5"
+                    className="ml-2 w-4 h-4 lg:w-5 lg:h-5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -577,17 +581,17 @@ function UserHome() {
                       <img
                         src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
                         alt="Students learning online"
-                        className="w-full h-[500px] object-cover"
+                        className="w-full lg:h-[450px] object-cover"
                       />
 
                       {/* Overlay */}
                       <div className="absolute inset-0 bg-gradient-to-t from-green-900/50 to-transparent"></div>
 
                       {/* Floating Elements */}
-                      <div className="absolute top-6 right-6 bg-white text-green-600 px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
+                      <div className="absolute top-6 right-6 bg-white text-green-600 px-4 py-2 rounded-full text-xs md:text-sm font-semibold shadow-lg">
                         🎓 95% Success
                       </div>
-                      <div className="absolute bottom-6 left-6 bg-white text-green-600 px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
+                      <div className="absolute bottom-6 left-6 bg-white text-green-600 px-4 py-2 rounded-full text-xs md:text-sm font-semibold shadow-lg">
                         ⭐ 4.9/5 Rating
                       </div>
                     </div>
@@ -663,7 +667,7 @@ function UserHome() {
           <FindTutorMenu />
         </div>
       </div>
-      <Footer />
+     
     </div>
   );
 }

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { FiChevronDown } from "react-icons/fi";
 
 import DefaultButton from "../../common/DefaultButton/DefaultButton"
 
@@ -20,7 +19,7 @@ function HeroSearchForm() {
           value={courseName}
           onChange={(e) => setCourseName(e.target.value)}
           placeholder="Enter Course Name"
-          className="w-full px-4 py-2 pr-28 lg:h-[60px] rounded-md outline-none border"
+          className="w-full px-4 py-2 pr-28 lg:h-[60px] rounded-md outline-none border focus:ring-0 focus:border-primary"
         />
 
         {/* Search Button */}

@@ -1,18 +1,10 @@
 import React from "react";
 
 import shapeIcon from "../../../assets/images/91.png";
-import shapeIcon2 from "../../../assets/images/92.png";
 import bannerImg from "../../../assets/images/1.png";
 
-import herobg from "../../../assets/images/hero.jpg"
+import herobg from "../../../assets/images/hero.jpg";
 
-import {
-  FaStar,
-  FaStarHalfAlt,
-  FaChevronLeft,
-  FaChevronRight,
-} from "react-icons/fa";
-import DefaultButton from "../DefaultButton/DefaultButton";
 import HeroSearchForm from "../HeroSearchForm/HeroSearchForm";
 
 function Hero() {
@@ -55,7 +47,6 @@ function Hero() {
           {/* Right Content - Image Area */}
           <div className="w-full lg:w-5/12 relative mt-12 lg:mt-0">
             <div className="relative w-full max-w-[400px] mx-auto">
-              {/* Main Image with floating animation */}
               <img
                 src={bannerImg}
                 alt="Learning Illustration"
