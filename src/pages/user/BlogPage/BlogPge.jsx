@@ -44,11 +44,11 @@ function BlogPge() {
    <div>
     <PageHeader
         title="Blogs"
-        headerBg="https://plus.unsplash.com/premium_photo-1681842143575-03bf1be4c11c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzN8fGVkdWNhdGlvbnxlbnwwfHwwfHx8MA%3D%3D"
+        headerBg="https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8YmxvZ3N8ZW58MHx8MHx8fDA%3D"
       />
     <div className="container">
        <section className="w-full py-16 bg-gray-50">
-      <div className="mx-auto px-6 lg:px-12">
+      <div className="mx-auto lg:px-12">
         {/* Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {posts.map((post) => (

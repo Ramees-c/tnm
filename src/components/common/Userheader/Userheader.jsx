@@ -124,7 +124,7 @@ function Userheader() {
                     <div>
                       <h4 className="font-bold mb-3 text-gray-800">Tuition</h4>
                       <ul className="space-y-3">
-                        {category.map((item) => (
+                        {/* {category.map((item) => (
                           <li key={item.subject}>
                             <NavLink
                               to={`/tutors/${item.subject.toLowerCase()}`}
@@ -137,45 +137,13 @@ function Userheader() {
                               {item.subject}
                             </NavLink>
                           </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div>
-                      <h4 className="font-bold mb-3 text-gray-800">Tuition</h4>
-                      <ul className="space-y-3">
-                        {category.map((item) => (
-                          <li key={item.subject}>
-                            <NavLink
-                              to={`/tutors/${item.subject.toLowerCase()}`}
-                              className={({ isActive }) =>
-                                `block py-1 ${
-                                  isActive ? "text-primary" : "text-gray-700"
-                                }`
-                              }
-                            >
-                              {item.subject}
-                            </NavLink>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div>
-                      <h4 className="font-bold mb-3 text-gray-800">Tuition</h4>
-                      <ul className="space-y-3">
-                        {category.map((item) => (
-                          <li key={item.subject}>
-                            <NavLink
-                              to={`/tutors/${item.subject.toLowerCase()}`}
-                              className={({ isActive }) =>
-                                `block py-1 ${
-                                  isActive ? "text-primary" : "text-gray-700"
-                                }`
-                              }
-                            >
-                              {item.subject}
-                            </NavLink>
-                          </li>
-                        ))}
+                        ))} */}
+
+                        <li>Mathamatics</li>
+                        <li>Hindi</li>
+                        <li>English</li>
+                        <li>Botony</li>
+                        <li>Zoology</li>
                       </ul>
                     </div>
                   </div>

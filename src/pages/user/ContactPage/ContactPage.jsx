@@ -95,7 +95,7 @@ function ContactPage() {
     <div className="w-full min-h-screen">
       <PageHeader
         title="Contact Us"
-        headerBg="https://plus.unsplash.com/premium_photo-1681842143575-03bf1be4c11c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzN8fGVkdWNhdGlvbnxlbnwwfHwwfHx8MA%3D%3D"
+        headerBg="https://images.unsplash.com/photo-1423784346385-c1d4dac9893a?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTAwfHxjb250YWN0fGVufDB8fDB8fHww"
       />
       
 

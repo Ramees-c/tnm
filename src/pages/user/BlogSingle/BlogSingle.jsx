@@ -5,7 +5,7 @@ import BlogSidebar from "../../../components/common/BlogSidebar/BlogSidebar";
 function BlogSingle() {
   return (
     <section className="w-full py-12 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+      <div className=" mx-auto px-6 lg:px-12">
         {/* Title */}
         <h1 className="text-xl md:text-2xl lg:text-4xl font-bold text-center text-gray-900 leading-snug mb-10">
           Partiality indulgence dispatched to of celebrated.

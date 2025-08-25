@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Userheader from "../../../components/common/Userheader/Userheader";
 import Hero from "../../../components/common/Hero/Hero";
 import TutorCard from "../../../components/common/TutorCard/TutorCard";
@@ -9,7 +9,6 @@ import FeatureCard from "../../../components/common/FeatureCard/FeatureCard";
 import TestimonialCard from "../../../components/common/TestimonialCard/TestimonialCard";
 
 import testimonialImg from "../../../assets/images/testimonial-image.jpg";
-
 
 import {
   FaGraduationCap,
@@ -30,6 +29,7 @@ import FindTutorMenu from "../../../components/common/FindTutorMenu/FindTutorMen
 import Footer from "../../../components/common/Footer/Footer";
 import TopHeader from "../../../components/common/TopHeader/TopHeader";
 import DefaultButton from "../../../components/common/DefaultButton/DefaultButton";
+import Loading from "../../../components/common/Loading/Loading";
 
 function UserHome() {
   const features = [
@@ -392,16 +392,31 @@ function UserHome() {
     },
   ];
 
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate page loading
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000); // 2 seconds loading time
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <div>
       {/* <TopHeader /> */}
-     
+
       <div>
         <Hero />
       </div>
 
       <div className="container">
-        <div  > 
+        <div>
           <SubHeader
             tagline=" Meet Our Experts"
             title="Find Your Ideal Learning Partner"
@@ -409,12 +424,16 @@ function UserHome() {
           />
           <Slider slidesToShow={3} autoSlide={true} autoSlideInterval={5000}>
             {tutors.map((tutor) => (
-              <div key={tutor.id} className="flex justify-center items-center" data-aos="fade-up">
+              <div
+                key={tutor.id}
+                className="flex justify-center items-center"
+                data-aos="fade-up"
+              >
                 <TutorCard tutor={tutor} />
               </div>
             ))}
           </Slider>
-         {/* <div className="text-center mt-5">
+          {/* <div className="text-center mt-5">
            <DefaultButton buttonText="View All Tutors" />
          </div> */}
         </div>
@@ -523,7 +542,10 @@ function UserHome() {
           </div>
         </div> */}
 
-        <section className="relative bg-gradient-to-br from-green-500 via-green-600 to-green-700 rounded-md text-white py-16 px-4 md:px-8 lg:px-12 overflow-hidden" data-aos="fade-up">
+        <section
+          className="relative bg-gradient-to-br from-green-500 via-green-600 to-green-700 rounded-md text-white py-16 px-4 md:px-8 lg:px-12 overflow-hidden"
+          data-aos="fade-up"
+        >
           {/* Background Elements */}
           <div className="absolute inset-0 bg-black/10 mix-blend-overlay"></div>
           <div className="absolute top-0 left-0 w-72 h-72 bg-white/5 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
@@ -541,8 +563,6 @@ function UserHome() {
 
                   <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold leading-tight">
                     Over 16 Years of Excellence in Online Education
-                    
-                    
                   </h2>
 
                   <p className="text-md lg:text-lg text-green-100  leading-relaxed">
@@ -632,7 +652,10 @@ function UserHome() {
           description="Hear from our community of learners about their experiences"
         />
         {/* Testimonial Cards - Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-5" data-aos="fade-up">
+        <div
+          className="grid grid-cols-1 md:grid-cols-2 items-center gap-5"
+          data-aos="fade-up"
+        >
           <div>
             <img
               src={testimonialImg}
@@ -648,11 +671,8 @@ function UserHome() {
               slideBtnHide={true}
             >
               {testimonials.map((testimonial) => (
-                <div  key={testimonial.id} className="flex justify-center">
-                  <TestimonialCard
-                   
-                    testimonial={testimonial}
-                  />
+                <div key={testimonial.id} className="flex justify-center">
+                  <TestimonialCard testimonial={testimonial} />
                 </div>
               ))}
             </Slider>
@@ -665,12 +685,11 @@ function UserHome() {
             title="Find a Tutor for Anything!"
             description="Discover expert tutors for all subjects, languages, hobbies, and exam preparation"
           />
-         <div data-aos="fade-up">
-           <FindTutorMenu />
-         </div>
+          <div data-aos="fade-up">
+            <FindTutorMenu />
+          </div>
         </div>
       </div>
-     
     </div>
   );
 }
