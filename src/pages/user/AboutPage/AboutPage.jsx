@@ -10,9 +10,9 @@ function AboutPage() {
     <div>
       <div className="container">
         <section className="w-full pt-16">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center px-6 lg:px-12">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-10 items-center px-6 lg:px-12">
             {/* Left Image */}
-            <div className="flex justify-center lg:justify-end">
+            <div className="flex justify-center xl:justify-end">
               <img
                 src={aboutImg}
                 alt="Students"
@@ -34,6 +34,16 @@ function AboutPage() {
                 cupiditate dignissimos ratione, alias ducimus odit deserunt
                 libero veritatis exercitationem natus, repudiandae quidem veniam
                 minima consequuntur!
+                <br />
+                Explicabo illo consectetur sed ipsa fuga impedit consequatur
+                beatae, minus quam quibusdam optio ipsum. Sed ad iusto fugiat
+                labore ullam atque soluta fugit, blanditiis exercitationem
+                mollitia totam expedita ab ratione repellendus.
+                <br />
+                Explicabo illo consectetur sed ipsa fuga impedit consequatur
+                beatae, minus quam quibusdam optio ipsum. Sed ad iusto fugiat
+                labore ullam atque soluta fugit, blanditiis exercitationem
+                mollitia totam expedita ab ratione repellendus.
                 <br />
                 Explicabo illo consectetur sed ipsa fuga impedit consequatur
                 beatae, minus quam quibusdam optio ipsum. Sed ad iusto fugiat

@@ -46,7 +46,7 @@ function Hero() {
 
           {/* Right Content - Image Area */}
           <div className="w-full lg:w-5/12 relative mt-12 lg:mt-0">
-            <div className="relative w-full max-w-[400px] mx-auto">
+            <div className="relative w-full max-w-[400px] mx-auto animate-fade-in">
               <img
                 src={bannerImg}
                 alt="Learning Illustration"

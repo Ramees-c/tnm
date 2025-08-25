@@ -1,5 +1,5 @@
 import React from "react";
-import BlogRecentPost from "../../BlogRecentPost/BlogRecentPost";
+import BlogRecentPost from "../BlogRecentPost/BlogRecentPost";
 
 function BlogSidebar() {
   return (

@@ -1,14 +1,17 @@
 import { useState, useEffect, useRef } from "react";
+import { NavLink } from "react-router-dom";
 import logo from "../../../assets/images/logo/tnmlogo.png";
-import { FaBars, FaTimes } from "react-icons/fa";
+import { FaBars } from "react-icons/fa";
 import { FiChevronDown } from "react-icons/fi";
 import DefaultButton from "../DefaultButton/DefaultButton";
 import MobileSidebar from "../MobileSidebar/MobileSidebar";
+import axios from "axios";
+import { API_URL } from "../../../API/API";
 
 function Userheader() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showHeader, setShowHeader] = useState(true);
-  const [isOpen, setIsOpen] = useState(false);
+  const [category, setCategory] = useState([]);
   const dropdownRef = useRef(null);
 
   // Handle scroll to show/hide header
@@ -29,11 +32,21 @@ function Userheader() {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
+        // close dropdown logic if needed
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const getCategory = async () => {
+      const data = await axios.get(
+        `http://tnm-test-api.dhanwis.com/api/tutors/subjects/`
+      );
+      setCategory(data.data);
+    };
+    getCategory();
   }, []);
 
   return (
@@ -42,7 +55,6 @@ function Userheader() {
         showHeader ? "translate-y-0" : "-translate-y-full"
       }`}
     >
-      {/* Main Navigation */}
       <nav className="container mx-auto">
         <div className="flex justify-between items-center">
           {/* Logo and Mobile Menu Button */}
@@ -54,74 +66,158 @@ function Userheader() {
               >
                 <FaBars size={30} />
               </button>
-              <a href="/" className="flex items-center">
+              <NavLink to="/" className="flex items-center">
                 <img src={logo} alt="Logo" className="h-10 md:h-20" />
-              </a>
+              </NavLink>
             </div>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center ">
-            <ul className="flex items-center justify-center space-x-9 xl:space-x-12 ">
-              <li className="text-sm xl:text-md font-medium font-montserrat">Home</li>
-              <li className="text-sm xl:text-md font-medium font-montserrat">About</li>
+          <div className="hidden lg:flex items-center">
+            <ul className="flex items-center justify-center space-x-9 xl:space-x-12">
+              <li>
+                <NavLink
+                  to="/"
+                  className={({ isActive }) =>
+                    `text-sm xl:text-lg font-montserrat hover:text-primary hover:font-bold duration-300 ${
+                      isActive
+                        ? "text-primary font-bold"
+                        : "text-gray-700 font-medium"
+                    }`
+                  }
+                >
+                  Home
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/about"
+                  className={({ isActive }) =>
+                    `text-sm xl:text-lg  font-montserrat hover:text-primary hover:font-bold duration-300 ${
+                      isActive
+                        ? "text-primary font-bold"
+                        : "text-gray-700 font-medium"
+                    }`
+                  }
+                >
+                  About
+                </NavLink>
+              </li>
 
-              {/* Find Tutors Dropdown */}
+              {/* Find Tutors Dropdown (just example – you can wrap NavLink inside each item in grid) */}
               <li className="group relative">
-                <div className="flex items-center hover:text-primary cursor-pointer text-sm xl:text-md font-medium font-montserrat">
+                <div className="flex items-center cursor-pointer text-sm xl:text-lg font-medium font-montserrat hover:text-primary hover:font-bold duration-300">
                   Find Tutors
                   <FiChevronDown className="ml-2 text-lg" />
                 </div>
-                <div className="fixed right-0 mt-0 w-[95vw] max-w-[78.125vw] bg-white shadow-lg rounded-md p-4 hidden group-hover:block z-50 mr-10 ">
-                  <div className="grid grid-cols-4 gap-6">
-                    {/* Column 1 */}
+                <div
+                  className="absolute top-full left-0 mt-2 bg-white shadow-lg rounded-md p-6 hidden group-hover:block z-50 
+                min-w-[600px] max-w-[90vw]"
+                >
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-12 gap-y-6">
                     <div>
-                      <h4 className="font-bold mb-3 text-gray-800">
-                        Lorem, ipsum.
-                      </h4>
+                      <h4 className="font-bold mb-3 text-gray-800">Tuition</h4>
                       <ul className="space-y-3">
-                        {[...Array(4)].map((_, i) => (
-                          <li key={i}>
-                            <a
-                              href="#"
-                              className="hover:text-blue-500 transition-colors duration-200 block py-1"
+                        {category.map((item) => (
+                          <li key={item.subject}>
+                            <NavLink
+                              to={`/tutors/${item.subject.toLowerCase()}`}
+                              className={({ isActive }) =>
+                                `block py-1 ${
+                                  isActive ? "text-primary" : "text-gray-700"
+                                }`
+                              }
                             >
-                              Lorem, ipsum.
-                            </a>
+                              {item.subject}
+                            </NavLink>
                           </li>
                         ))}
                       </ul>
                     </div>
-
-                    {/* Repeat similar structure for other columns */}
-                    {[...Array(7)].map((_, colIndex) => (
-                      <div key={colIndex}>
-                        <h4 className="font-bold mb-3 text-gray-800">
-                          Lorem, ipsum.
-                        </h4>
-                        <ul className="space-y-3">
-                          {[...Array(4)].map((_, i) => (
-                            <li key={i}>
-                              <a
-                                href="#"
-                                className="hover:text-blue-500 transition-colors duration-200 block py-1"
-                              >
-                                Lorem, ipsum.
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
+                    <div>
+                      <h4 className="font-bold mb-3 text-gray-800">Tuition</h4>
+                      <ul className="space-y-3">
+                        {category.map((item) => (
+                          <li key={item.subject}>
+                            <NavLink
+                              to={`/tutors/${item.subject.toLowerCase()}`}
+                              className={({ isActive }) =>
+                                `block py-1 ${
+                                  isActive ? "text-primary" : "text-gray-700"
+                                }`
+                              }
+                            >
+                              {item.subject}
+                            </NavLink>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-bold mb-3 text-gray-800">Tuition</h4>
+                      <ul className="space-y-3">
+                        {category.map((item) => (
+                          <li key={item.subject}>
+                            <NavLink
+                              to={`/tutors/${item.subject.toLowerCase()}`}
+                              className={({ isActive }) =>
+                                `block py-1 ${
+                                  isActive ? "text-primary" : "text-gray-700"
+                                }`
+                              }
+                            >
+                              {item.subject}
+                            </NavLink>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </li>
 
-              <li className="text-sm xl:text-md font-medium font-montserrat">Blogs</li>
-              <li className="text-sm xl:text-md font-medium font-montserrat">
-                Testimonials
+              <li>
+                <NavLink
+                  to="/blog"
+                  className={({ isActive }) =>
+                    `text-sm xl:text-lg font-montserrat hover:text-primary duration-300 hover:font-bold ${
+                      isActive
+                        ? "text-primary font-bold"
+                        : "text-gray-700 font-medium"
+                    }`
+                  }
+                >
+                  Blogs
+                </NavLink>
               </li>
-              <li className="text-sm xl:text-md font-medium font-montserrat">Contact</li>
+              <li>
+                <NavLink
+                  to="/testimonials"
+                  className={({ isActive }) =>
+                    `text-sm xl:text-lg font-montserrat hover:text-primary hover:font-bold duration-300 ${
+                      isActive
+                        ? "text-primary font-bold"
+                        : "text-gray-700 font-medium"
+                    }`
+                  }
+                >
+                  Testimonials
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/contact"
+                  className={({ isActive }) =>
+                    `text-sm xl:text-lg font-montserrat hover:text-primary hover:font-bold duration-300 ${
+                      isActive
+                        ? "text-primary font-bold"
+                        : "text-gray-700 font-medium"
+                    }`
+                  }
+                >
+                  Contact
+                </NavLink>
+              </li>
             </ul>
           </div>
 

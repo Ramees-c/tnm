@@ -647,9 +647,9 @@ function UserHome() {
               slideBtnHide={true}
             >
               {testimonials.map((testimonial) => (
-                <div className="flex justify-center">
+                <div  key={testimonial.id} className="flex justify-center">
                   <TestimonialCard
-                    key={testimonial.id}
+                   
                     testimonial={testimonial}
                   />
                 </div>

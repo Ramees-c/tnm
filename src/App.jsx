@@ -12,6 +12,7 @@ import FaqPage from "./pages/user/FaqPage/FaqPage";
 import ContactPage from "./pages/user/ContactPage/ContactPage";
 import BlogPge from "./pages/user/BlogPage/BlogPge";
 import BlogSingle from "./pages/user/BlogSingle/BlogSingle";
+import LoginRegisterPage from "./pages/user/LoginRegisterPage/LoginRegisterPage";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/blog" element={<BlogPge />} />
         <Route path="/blogSingle" element={<BlogSingle />} />
+        <Route path="/register" element={<LoginRegisterPage />} />
       </Routes>
       <Footer />
     </div>
