@@ -1,28 +1,49 @@
 import { useEffect } from "react";
+import { NavLink } from "react-router-dom";
 import { FiHome, FiUser, FiBook, FiStar, FiMail, FiX } from "react-icons/fi";
 import logo from "../../../assets/images/logo/tnmlogo.png";
 
 const MobileSidebar = ({ isOpen, onClose }) => {
   // Navigation items with React Icons
   const navItems = [
-    { name: "Home", icon: <FiHome className="text-primary text-lg" /> },
-    { name: "About", icon: <FiUser className="text-primary text-lg" /> },
-    { name: "Blogs", icon: <FiBook className="text-primary text-lg" /> },
-    { name: "Testimonials", icon: <FiStar className="text-primary text-lg" /> },
-    { name: "Contact", icon: <FiMail className="text-primary text-lg" /> },
+    {
+      name: "Home",
+      path: "/",
+      icon: <FiHome className="text-primary text-lg" />,
+    },
+    {
+      name: "About",
+      path: "/about",
+      icon: <FiUser className="text-primary text-lg" />,
+    },
+    {
+      name: "Blogs",
+      path: "/blogs",
+      icon: <FiBook className="text-primary text-lg" />,
+    },
+    {
+      name: "Testimonials",
+      path: "/testimonials",
+      icon: <FiStar className="text-primary text-lg" />,
+    },
+    {
+      name: "Contact",
+      path: "/contact",
+      icon: <FiMail className="text-primary text-lg" />,
+    },
   ];
 
   // Disable body scroll when sidebar is open
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = "auto";
     }
 
     // Cleanup function
     return () => {
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = "auto";
     };
   }, [isOpen]);
 
@@ -64,19 +85,25 @@ const MobileSidebar = ({ isOpen, onClose }) => {
         <nav className="p-4 overflow-y-auto h-[calc(100vh-80px)]">
           <ul className="space-y-1">
             {navItems.map((item, index) => (
-              <li key={index}>
-                <a
-                  href="#"
-                  className="flex items-center p-3 rounded-md hover:bg-secondary/60 transition-colors duration-200 group"
-                >
-                  <span className="group-hover:scale-110 transition-transform">
-                    {item.icon}
-                  </span>
-                  <span className="ml-3 font-medium text-gray-700 group-hover:text-primary text-lg">
-                    {item.name}
-                  </span>
-                </a>
-              </li>
+              <NavLink
+              key={item.id}
+                to={item.path}
+                onClick={onClose} // closes sidebar after clicking
+                className={({ isActive }) =>
+                  `flex items-center p-3 rounded-md transition-colors duration-200 group ${
+                    isActive
+                      ? "bg-secondary/70 text-primary font-semibold"
+                      : "hover:bg-secondary/60"
+                  }`
+                }
+              >
+                <span className="group-hover:scale-110 transition-transform">
+                  {item.icon}
+                </span>
+                <span className="ml-3 font-medium text-gray-700 group-hover:text-primary text-lg">
+                  {item.name}
+                </span>
+              </NavLink>
             ))}
           </ul>
         </nav>
