@@ -92,7 +92,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
                 className={({ isActive }) =>
                   `flex items-center p-3 rounded-md transition-colors duration-200 group ${
                     isActive
-                      ? "bg-secondary/70 text-primary font-semibold"
+                      ? "bg-secondary/70 text-white font-semibold"
                       : "hover:bg-secondary/60"
                   }`
                 }
@@ -100,7 +100,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
                 <span className="group-hover:scale-110 transition-transform">
                   {item.icon}
                 </span>
-                <span className="ml-3 font-medium text-gray-700 group-hover:text-primary text-lg">
+                <span className="ml-3 font-medium group-hover:text-primary text-lg">
                   {item.name}
                 </span>
               </NavLink>
