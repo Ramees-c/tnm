@@ -18,9 +18,11 @@ function BlogSingle() {
             <BlogContent />
           </div>
 
-          {/* Sidebar */}
-          <div>
-            <BlogSidebar />
+          {/* Sidebar (Sticky) */}
+          <div className="relative">
+            <div className="sticky top-24 transition-all duration-300">
+              <BlogSidebar />
+            </div>
           </div>
         </div>
       </div>

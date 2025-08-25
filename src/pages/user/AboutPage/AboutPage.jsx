@@ -4,15 +4,20 @@ import PlatformOverview from "../../../components/common/PlatformOverview/Platfo
 import aboutImg from "../../../assets/images/about-img.jpg";
 import CEOSection from "../../../components/common/CEOSection/CEOSection";
 import VisionMission from "../../../components/common/VisionMission/VisionMission";
+import PageHeader from "../../../components/common/PageHeader/PageHeader";
 
 function AboutPage() {
   return (
     <div>
+      <PageHeader
+        title="About Us"
+        headerBg="https://plus.unsplash.com/premium_photo-1681842143575-03bf1be4c11c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzN8fGVkdWNhdGlvbnxlbnwwfHwwfHx8MA%3D%3D"
+      />
       <div className="container">
-        <section className="w-full pt-16">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-10 items-center px-6 lg:px-12">
+        <section className="w-full pt-16" data-aos="fade-up">
+          <div className="mx-auto grid grid-cols-1 xl:grid-cols-2 gap-10 items-center  lg:px-12">
             {/* Left Image */}
-            <div className="flex justify-center xl:justify-end">
+            <div className="flex justify-center xl:justify-center">
               <img
                 src={aboutImg}
                 alt="Students"
@@ -54,13 +59,13 @@ function AboutPage() {
           </div>
         </section>
 
-        <div className="">
+        <div className="" data-aos="fade-up">
           <PlatformOverview />
         </div>
-        <div>
+        <div data-aos="fade-up">
           <VisionMission />
         </div>
-        <div className="py-16">
+        <div className="py-16" data-aos="fade-up">
           <CEOSection />
         </div>
       </div>

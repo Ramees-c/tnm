@@ -19,6 +19,18 @@ const posts = [
     date: "Jul 14, 2022",
     image: "https://plus.unsplash.com/premium_photo-1661909267383-58991abdca51?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8ZWR1Y2F0aW9ufGVufDB8fDB8fHww",
   },
+  {
+    id: 3,
+    title: "Melancholy particular devonshire alteration.",
+    date: "Jul 14, 2022",
+    image: "https://plus.unsplash.com/premium_photo-1661909267383-58991abdca51?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8ZWR1Y2F0aW9ufGVufDB8fDB8fHww",
+  },
+  {
+    id: 3,
+    title: "Melancholy particular devonshire alteration.",
+    date: "Jul 14, 2022",
+    image: "https://plus.unsplash.com/premium_photo-1661909267383-58991abdca51?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8ZWR1Y2F0aW9ufGVufDB8fDB8fHww",
+  },
 ];
 
 function BlogRecentPost() {

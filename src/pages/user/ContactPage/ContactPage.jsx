@@ -13,6 +13,7 @@ import {
 
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import PageHeader from "../../../components/common/PageHeader/PageHeader";
 
 function ContactPage() {
   const [formData, setFormData] = useState({
@@ -92,21 +93,27 @@ function ContactPage() {
 
   return (
     <div className="w-full min-h-screen">
-      {/* Hero */}
-      <div className="relative bg-gradient-to-br from-green-500 via-green-600 to-green-700 py-16 md:py-24 px-4 text-center text-white">
+      <PageHeader
+        title="Contact Us"
+        headerBg="https://plus.unsplash.com/premium_photo-1681842143575-03bf1be4c11c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzN8fGVkdWNhdGlvbnxlbnwwfHwwfHx8MA%3D%3D"
+      />
+      
+
+      <div className="container mx-auto px-4 py-12">
+        {/* <div className="bg-gradient-to-br from-green-500 via-green-600 to-green-700 rounded-lg p-10 text-center text-white relative overflow-hidden">
+        <div className="absolute -top-20 -right-20 w-40 h-40 bg-white/10 rounded-full"></div>
+          <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-white/10 rounded-full"></div>
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
             Get in Touch
           </h1>
-          <p className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto">
+          <p className="text-sm md:text-lg opacity-90 mx-auto">
             We'd love to hear from you. Let's start a conversation.
           </p>
         </div>
-      </div>
-
-      <div className="container mx-auto px-4 py-12">
+      </div> */}
         {showSuccess && (
-          <div className="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-lg flex items-center">
+          <div className="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-lg flex items-center" data-aos="fade-up">
             <svg
               className="w-6 h-6 mr-2"
               fill="none"
@@ -124,7 +131,7 @@ function ContactPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8" data-aos="fade-up">
           {/* Info */}
           <div className="bg-white rounded-xl shadow-lg p-8 space-y-6">
             <h2 className="text-2xl font-bold text-gray-800 border-b pb-4">
@@ -301,7 +308,7 @@ function ContactPage() {
         </div>
 
         {/* Map */}
-        <div className="mt-12">
+        <div className="mt-12" data-aos="fade-up">
           <div className="rounded-xl shadow-lg overflow-hidden">
             <iframe
               title="map"

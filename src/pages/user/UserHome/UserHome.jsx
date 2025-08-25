@@ -10,6 +10,7 @@ import TestimonialCard from "../../../components/common/TestimonialCard/Testimon
 
 import testimonialImg from "../../../assets/images/testimonial-image.jpg";
 
+
 import {
   FaGraduationCap,
   FaChalkboardTeacher,
@@ -400,7 +401,7 @@ function UserHome() {
       </div>
 
       <div className="container">
-        <div>
+        <div  > 
           <SubHeader
             tagline=" Meet Our Experts"
             title="Find Your Ideal Learning Partner"
@@ -408,14 +409,14 @@ function UserHome() {
           />
           <Slider slidesToShow={3} autoSlide={true} autoSlideInterval={5000}>
             {tutors.map((tutor) => (
-              <div key={tutor.id} className="flex justify-center items-center">
+              <div key={tutor.id} className="flex justify-center items-center" data-aos="fade-up">
                 <TutorCard tutor={tutor} />
               </div>
             ))}
           </Slider>
-         <div className="text-center mt-5">
+         {/* <div className="text-center mt-5">
            <DefaultButton buttonText="View All Tutors" />
-         </div>
+         </div> */}
         </div>
         <SubHeader
           tagline="Lorem, ipsum dolor."
@@ -423,7 +424,7 @@ function UserHome() {
           description="Lorem ipsum dolor, sit amet consectetur adipisicing elit. Corrupti, sunt. Doloribus quibusdam beatae vero earum?"
         />
         <div>
-          <div className="mb-16">
+          <div className="mb-16" data-aos="fade-up">
             <h1 className="text-2xl font-medium mb-5">Tution</h1>
             {/* Grid (large screens only) */}
             <div className="hidden lg:grid lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2">
@@ -450,7 +451,7 @@ function UserHome() {
               ))}
             </div>
           </div>
-          <div className="mb-16">
+          <div className="mb-16" data-aos="fade-up">
             <h1 className="text-2xl font-medium mb-5">Languages</h1>
             {/* Grid (large screens only) */}
             <div className="hidden lg:grid lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2">
@@ -477,7 +478,7 @@ function UserHome() {
               ))}
             </div>
           </div>
-          <div className="mb-16">
+          <div className="mb-16" data-aos="fade-up">
             <h1 className="text-2xl font-medium mb-5">Hobbies</h1>
             {/* Grid (large screens only) */}
             <div className="hidden lg:grid lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2">
@@ -522,7 +523,7 @@ function UserHome() {
           </div>
         </div> */}
 
-        <section className="relative bg-gradient-to-br from-green-500 via-green-600 to-green-700 rounded-md text-white py-16 px-4 md:px-8 lg:px-12 overflow-hidden">
+        <section className="relative bg-gradient-to-br from-green-500 via-green-600 to-green-700 rounded-md text-white py-16 px-4 md:px-8 lg:px-12 overflow-hidden" data-aos="fade-up">
           {/* Background Elements */}
           <div className="absolute inset-0 bg-black/10 mix-blend-overlay"></div>
           <div className="absolute top-0 left-0 w-72 h-72 bg-white/5 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
@@ -631,7 +632,7 @@ function UserHome() {
           description="Hear from our community of learners about their experiences"
         />
         {/* Testimonial Cards - Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-5" data-aos="fade-up">
           <div>
             <img
               src={testimonialImg}
@@ -664,7 +665,9 @@ function UserHome() {
             title="Find a Tutor for Anything!"
             description="Discover expert tutors for all subjects, languages, hobbies, and exam preparation"
           />
-          <FindTutorMenu />
+         <div data-aos="fade-up">
+           <FindTutorMenu />
+         </div>
         </div>
       </div>
      

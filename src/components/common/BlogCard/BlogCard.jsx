@@ -3,9 +3,12 @@ import { FaCalendarAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 function BlogCard({ post }) {
+  const handleClick = () => {
+    window.scrollTo(0, 0);
+  };
   return (
-    <div>
-      <Link to="/blogSingle">
+    <div data-aos="fade-up">
+      <Link to="/blogSingle" onClick={handleClick} >
         <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
           {/* Image */}
           <img

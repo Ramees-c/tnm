@@ -91,24 +91,20 @@ const PlatformOverview = () => {
 
   return (
     <section className="py-16 relative overflow-hidden">
-      {/* Decorative elements */}
-      <div className="absolute top-0 left-0 w-full h-72 -skew-y-3 -translate-y-24"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-400/10 rounded-full -translate-x-64 translate-y-64"></div>
-
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="px-4 relative z-10">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center  mx-auto mb-16">
           <span className="inline-block px-4 py-1.5 text-xs font-semibold text-green-600 bg-green-100 rounded-full mb-4">
             Transforming Education
           </span>
-          <h2 className="text-3xl md:text-5xl font-bold text-gray-800 mb-6 leading-tight">
+          <h2 className="text-2xl md:text-5xl font-bold text-gray-800 mb-6 leading-tight">
             Learn from the Best{" "}
             <span className="text-transparent bg-clip-text bg-green-600">
               Educators
             </span>{" "}
             Worldwide
           </h2>
-          <p className="text-lg text-gray-600 leading-relaxed">
+          <p className="text-sm md:text-lg text-gray-600 leading-relaxed">
             Our innovative platform connects passionate learners with expert
             educators for personalized, effective learning experiences.
           </p>
@@ -120,7 +116,7 @@ const PlatformOverview = () => {
             <button
               key={index}
               onClick={() => setActiveTab(index)}
-              className={`px-8 py-4 mx-2 mb-4 rounded-xl text-base md:text-lg font-medium transition-all duration-300 relative overflow-hidden group ${
+              className={`px-8 py-4 mx-2 mb-4 rounded-xl text-sm md:text-md md:text-lg font-medium transition-all duration-300 relative overflow-hidden group ${
                 activeTab === index
                   ? "text-white shadow-xl"
                   : "bg-white text-gray-700 hover:text-white shadow-md hover:shadow-lg"
@@ -161,7 +157,7 @@ const PlatformOverview = () => {
           {features.map((feature, index) => (
             <div
               key={index}
-              className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 relative overflow-hidden group"
+              className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 relative overflow-hidden group"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-gray-50 to-white rounded-bl-full"></div>
 
@@ -186,7 +182,7 @@ const PlatformOverview = () => {
         </div>
 
         {/* CTA Section */}
-        <div className="bg-gradient-to-br from-green-500 via-green-600 to-green-700 rounded-2xl shadow-2xl p-10 text-center text-white relative overflow-hidden">
+        <div className="bg-gradient-to-br from-green-500 via-green-600 to-green-700 rounded-2xl shadow-md p-10 text-center text-white relative overflow-hidden">
           <div className="absolute -top-20 -right-20 w-40 h-40 bg-white/10 rounded-full"></div>
           <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-white/10 rounded-full"></div>
 

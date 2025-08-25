@@ -14,6 +14,10 @@ function Userheader() {
   const [category, setCategory] = useState([]);
   const dropdownRef = useRef(null);
 
+  const handleClick = () => {
+    window.scrollTo(0, 0);
+  };
+
   // Handle scroll to show/hide header
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -85,6 +89,7 @@ function Userheader() {
                         : "text-gray-700 font-medium"
                     }`
                   }
+                  onClick={handleClick}
                 >
                   Home
                 </NavLink>
@@ -99,6 +104,7 @@ function Userheader() {
                         : "text-gray-700 font-medium"
                     }`
                   }
+                  onClick={handleClick}
                 >
                   About
                 </NavLink>
@@ -186,13 +192,14 @@ function Userheader() {
                         : "text-gray-700 font-medium"
                     }`
                   }
+                  onClick={handleClick}
                 >
                   Blogs
                 </NavLink>
               </li>
               <li>
                 <NavLink
-                  to="/testimonials"
+                  to="/testimonial"
                   className={({ isActive }) =>
                     `text-sm xl:text-lg font-montserrat hover:text-primary hover:font-bold duration-300 ${
                       isActive
@@ -200,6 +207,7 @@ function Userheader() {
                         : "text-gray-700 font-medium"
                     }`
                   }
+                  onClick={handleClick}
                 >
                   Testimonials
                 </NavLink>
@@ -214,6 +222,7 @@ function Userheader() {
                         : "text-gray-700 font-medium"
                     }`
                   }
+                  onClick={handleClick}
                 >
                   Contact
                 </NavLink>

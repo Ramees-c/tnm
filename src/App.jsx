@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
+import AOS from "aos";
+import "aos/dist/aos.css";
 import "./App.css";
 
 import UserHome from "./pages/user/UserHome/UserHome";
@@ -13,8 +15,16 @@ import ContactPage from "./pages/user/ContactPage/ContactPage";
 import BlogPge from "./pages/user/BlogPage/BlogPge";
 import BlogSingle from "./pages/user/BlogSingle/BlogSingle";
 import LoginRegisterPage from "./pages/user/LoginRegisterPage/LoginRegisterPage";
+import TestimonialPage from "./pages/user/TestimonialPage/TestimonialPage";
 
 function App() {
+  useEffect(() => {
+    AOS.init({
+      duration: 800, 
+      easing: "ease-in-out", 
+      once: true, 
+    });
+  }, []);
   return (
     <div>
       <Userheader />
@@ -28,6 +38,7 @@ function App() {
         <Route path="/blog" element={<BlogPge />} />
         <Route path="/blogSingle" element={<BlogSingle />} />
         <Route path="/register" element={<LoginRegisterPage />} />
+        <Route path="/testimonial" element={<TestimonialPage />} />
       </Routes>
       <Footer />
     </div>

@@ -18,12 +18,12 @@ const MobileSidebar = ({ isOpen, onClose }) => {
     },
     {
       name: "Blogs",
-      path: "/blogs",
+      path: "/blog",
       icon: <FiBook className="text-primary text-lg" />,
     },
     {
       name: "Testimonials",
-      path: "/testimonials",
+      path: "/testimonial",
       icon: <FiStar className="text-primary text-lg" />,
     },
     {
@@ -46,6 +46,10 @@ const MobileSidebar = ({ isOpen, onClose }) => {
       document.body.style.overflow = "auto";
     };
   }, [isOpen]);
+
+  const handleClick = () => {
+    window.scrollTo(0, 0);
+  };
 
   return (
     <>
@@ -86,9 +90,12 @@ const MobileSidebar = ({ isOpen, onClose }) => {
           <ul className="space-y-1">
             {navItems.map((item, index) => (
               <NavLink
-              key={item.id}
+                key={item.id}
                 to={item.path}
-                onClick={onClose} // closes sidebar after clicking
+                onClick={() => {
+                  onClose();
+                  handleClick();
+                }}
                 className={({ isActive }) =>
                   `flex items-center p-3 rounded-md transition-colors duration-200 group ${
                     isActive
