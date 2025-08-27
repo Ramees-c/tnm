@@ -1,189 +1,27 @@
-// import { useState } from "react";
-// import { FaSpinner } from "react-icons/fa";
-// import FormInput from "../FormInput/FormInput";
-// import PhoneInput from "react-phone-input-2";
-// import "react-phone-input-2/lib/style.css";
-
-// function TutorRegisterForm() {
-//   const [formData, setFormData] = useState({
-//     name: "",
-//     email: "",
-//     countryCode: "91", // default India 🇮🇳
-//     phoneNumber: "",
-//     gender: "",
-//     category: "",
-//     location: "",
-//   });
-
-//   const [isSubmitting, setIsSubmitting] = useState(false);
-
-//   const handleChange = (e) => {
-//     setFormData({ ...formData, [e.target.name]: e.target.value });
-//   };
-
-//   // Country Code change
-//   const handleCountryCodeChange = (value, country) => {
-//     setFormData({ ...formData, countryCode: value });
-//   };
-
-//   // Phone Number change
-//   const handlePhoneChange = (e) => {
-//     const onlyNums = e.target.value.replace(/\D/g, ""); // remove non-numeric
-//     setFormData({ ...formData, phoneNumber: onlyNums });
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     setIsSubmitting(true);
-
-//     // Combine country code + phone number before sending
-//     const fullPhone = `+${formData.countryCode}${formData.phoneNumber}`;
-//     const submitData = { ...formData, phone: fullPhone };
-
-//     await new Promise((resolve) => setTimeout(resolve, 1500));
-
-//     console.log(submitData);
-//     setIsSubmitting(false);
-
-//     alert("Registration successful! We'll contact you soon.");
-//   };
-
-//   return (
-//     <div className="min-h-screen flex items-center justify-center py-8">
-//       <div className="w-full max-w-md bg-white rounded-lg shadow-lg overflow-hidden">
-//         {/* Header */}
-//         <div className="bg-gradient-to-r from-green-500 to-green-600 p-6 text-center">
-//           <h2 className="text-xl font-bold text-white">Join as a Tutor</h2>
-//           <p className="text-white mt-2 text-xs md:text-sm">
-//             Share your knowledge and inspire students
-//           </p>
-//         </div>
-
-//         {/* Form */}
-//         <form onSubmit={handleSubmit} className="p-6 space-y-5">
-//           <FormInput
-//             name="name"
-//             placeholder="Enter your Full Name"
-//             value={formData.name}
-//             onChange={handleChange}
-//             required
-//           />
-
-//           <FormInput
-//             type="email"
-//             name="email"
-//             placeholder="Enter your Email"
-//             value={formData.email}
-//             onChange={handleChange}
-//             required
-//           />
-
-//           {/* ✅ Country Code + Phone in separate columns */}
-//           <div className="grid grid-cols-3 gap-3">
-//             <div className="col-span-1">
-//               <PhoneInput
-//                 country={"in"}
-//                 value={formData.countryCode}
-//                 onChange={handleCountryCodeChange}
-//                 inputClass="!w-full !h-11 !text-gray-700 !rounded-md !outline-none !border !cursor-pointer !border-gray-300 focus:!ring-0 focus:!border-primary"
-//                 buttonClass="!h-11"
-//                 dropdownClass="!bg-white !text-gray-700"
-//                 enableSearch={true}
-//                 inputProps={{
-//                   name: "countryCode",
-//                   required: true,
-//                 }}
-//               />
-//             </div>
-//             <div className="col-span-2">
-//               <input
-//                 type="tel"
-//                 name="phoneNumber"
-//                 value={formData.phoneNumber}
-//                 onChange={handlePhoneChange}
-//                 placeholder="Enter your Phone Number"
-//                 className="w-full px-4 py-2 flex justify-between items-center border placeholder-gray-400 border-gray-300 rounded-md cursor-pointer outline-none focus:ring-0 bg-white focus:border-primary transition"
-//                 required
-//               />
-//             </div>
-//           </div>
-
-//           <FormInput
-//             name="gender"
-//             placeholder="Select Gender"
-//             value={formData.gender}
-//             onChange={handleChange}
-//             select
-//             options={[
-//               { label: "Select Gender", value: "" },
-//               { label: "Male", value: "male" },
-//               { label: "Female", value: "female" },
-//               { label: "Other", value: "other" },
-//             ]}
-//             required
-//           />
-
-//           <FormInput
-//             name="category"
-//             placeholder="Subject or Category you Teach"
-//             value={formData.category}
-//             onChange={handleChange}
-//             required
-//           />
-
-//           <FormInput
-//             name="location"
-//             placeholder="Pincode or Locality (e.g., 560076 or JP Nagar)"
-//             value={formData.location}
-//             onChange={handleChange}
-//             required
-//           />
-
-//           {/* Submit Button */}
-//           <button
-//             type="submit"
-//             disabled={isSubmitting}
-//             className={`w-full py-3 px-4 rounded-lg font-medium text-white transition-all flex items-center justify-center ${
-//               isSubmitting
-//                 ? "bg-green-300 cursor-not-allowed"
-//                 : "bg-gradient-to-r from-green-500 to-green-600 shadow-md hover:shadow-lg"
-//             }`}
-//           >
-//             {isSubmitting ? (
-//               <>
-//                 <FaSpinner className="animate-spin h-5 w-5 text-white mr-2" />
-//                 Processing...
-//               </>
-//             ) : (
-//               "Create Tutor Profile"
-//             )}
-//           </button>
-
-//           <p className="text-xs text-center text-gray-500 mt-4">
-//             By signing up, you agree to our{" "}
-//             <a href="#" className="text-primary hover:underline font-bold">
-//               Terms of Use
-//             </a>{" "}
-//             and{" "}
-//             <a href="#" className="text-primary hover:underline font-bold">
-//               Privacy Policy
-//             </a>
-//           </p>
-//         </form>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default TutorRegisterForm;
-
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { FaSpinner, FaEye, FaEyeSlash } from "react-icons/fa";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import FormInput from "../FormInput/FormInput";
-
 import { Upload, ImageIcon, X } from "lucide-react";
+
+const subjectsList = [
+  "Mathematics",
+  "Physics",
+  "Chemistry",
+  "Biology",
+  "English",
+  "Computer Science",
+  "History",
+  "Geography",
+  "Economics",
+  "Accountancy",
+  "Political Science",
+  "Sociology",
+  "Psychology",
+  "Business Studies",
+  "Environmental Science",
+];
 
 function TutorRegisterForm() {
   const [formData, setFormData] = useState({
@@ -192,7 +30,6 @@ function TutorRegisterForm() {
     countryCode: "91",
     phoneNumber: "",
     password: "",
-    confirmPassword: "",
     profilePhoto: null,
     gender: "",
     city: "",
@@ -205,52 +42,158 @@ function TutorRegisterForm() {
     bio: "",
   });
 
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [filteredSubjects, setFilteredSubjects] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [preview, setPreview] = useState(null);
+
+  // Refs for form fields to focus on error
+  const errorRefs = {
+    name: useRef(null),
+    email: useRef(null),
+    countryCode: useRef(null),
+    phoneNumber: useRef(null),
+    password: useRef(null),
+    confirmPassword: useRef(null),
+    gender: useRef(null),
+    city: useRef(null),
+    state: useRef(null),
+    pincode: useRef(null),
+    qualification: useRef(null),
+    experience: useRef(null),
+    hourlyRate: useRef(null),
+    subjects: useRef(null),
+    bio: useRef(null),
+  };
+
+  // Scroll to first error field when errors change
+  useEffect(() => {
+    const firstErrorKey = Object.keys(errors)[0];
+    if (firstErrorKey && errors[firstErrorKey] && errorRefs[firstErrorKey]?.current) {
+      // Use setTimeout to ensure DOM is updated before scrolling
+      setTimeout(() => {
+        errorRefs[firstErrorKey].current.scrollIntoView({ 
+          behavior: "smooth", 
+          block: "center"
+        });
+        errorRefs[firstErrorKey].current.focus({ preventScroll: true });
+      }, 100);
+    }
+  }, [errors]);
 
   const handleChange = (e) => {
     const { name, value, files, type } = e.target;
-
     if (type === "file") {
-      setFormData({
-        ...formData,
-        [name]: files[0], // store only one file (first one)
-      });
+      setFormData({ ...formData, [name]: files[0] });
     } else {
-      setFormData({
-        ...formData,
-        [name]: value, // for text, email, password, etc.
-      });
+      setFormData({ ...formData, [name]: value });
     }
+    setErrors((prev) => ({ ...prev, [name]: "" })); // clear error
   };
 
   const handleCountryCodeChange = (value) => {
     setFormData({ ...formData, countryCode: value });
+    setErrors((prev) => ({ ...prev, countryCode: "" }));
   };
 
   const handlePhoneChange = (e) => {
     const onlyNums = e.target.value.replace(/\D/g, "");
     setFormData({ ...formData, phoneNumber: onlyNums });
+    setErrors((prev) => ({ ...prev, phoneNumber: "" }));
+  };
+
+  const validateForm = () => {
+    let newErrors = {};
+
+    if (!formData.name.trim()) newErrors.name = "Full name is required";
+
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Invalid email address";
+    }
+
+    if (!formData.countryCode)
+      newErrors.countryCode = "Country code is required";
+    if (!formData.phoneNumber)
+      newErrors.phoneNumber = "Phone number is required";
+
+    if (!formData.gender) newErrors.gender = "Gender is required";
+
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
+    } else if (!/[0-9]/.test(formData.password)) {
+      newErrors.password = "Password must contain at least one number";
+    } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) {
+      newErrors.password =
+        "Password must contain at least one special character";
+    }
+
+    if (!confirmPassword) {
+      newErrors.confirmPassword = "Confirm password is required";
+    } else if (formData.password !== confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    if (!formData.city) newErrors.city = "City is required";
+    if (!formData.state) newErrors.state = "State is required";
+    if (!formData.pincode) newErrors.pincode = "Pincode is required";
+    if (!formData.qualification)
+      newErrors.qualification = "Qualification is required";
+    if (!formData.experience) newErrors.experience = "Experience is required";
+    if (!formData.hourlyRate) newErrors.hourlyRate = "Hourly rate is required";
+    if (!formData.subjects) newErrors.subjects = "Subjects are required";
+    if (!formData.bio) newErrors.bio = "Bio is required";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubjectChange = (e) => {
+    const value = e.target.value;
+    setFormData({ ...formData, subjects: value });
+    setErrors((prev) => ({ ...prev, subjects: "" }));
+
+    if (value.length > 0) {
+      const matches = subjectsList.filter((s) =>
+        s.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredSubjects(matches);
+      setShowSuggestions(true);
+    } else {
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSuggestionClick = (subject) => {
+    setFormData({ ...formData, subjects: subject });
+    setShowSuggestions(false);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
     setIsSubmitting(true);
 
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
-      setIsSubmitting(false);
-      return;
-    }
-
+    // Only include password if it matches confirmPassword
+    const { ...rest } = formData;
     const fullPhone = `+${formData.countryCode}${formData.phoneNumber}`;
-    const submitData = { ...formData, phone: fullPhone };
+    const submitData = {
+      ...rest,
+      phone: fullPhone,
+    };
 
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    console.log(submitData);
+    console.log(submitData); // confirmPassword not included
     setIsSubmitting(false);
     alert("Registration successful! We'll contact you soon.");
   };
@@ -268,7 +211,7 @@ function TutorRegisterForm() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-6">
-          {/* Personal Information Section */}
+          {/* Personal Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">
               Personal Information
@@ -320,7 +263,7 @@ function TutorRegisterForm() {
                   onClick={() => {
                     setPreview(null);
                     setFormData((prev) => ({ ...prev, profilePhoto: null }));
-                    document.getElementById("profilePhoto").value = ""; // reset input
+                    document.getElementById("profilePhoto").value = "";
                   }}
                   className="mt-2 flex items-center gap-1 text-sm text-red-600 hover:text-red-700 transition"
                 >
@@ -331,79 +274,125 @@ function TutorRegisterForm() {
               <p className="text-xs text-gray-500 mt-2">PNG, JPG up to 5MB</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Name & Email */}
+            <div ref={errorRefs.name}>
               <FormInput
                 name="name"
                 placeholder="Enter your Full Name"
                 value={formData.name}
                 onChange={handleChange}
-                required
+                hasError={errors.name}
+                innerRef={errorRefs.name}
               />
+              {errors.name && (
+                <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+              )}
+            </div>
+
+            <div ref={errorRefs.email}>
               <FormInput
                 type="email"
                 name="email"
                 placeholder="Enter your Email"
                 value={formData.email}
                 onChange={handleChange}
-                required
+                hasError={errors.email}
+                innerRef={errorRefs.email}
               />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+              )}
             </div>
 
+            {/* Phone + Gender */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex gap-3">
-                <div className="w-28">
-                  <PhoneInput
-                    country={"in"}
-                    value={formData.countryCode}
-                    onChange={handleCountryCodeChange}
-                    inputClass="!w-full !h-12 !text-gray-700 !rounded-lg !outline-none !border !border-gray-300 focus:!ring-0 focus:!border-green-500"
-                    buttonClass="!h-12 !rounded-lg !border-gray-300 !bg-white"
-                    dropdownClass="!bg-white !text-gray-700 !rounded-lg !border-gray-200 !shadow-md"
-                    enableSearch={true}
-                    inputProps={{
-                      name: "countryCode",
-                      required: true,
-                    }}
-                  />
-                </div>
-                <div className="flex-1">
-                  <input
-                    type="tel"
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
-                    onChange={handlePhoneChange}
-                    placeholder="Phone Number *"
-                    className="w-full h-12 px-4 border border-gray-300 rounded-lg outline-none focus:ring-0 focus:border-primary"
-                    required
-                  />
+              <div ref={errorRefs.phoneNumber}>
+                <div className="flex gap-3">
+                  <div className="w-28" ref={errorRefs.countryCode}>
+                    <PhoneInput
+                      country={"in"}
+                      value={formData.countryCode}
+                      onChange={handleCountryCodeChange}
+                      inputClass={`!w-full !h-12 !text-gray-700 !rounded-lg !outline-none !border ${
+                        errors.countryCode
+                          ? "!border-red-500"
+                          : "!border-gray-300"
+                      } focus:!ring-0 focus:!border-green-500`}
+                      buttonClass={`!h-12 !rounded-lg !border ${
+                        errors.countryCode
+                          ? "!border-red-500"
+                          : "!border-gray-300"
+                      } !bg-white`}
+                      dropdownClass="!bg-white !text-gray-700 !rounded-lg !border-gray-200 !shadow-md"
+                      enableSearch={true}
+                      inputProps={{ 
+                        name: "countryCode",
+                        ref: errorRefs.countryCode
+                      }}
+                    />
+                    {errors.countryCode && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.countryCode}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex-1">
+                    <input
+                      type="tel"
+                      name="phoneNumber"
+                      value={formData.phoneNumber}
+                      onChange={handlePhoneChange}
+                      placeholder="Phone Number *"
+                      ref={errorRefs.phoneNumber}
+                      className={`w-full h-12 px-4 border ${
+                        errors.phoneNumber
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      } rounded-lg placeholder-gray-400 outline-none focus:ring-0 focus:border-primary`}
+                    />
+                    {errors.phoneNumber && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.phoneNumber}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              <FormInput
-                name="gender"
-                placeholder="Select Gender"
-                value={formData.gender}
-                onChange={handleChange}
-                select
-                options={[
-                  { label: "Select Gender *", value: "" },
-                  { label: "Male", value: "male" },
-                  { label: "Female", value: "female" },
-                  { label: "Other", value: "other" },
-                ]}
-                required
-              />
+              <div ref={errorRefs.gender}>
+                <FormInput
+                  name="gender"
+                  placeholder="Select Gender"
+                  value={formData.gender}
+                  onChange={handleChange}
+                  select
+                  options={[
+                    { label: "Select Gender *", value: "" },
+                    { label: "Male", value: "male" },
+                    { label: "Female", value: "female" },
+                    { label: "Other", value: "other" },
+                  ]}
+                  hasError={errors.gender}
+                  innerRef={errorRefs.gender}
+                />
+                {errors.gender && (
+                  <p className="text-red-500 text-xs mt-1">{errors.gender}</p>
+                )}
+              </div>
             </div>
 
+            {/* Password + Confirm Password */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="relative">
+              <div className="relative" ref={errorRefs.password}>
                 <FormInput
                   type={showPassword ? "text" : "password"}
                   name="password"
                   placeholder="Password *"
                   value={formData.password}
                   onChange={handleChange}
-                  required
+                  hasError={errors.password}
+                  innerRef={errorRefs.password}
                 />
                 <button
                   type="button"
@@ -412,16 +401,24 @@ function TutorRegisterForm() {
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
+                {errors.password && (
+                  <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+                )}
               </div>
 
-              <div className="relative">
-                <FormInput
+              <div className="relative" ref={errorRefs.confirmPassword}>
+                <input
                   type={showConfirmPassword ? "text" : "password"}
                   name="confirmPassword"
                   placeholder="Confirm Password *"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  ref={errorRefs.confirmPassword}
+                  className={`w-full h-12 px-4 pr-10 border ${
+                    errors.confirmPassword
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } rounded-lg placeholder-gray-400 outline-none focus:ring-0 focus:border-primary`}
                 />
                 <button
                   type="button"
@@ -430,82 +427,164 @@ function TutorRegisterForm() {
                 >
                   {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
+                {errors.confirmPassword && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.confirmPassword}
+                  </p>
+                )}
               </div>
             </div>
           </div>
 
-          {/* Location Information Section */}
+          {/* Location & Professional Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">
               Location Information
             </h3>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <FormInput
-                name="city"
-                placeholder="City *"
-                value={formData.city}
-                onChange={handleChange}
-                required
-              />
-              <FormInput
-                name="state"
-                placeholder="State *"
-                value={formData.state}
-                onChange={handleChange}
-                required
-              />
-              <FormInput
-                name="pincode"
-                placeholder="Pincode *"
-                value={formData.pincode}
-                onChange={handleChange}
-                required
-              />
+              <div ref={errorRefs.city}>
+                <FormInput
+                  name="city"
+                  placeholder="City *"
+                  value={formData.city}
+                  onChange={handleChange}
+                  hasError={errors.city}
+                  innerRef={errorRefs.city}
+                />
+                {errors.city && (
+                  <p className="text-red-500 text-xs mt-1">{errors.city}</p>
+                )}
+              </div>
+              <div ref={errorRefs.state}>
+                <FormInput
+                  name="state"
+                  placeholder="State *"
+                  value={formData.state}
+                  onChange={handleChange}
+                  hasError={errors.state}
+                  innerRef={errorRefs.state}
+                />
+                {errors.state && (
+                  <p className="text-red-500 text-xs mt-1">{errors.state}</p>
+                )}
+              </div>
+              <div ref={errorRefs.pincode}>
+                <FormInput
+                  name="pincode"
+                  placeholder="Pincode *"
+                  value={formData.pincode}
+                  onChange={handleChange}
+                  hasError={errors.pincode}
+                  innerRef={errorRefs.pincode}
+                />
+                {errors.pincode && (
+                  <p className="text-red-500 text-xs mt-1">{errors.pincode}</p>
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Professional Information Section */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">
+            <h3 className="text-lg font-semibold text-gray-700 border-b pb-2 mt-6">
               Professional Information
             </h3>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormInput
-                name="qualification"
-                placeholder="Highest Qualification *"
-                value={formData.qualification}
-                onChange={handleChange}
-                required
-              />
-              <FormInput
-                name="experience"
-                placeholder="Teaching Experience (years) *"
-                value={formData.experience}
-                onChange={handleChange}
-                required
-              />
+              <div ref={errorRefs.qualification}>
+                <FormInput
+                  name="qualification"
+                  placeholder="Highest Qualification *"
+                  value={formData.qualification}
+                  onChange={handleChange}
+                  hasError={errors.qualification}
+                  innerRef={errorRefs.qualification}
+                />
+                {errors.qualification && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.qualification}
+                  </p>
+                )}
+              </div>
+              <div ref={errorRefs.experience}>
+                <FormInput
+                  name="experience"
+                  placeholder="Teaching Experience (years) *"
+                  value={formData.experience}
+                  onChange={handleChange}
+                  hasError={errors.experience}
+                  innerRef={errorRefs.experience}
+                />
+                {errors.experience && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.experience}
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormInput
-                name="hourlyRate"
-                placeholder="Hourly Rate (₹) *"
-                value={formData.hourlyRate}
-                onChange={handleChange}
-                required
-              />
-              <FormInput
-                name="subjects"
-                placeholder="Subjects You Teach *"
-                value={formData.subjects}
-                onChange={handleChange}
-                required
-              />
+              <div ref={errorRefs.hourlyRate}>
+                <FormInput
+                  name="hourlyRate"
+                  placeholder="Hourly Rate (₹) *"
+                  value={formData.hourlyRate}
+                  onChange={handleChange}
+                  hasError={errors.hourlyRate}
+                  innerRef={errorRefs.hourlyRate}
+                />
+                {errors.hourlyRate && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.hourlyRate}
+                  </p>
+                )}
+              </div>
+              <div ref={errorRefs.subjects} className="relative">
+                <input
+                  type="text"
+                  name="subjects"
+                  placeholder="Subjects You Teach *"
+                  value={formData.subjects}
+                  onChange={handleSubjectChange}
+                  ref={errorRefs.subjects}
+                  className={`w-full h-12 px-4 border ${
+                    errors.subjects ? "border-red-500" : "border-gray-300"
+                  } rounded-lg placeholder-gray-400 outline-none focus:ring-0 focus:border-primary`}
+                />
+                {errors.subjects && (
+                  <p className="text-red-500 text-xs mt-1">{errors.subjects}</p>
+                )}
+
+                {showSuggestions && filteredSubjects.length > 0 && (
+                  <ul className="absolute z-10 bg-white border border-gray-300 rounded-lg mt-1 w-full max-h-40 overflow-y-auto shadow-lg">
+                    {filteredSubjects.map((subject, index) => {
+                      // Highlight matched letters
+                      const regex = new RegExp(`(${formData.subjects})`, "gi");
+                      const parts = subject.split(regex);
+
+                      return (
+                        <li
+                          key={index}
+                          onClick={() => handleSuggestionClick(subject)}
+                          className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                        >
+                          {parts.map((part, i) =>
+                            regex.test(part) ? (
+                              <span
+                                key={i}
+                                className="text-green-400 font-semibold"
+                              >
+                                {part}
+                              </span>
+                            ) : (
+                              <span key={i}>{part}</span>
+                            )
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
             </div>
 
-            <div>
+            <div ref={errorRefs.bio}>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Bio *
               </label>
@@ -514,14 +593,19 @@ function TutorRegisterForm() {
                 placeholder="Tell us about yourself, your teaching style, and experience..."
                 value={formData.bio}
                 onChange={handleChange}
+                ref={errorRefs.bio}
                 rows="4"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none focus:ring-0 focus:border-primary transition"
-                required
+                className={`w-full px-4 py-3 border ${
+                  errors.bio ? "border-red-500" : "border-gray-300"
+                } rounded-lg outline-none focus:ring-0 focus:border-primary transition`}
               />
+              {errors.bio && (
+                <p className="text-red-500 text-xs mt-1">{errors.bio}</p>
+              )}
             </div>
           </div>
 
-          {/* Submit Button */}
+          {/* Submit */}
           <button
             type="submit"
             disabled={isSubmitting}
@@ -540,17 +624,6 @@ function TutorRegisterForm() {
               "Create Tutor Profile"
             )}
           </button>
-
-          <p className="text-xs text-center text-gray-500 mt-4">
-            By signing up, you agree to our{" "}
-            <a href="#" className="text-green-600 hover:underline font-medium">
-              Terms of Use
-            </a>{" "}
-            and{" "}
-            <a href="#" className="text-green-600 hover:underline font-medium">
-              Privacy Policy
-            </a>
-          </p>
         </form>
       </div>
     </div>
