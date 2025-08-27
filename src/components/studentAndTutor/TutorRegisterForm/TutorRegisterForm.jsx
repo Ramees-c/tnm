@@ -4,6 +4,7 @@ import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import FormInput from "../FormInput/FormInput";
 import { Upload, ImageIcon, X } from "lucide-react";
+import axios from "axios";
 
 const subjectsList = [
   "Mathematics",
@@ -40,6 +41,7 @@ function TutorRegisterForm() {
     hourlyRate: "",
     subjects: "",
     bio: "",
+    availableDays: [],
   });
 
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -51,8 +53,8 @@ function TutorRegisterForm() {
   const [filteredSubjects, setFilteredSubjects] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [preview, setPreview] = useState(null);
+  const [shouldScroll, setShouldScroll] = useState(false);
 
-  // Refs for form fields to focus on error
   const errorRefs = {
     name: useRef(null),
     email: useRef(null),
@@ -69,22 +71,29 @@ function TutorRegisterForm() {
     hourlyRate: useRef(null),
     subjects: useRef(null),
     bio: useRef(null),
+    availableDays: useRef(null),
   };
-
   // Scroll to first error field when errors change
   useEffect(() => {
+    if (!shouldScroll) return; // 🚫 don’t scroll while typing
+
     const firstErrorKey = Object.keys(errors)[0];
-    if (firstErrorKey && errors[firstErrorKey] && errorRefs[firstErrorKey]?.current) {
-      // Use setTimeout to ensure DOM is updated before scrolling
+    if (
+      firstErrorKey &&
+      errors[firstErrorKey] &&
+      errorRefs[firstErrorKey]?.current
+    ) {
       setTimeout(() => {
-        errorRefs[firstErrorKey].current.scrollIntoView({ 
-          behavior: "smooth", 
-          block: "center"
+        errorRefs[firstErrorKey].current.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
         });
         errorRefs[firstErrorKey].current.focus({ preventScroll: true });
       }, 100);
     }
-  }, [errors]);
+
+    setShouldScroll(false); // reset flag
+  }, [errors, shouldScroll]);
 
   const handleChange = (e) => {
     const { name, value, files, type } = e.target;
@@ -150,23 +159,51 @@ function TutorRegisterForm() {
     if (!formData.experience) newErrors.experience = "Experience is required";
     if (!formData.hourlyRate) newErrors.hourlyRate = "Hourly rate is required";
     if (!formData.subjects) newErrors.subjects = "Subjects are required";
+    if (!formData.availableDays || formData.availableDays.length === 0) {
+      newErrors.availableDays = "Please select at least one available day";
+    }
     if (!formData.bio) newErrors.bio = "Bio is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubjectChange = (e) => {
+  const handleSubjectChange = async (e) => {
     const value = e.target.value;
-    setFormData({ ...formData, subjects: value });
+    setFormData((prev) => ({ ...prev, subjects: value }));
     setErrors((prev) => ({ ...prev, subjects: "" }));
 
-    if (value.length > 0) {
-      const matches = subjectsList.filter((s) =>
-        s.toLowerCase().includes(value.toLowerCase())
-      );
-      setFilteredSubjects(matches);
-      setShowSuggestions(true);
+    if (value.trim().length > 0) {
+      try {
+        const res = await axios.get(
+          "https://tnm-test-api.dhanwis.com/api/category-list-create/"
+        );
+
+        if (res.data && Array.isArray(res.data)) {
+          // Gather all subcategory names
+          const allSubcategories = res.data.flatMap((category) =>
+            (category.subcategory || []).map((sub) => ({
+              name: sub,
+              parent: category.name,
+            }))
+          );
+
+          // Filter subcategories that match typed input
+          const matches = allSubcategories.filter((sub) =>
+            sub.name.toLowerCase().includes(value.toLowerCase())
+          );
+
+          setFilteredSubjects(matches); // array of objects with name + parent
+          setShowSuggestions(matches.length > 0);
+        } else {
+          setFilteredSubjects([]);
+          setShowSuggestions(false);
+        }
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+        setFilteredSubjects([]);
+        setShowSuggestions(false);
+      }
     } else {
       setShowSuggestions(false);
     }
@@ -179,23 +216,47 @@ function TutorRegisterForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      setShouldScroll(true);
+      return;
+    }
 
     setIsSubmitting(true);
 
-    // Only include password if it matches confirmPassword
-    const { ...rest } = formData;
-    const fullPhone = `+${formData.countryCode}${formData.phoneNumber}`;
-    const submitData = {
-      ...rest,
-      phone: fullPhone,
-    };
+    try {
+      // Remove confirmPassword before sending
+      const { confirmPassword, ...rest } = formData;
+      const fullPhone = `+${formData.countryCode}${formData.phoneNumber}`;
 
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Build FormData
+      const submitData = new FormData();
+      Object.entries({
+        ...rest,
+        phone: fullPhone,
+        availableDays: formData.availableDays.join(","), // ✅ convert array to CSV string
+      }).forEach(([key, value]) => {
+        submitData.append(key, value);
+      });
 
-    console.log(submitData); // confirmPassword not included
-    setIsSubmitting(false);
-    alert("Registration successful! We'll contact you soon.");
+      // Example API call
+      const res = await axios.post(
+        "http://tnm-test-api.dhanwis.com/api/register/", // replace with your endpoint
+        submitData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("✅ Response:", res.data);
+      alert("Registration successful! We'll contact you soon.");
+    } catch (error) {
+      console.error("❌ Error submitting form:", error);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -325,9 +386,9 @@ function TutorRegisterForm() {
                       } !bg-white`}
                       dropdownClass="!bg-white !text-gray-700 !rounded-lg !border-gray-200 !shadow-md"
                       enableSearch={true}
-                      inputProps={{ 
+                      inputProps={{
                         name: "countryCode",
-                        ref: errorRefs.countryCode
+                        ref: errorRefs.countryCode,
                       }}
                     />
                     {errors.countryCode && (
@@ -582,6 +643,56 @@ function TutorRegisterForm() {
                   </ul>
                 )}
               </div>
+            </div>
+
+            <div ref={errorRefs.availableDays}>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Available Days *
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                {[
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday",
+                  "Sunday",
+                ].map((day) => (
+                  <label
+                    key={day}
+                    className="flex items-center space-x-2 border p-2 rounded-lg cursor-pointer hover:bg-gray-50"
+                  >
+                    <input
+                      type="checkbox"
+                      value={day}
+                      checked={formData.availableDays.includes(day)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFormData((prev) => ({
+                            ...prev,
+                            availableDays: [...prev.availableDays, day],
+                          }));
+                        } else {
+                          setFormData((prev) => ({
+                            ...prev,
+                            availableDays: prev.availableDays.filter(
+                              (d) => d !== day
+                            ),
+                          }));
+                        }
+                      }}
+                      className="h-4 w-4 text-green-600"
+                    />
+                    <span>{day}</span>
+                  </label>
+                ))}
+              </div>
+              {errors.availableDays && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.availableDays}
+                </p>
+              )}
             </div>
 
             <div ref={errorRefs.bio}>
