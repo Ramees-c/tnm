@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import logo from "../../../assets/images/logo/tnmlogo.png";
 import { FaBars } from "react-icons/fa";
 import { FiChevronDown } from "react-icons/fi";
@@ -200,7 +200,9 @@ function Userheader() {
 
           {/* Login/Register Button */}
           <div className="flex">
-            <DefaultButton buttonText="Login/Register" />
+            <Link to="/register" onClick={handleClick}>
+              <DefaultButton buttonText="Login/Register" />
+            </Link>
           </div>
         </div>
 
