@@ -168,52 +168,99 @@ function TutorRegisterForm() {
     return Object.keys(newErrors).length === 0;
   };
 
+  // ✅ Recursive function to flatten categories and all nested subcategories
+  const flattenCategories = (categories, rootCategory = "", chain = []) => {
+    let result = [];
+
+    categories.forEach((category) => {
+      const currentRoot = rootCategory || category.name;
+
+      // build label chain (exclude root from chain list)
+      if (rootCategory) {
+        const cleanChain = [...chain].filter((c) => c !== currentRoot);
+
+        const label =
+          cleanChain.length > 0
+            ? `${category.name} in ${cleanChain
+                .reverse()
+                .join(" in ")} (${currentRoot})`
+            : `${category.name} (${currentRoot})`;
+
+        result.push({
+          id: category.id,
+          name: category.name,
+          label,
+          parent: currentRoot,
+        });
+      }
+
+      // Recurse deeper
+      if (category.subcategories && category.subcategories.length > 0) {
+        result = result.concat(
+          flattenCategories(category.subcategories, currentRoot, [
+            ...chain,
+            category.name,
+          ])
+        );
+      }
+    });
+
+    return result;
+  };
+
+  // ✅ Subject input change
   const handleSubjectChange = async (e) => {
     const value = e.target.value;
     setFormData((prev) => ({ ...prev, subjects: value }));
     setErrors((prev) => ({ ...prev, subjects: "" }));
 
-    if (value.trim().length > 0) {
-      try {
-        const res = await axios.get(
-          "https://tnm-test-api.dhanwis.com/api/category-list-create/"
+    if (!value.trim()) {
+      setFilteredSubjects([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    try {
+      const res = await axios.get(
+        "http://tnm-test-api.dhanwis.com/api/category-list/"
+      );
+
+      if (res.data && Array.isArray(res.data)) {
+        const allSubcategories = flattenCategories(res.data);
+
+        const matches = allSubcategories.filter((sub) =>
+          sub.label.toLowerCase().includes(value.toLowerCase())
         );
 
-        if (res.data && Array.isArray(res.data)) {
-          // Gather all subcategory names
-          const allSubcategories = res.data.flatMap((category) =>
-            (category.subcategory || []).map((sub) => ({
-              name: sub,
-              parent: category.name,
-            }))
-          );
-
-          // Filter subcategories that match typed input
-          const matches = allSubcategories.filter((sub) =>
-            sub.name.toLowerCase().includes(value.toLowerCase())
-          );
-
-          setFilteredSubjects(matches); // array of objects with name + parent
-          setShowSuggestions(matches.length > 0);
-        } else {
-          setFilteredSubjects([]);
-          setShowSuggestions(false);
-        }
-      } catch (err) {
-        console.error("Error fetching categories:", err);
+        setFilteredSubjects(matches);
+        setShowSuggestions(matches.length > 0);
+      } else {
         setFilteredSubjects([]);
         setShowSuggestions(false);
       }
-    } else {
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      setFilteredSubjects([]);
       setShowSuggestions(false);
     }
   };
 
-  const handleSuggestionClick = (subject) => {
-    setFormData({ ...formData, subjects: subject });
+  // ✅ Select subject
+  const handleSelectSubject = (label) => {
+    setFormData((prev) => ({ ...prev, subjects: label })); // full label in input
     setShowSuggestions(false);
+    setFilteredSubjects([]); // clear dropdown
   };
 
+  // ✅ Highlight typed text
+  const highlightMatch = (text, query) => {
+    if (!query) return text;
+    const regex = new RegExp(`(${query})`, "gi");
+    return text.replace(
+      regex,
+      (match) => `<span class="text-green-400 font-semibold">${match}</span>`
+    );
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
@@ -224,32 +271,11 @@ function TutorRegisterForm() {
     setIsSubmitting(true);
 
     try {
-      // Remove confirmPassword before sending
       const { confirmPassword, ...rest } = formData;
       const fullPhone = `+${formData.countryCode}${formData.phoneNumber}`;
 
-      // Build FormData
-      const submitData = new FormData();
-      Object.entries({
-        ...rest,
-        phone: fullPhone,
-        availableDays: formData.availableDays.join(","), // ✅ convert array to CSV string
-      }).forEach(([key, value]) => {
-        submitData.append(key, value);
-      });
+      console.log("📤 Data to submit:", { ...rest, phone: fullPhone });
 
-      // Example API call
-      const res = await axios.post(
-        "http://tnm-test-api.dhanwis.com/api/register/", // replace with your endpoint
-        submitData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      console.log("✅ Response:", res.data);
       alert("Registration successful! We'll contact you soon.");
     } catch (error) {
       console.error("❌ Error submitting form:", error);
@@ -473,7 +499,10 @@ function TutorRegisterForm() {
                   name="confirmPassword"
                   placeholder="Confirm Password *"
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    setErrors((prev) => ({ ...prev, confirmPassword: "" })); // ✅ clear error while typing
+                  }}
                   ref={errorRefs.confirmPassword}
                   className={`w-full h-12 px-4 pr-10 border ${
                     errors.confirmPassword
@@ -612,34 +641,19 @@ function TutorRegisterForm() {
                   <p className="text-red-500 text-xs mt-1">{errors.subjects}</p>
                 )}
 
+                {/* ✅ Suggestions Dropdown */}
                 {showSuggestions && filteredSubjects.length > 0 && (
-                  <ul className="absolute z-10 bg-white border border-gray-300 rounded-lg mt-1 w-full max-h-40 overflow-y-auto shadow-lg">
-                    {filteredSubjects.map((subject, index) => {
-                      // Highlight matched letters
-                      const regex = new RegExp(`(${formData.subjects})`, "gi");
-                      const parts = subject.split(regex);
-
-                      return (
-                        <li
-                          key={index}
-                          onClick={() => handleSuggestionClick(subject)}
-                          className="px-4 py-2 cursor-pointer hover:bg-gray-100"
-                        >
-                          {parts.map((part, i) =>
-                            regex.test(part) ? (
-                              <span
-                                key={i}
-                                className="text-green-400 font-semibold"
-                              >
-                                {part}
-                              </span>
-                            ) : (
-                              <span key={i}>{part}</span>
-                            )
-                          )}
-                        </li>
-                      );
-                    })}
+                  <ul className="absolute w-full border rounded-lg bg-white shadow-md mt-2 max-h-60 overflow-y-auto z-10">
+                    {filteredSubjects.map((sub) => (
+                      <li
+                        key={sub.id}
+                        onClick={() => handleSelectSubject(sub.label)} // 👈 pass full label
+                        className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm"
+                        dangerouslySetInnerHTML={{
+                          __html: highlightMatch(sub.label, formData.subjects),
+                        }}
+                      />
+                    ))}
                   </ul>
                 )}
               </div>
@@ -658,36 +672,47 @@ function TutorRegisterForm() {
                   "Friday",
                   "Saturday",
                   "Sunday",
-                ].map((day) => (
-                  <label
-                    key={day}
-                    className="flex items-center space-x-2 border p-2 rounded-lg cursor-pointer hover:bg-gray-50"
-                  >
-                    <input
-                      type="checkbox"
-                      value={day}
-                      checked={formData.availableDays.includes(day)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setFormData((prev) => ({
-                            ...prev,
-                            availableDays: [...prev.availableDays, day],
-                          }));
-                        } else {
-                          setFormData((prev) => ({
-                            ...prev,
-                            availableDays: prev.availableDays.filter(
-                              (d) => d !== day
-                            ),
-                          }));
-                        }
-                      }}
-                      className="h-4 w-4 text-green-600"
-                    />
-                    <span>{day}</span>
-                  </label>
-                ))}
+                ].map((day) => {
+                  const isChecked = formData.availableDays.includes(day);
+                  return (
+                    <label
+                      key={day}
+                      className={`flex items-center space-x-2 border p-2 rounded-lg cursor-pointer hover:bg-gray-50`}
+                    >
+                      <input
+                        type="checkbox"
+                        value={day}
+                        checked={isChecked}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setFormData((prev) => ({
+                              ...prev,
+                              availableDays: [...prev.availableDays, day],
+                            }));
+                          } else {
+                            setFormData((prev) => ({
+                              ...prev,
+                              availableDays: prev.availableDays.filter(
+                                (d) => d !== day
+                              ),
+                            }));
+                          }
+                          setErrors((prev) => ({ ...prev, availableDays: "" })); // ✅ clear error
+                        }}
+                        className="h-4 w-4 text-green-600 outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 active:ring-0 active:ring-offset-0 appearance-none checked:bg-green-600 checked:border-green-600"
+                      />
+                      <span
+                        className={`${
+                          isChecked ? "text-black font-medium" : "text-gray-400"
+                        }`}
+                      >
+                        {day}
+                      </span>
+                    </label>
+                  );
+                })}
               </div>
+
               {errors.availableDays && (
                 <p className="text-red-500 text-xs mt-1">
                   {errors.availableDays}
