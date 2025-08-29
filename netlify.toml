@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/api/*"
+  to = "http://tnm-test-api.dhanwis.com/:splat"
+  status = 200
+  force = true

@@ -73,6 +73,8 @@ function TutorRegisterForm() {
     bio: useRef(null),
     availableDays: useRef(null),
   };
+
+  const subjectRef = useRef(null);
   // Scroll to first error field when errors change
   useEffect(() => {
     if (!shouldScroll) return; // 🚫 don’t scroll while typing
@@ -94,6 +96,18 @@ function TutorRegisterForm() {
 
     setShouldScroll(false); // reset flag
   }, [errors, shouldScroll]);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (subjectRef.current && !subjectRef.current.contains(event.target)) {
+        setShowSuggestions(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, files, type } = e.target;
@@ -222,7 +236,7 @@ function TutorRegisterForm() {
 
     try {
       const res = await axios.get(
-        "http://tnm-test-api.dhanwis.com/api/category-list/"
+        "/api/category-list/"
       );
 
       if (res.data && Array.isArray(res.data)) {
@@ -625,7 +639,11 @@ function TutorRegisterForm() {
                   </p>
                 )}
               </div>
-              <div ref={errorRefs.subjects} className="relative">
+              <div
+                ref={errorRefs.subjects}
+                className="relative"
+                ref={subjectRef}
+              >
                 <input
                   type="text"
                   name="subjects"
@@ -647,7 +665,7 @@ function TutorRegisterForm() {
                     {filteredSubjects.map((sub) => (
                       <li
                         key={sub.id}
-                        onClick={() => handleSelectSubject(sub.label)} // 👈 pass full label
+                        onClick={() => handleSelectSubject(sub.label)}
                         className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm"
                         dangerouslySetInnerHTML={{
                           __html: highlightMatch(sub.label, formData.subjects),
