@@ -39,7 +39,7 @@ function TutorRegisterForm() {
     qualification: "",
     experience: "",
     hourlyRate: "",
-    subjects: "",
+    subjects: [],
     bio: "",
     availableDays: [],
   });
@@ -54,6 +54,7 @@ function TutorRegisterForm() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [preview, setPreview] = useState(null);
   const [shouldScroll, setShouldScroll] = useState(false);
+  const [subjectInput, setSubjectInput] = useState("");
 
   const errorRefs = {
     name: useRef(null),
@@ -225,7 +226,7 @@ function TutorRegisterForm() {
   // ✅ Subject input change
   const handleSubjectChange = async (e) => {
     const value = e.target.value;
-    setFormData((prev) => ({ ...prev, subjects: value }));
+    setSubjectInput(value); // only updates what user sees
     setErrors((prev) => ({ ...prev, subjects: "" }));
 
     if (!value.trim()) {
@@ -235,17 +236,12 @@ function TutorRegisterForm() {
     }
 
     try {
-      const res = await axios.get(
-        "/api/category-list/"
-      );
-
+      const res = await axios.get("/api/category-list/");
       if (res.data && Array.isArray(res.data)) {
         const allSubcategories = flattenCategories(res.data);
-
         const matches = allSubcategories.filter((sub) =>
           sub.label.toLowerCase().includes(value.toLowerCase())
         );
-
         setFilteredSubjects(matches);
         setShowSuggestions(matches.length > 0);
       } else {
@@ -261,20 +257,40 @@ function TutorRegisterForm() {
 
   // ✅ Select subject
   const handleSelectSubject = (label) => {
-    setFormData((prev) => ({ ...prev, subjects: label })); // full label in input
+    // Extract root (inside parentheses)
+    const rootMatch = label.match(/\(([^)]+)\)$/);
+    const root = rootMatch ? rootMatch[1].trim() : "";
+
+    // Remove root from label
+    const withoutRoot = label.replace(/\s*\([^)]+\)$/, "").trim();
+
+    // Break chain by " in "
+    let chain = withoutRoot.split(" in ").map((s) => s.trim());
+
+    // Final array (root first, rest reversed)
+    const subjectsArray = root ? [root, ...chain.reverse()] : chain.reverse();
+
+    // 🔹 Save array in formData
+    setFormData((prev) => ({ ...prev, subjects: subjectsArray }));
+
+    // 🔹 Show ORIGINAL label in input (not joined array)
+    setSubjectInput(label);
+
     setShowSuggestions(false);
-    setFilteredSubjects([]); // clear dropdown
+    setFilteredSubjects([]);
   };
 
   // ✅ Highlight typed text
+  // ✅ Highlight typed text inside suggestion
   const highlightMatch = (text, query) => {
     if (!query) return text;
     const regex = new RegExp(`(${query})`, "gi");
     return text.replace(
       regex,
-      (match) => `<span class="text-green-400 font-semibold">${match}</span>`
+      (match) => `<span class="text-green-400 font-bold">${match}</span>` // highlight color
     );
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
@@ -414,17 +430,17 @@ function TutorRegisterForm() {
                       country={"in"}
                       value={formData.countryCode}
                       onChange={handleCountryCodeChange}
-                      inputClass={`!w-full !h-12 !text-gray-700 !rounded-lg !outline-none !border ${
+                      inputClass={`!w-full !h-12 !text-gray-700 !rounded-md !outline-none !border ${
                         errors.countryCode
                           ? "!border-red-500"
                           : "!border-gray-300"
                       } focus:!ring-0 focus:!border-green-500`}
-                      buttonClass={`!h-12 !rounded-lg !border ${
+                      buttonClass={`!h-12 !rounded-md !border ${
                         errors.countryCode
                           ? "!border-red-500"
                           : "!border-gray-300"
                       } !bg-white`}
-                      dropdownClass="!bg-white !text-gray-700 !rounded-lg !border-gray-200 !shadow-md"
+                      dropdownClass="!bg-white !text-gray-700 !rounded-md !border-gray-200 !shadow-md"
                       enableSearch={true}
                       inputProps={{
                         name: "countryCode",
@@ -446,11 +462,11 @@ function TutorRegisterForm() {
                       onChange={handlePhoneChange}
                       placeholder="Phone Number *"
                       ref={errorRefs.phoneNumber}
-                      className={`w-full h-12 px-4 border ${
+                      className={`w-full py-2 px-4 border ${
                         errors.phoneNumber
                           ? "border-red-500"
                           : "border-gray-300"
-                      } rounded-lg placeholder-gray-400 outline-none focus:ring-0 focus:border-primary`}
+                      } rounded-md placeholder-gray-400 outline-none focus:ring-0 focus:border-primary`}
                     />
                     {errors.phoneNumber && (
                       <p className="text-red-500 text-xs mt-1">
@@ -518,11 +534,11 @@ function TutorRegisterForm() {
                     setErrors((prev) => ({ ...prev, confirmPassword: "" })); // ✅ clear error while typing
                   }}
                   ref={errorRefs.confirmPassword}
-                  className={`w-full h-12 px-4 pr-10 border ${
+                  className={`w-full py-2 px-4 pr-10 border ${
                     errors.confirmPassword
                       ? "border-red-500"
                       : "border-gray-300"
-                  } rounded-lg placeholder-gray-400 outline-none focus:ring-0 focus:border-primary`}
+                  } rounded-md placeholder-gray-400 outline-none focus:ring-0 focus:border-primary`}
                 />
                 <button
                   type="button"
@@ -640,20 +656,24 @@ function TutorRegisterForm() {
                 )}
               </div>
               <div
-                ref={errorRefs.subjects}
+                ref={(el) => {
+                  errorRefs.subjects.current = el;
+                  subjectRef.current = el;
+                }}
                 className="relative"
-                ref={subjectRef}
               >
                 <input
                   type="text"
                   name="subjects"
                   placeholder="Subjects You Teach *"
-                  value={formData.subjects}
+                  value={subjectInput}
                   onChange={handleSubjectChange}
                   ref={errorRefs.subjects}
-                  className={`w-full h-12 px-4 border ${
+                  className={`w-full py-2 px-4 border ${
                     errors.subjects ? "border-red-500" : "border-gray-300"
-                  } rounded-lg placeholder-gray-400 outline-none focus:ring-0 focus:border-primary`}
+                  } rounded-md placeholder-gray-400 outline-none focus:ring-0 focus:border-primary`}
+                   autocomplete="off"
+                   autocorrect="off"
                 />
                 {errors.subjects && (
                   <p className="text-red-500 text-xs mt-1">{errors.subjects}</p>
@@ -661,14 +681,14 @@ function TutorRegisterForm() {
 
                 {/* ✅ Suggestions Dropdown */}
                 {showSuggestions && filteredSubjects.length > 0 && (
-                  <ul className="absolute w-full border rounded-lg bg-white shadow-md mt-2 max-h-60 overflow-y-auto z-10">
+                  <ul className="absolute w-full border rounded-md bg-white shadow-md mt-2 max-h-60 overflow-y-auto z-10">
                     {filteredSubjects.map((sub) => (
                       <li
                         key={sub.id}
                         onClick={() => handleSelectSubject(sub.label)}
                         className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm"
                         dangerouslySetInnerHTML={{
-                          __html: highlightMatch(sub.label, formData.subjects),
+                          __html: highlightMatch(sub.label, subjectInput), // ✅ use subjectInput
                         }}
                       />
                     ))}
@@ -695,7 +715,7 @@ function TutorRegisterForm() {
                   return (
                     <label
                       key={day}
-                      className={`flex items-center space-x-2 border p-2 rounded-lg cursor-pointer hover:bg-gray-50`}
+                      className={`flex items-center space-x-2 border p-2 rounded-md cursor-pointer hover:bg-gray-50`}
                     >
                       <input
                         type="checkbox"
@@ -751,7 +771,7 @@ function TutorRegisterForm() {
                 rows="4"
                 className={`w-full px-4 py-3 border ${
                   errors.bio ? "border-red-500" : "border-gray-300"
-                } rounded-lg outline-none focus:ring-0 focus:border-primary transition`}
+                } rounded-md outline-none focus:ring-0 focus:border-primary transition`}
               />
               {errors.bio && (
                 <p className="text-red-500 text-xs mt-1">{errors.bio}</p>

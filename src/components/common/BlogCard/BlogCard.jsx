@@ -14,7 +14,7 @@ function BlogCard({ post }) {
           <img
             src={post.image}
             alt={post.title}
-            className="w-full h-52 md:h-80 object-cover ransform transition-transform duration-500 hover:scale-105"
+            className="w-full h-52 2xl:h-80 object-cover ransform transition-transform duration-500 hover:scale-105"
           />
 
           {/* Content */}

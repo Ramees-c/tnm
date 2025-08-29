@@ -45,9 +45,7 @@ function Userheader() {
 
   useEffect(() => {
     const getCategory = async () => {
-      const data = await axios.get(
-        `http://tnm-test-api.dhanwis.com/api/tutors/subjects/`
-      );
+      const data = await axios.get(`/api/tutors/subjects/`);
       setCategory(data.data);
     };
     getCategory();
@@ -124,7 +122,7 @@ function Userheader() {
                     <div>
                       <h4 className="font-bold mb-3 text-gray-800">Tuition</h4>
                       <ul className="space-y-3">
-                        {/* {category.map((item) => (
+                        {category.map((item) => (
                           <li key={item.subject}>
                             <NavLink
                               to={`/tutors/${item.subject.toLowerCase()}`}
@@ -137,13 +135,13 @@ function Userheader() {
                               {item.subject}
                             </NavLink>
                           </li>
-                        ))} */}
+                        ))}
 
-                        <li>Mathamatics</li>
+                        {/* <li>Mathamatics</li>
                         <li>Hindi</li>
                         <li>English</li>
                         <li>Botony</li>
-                        <li>Zoology</li>
+                        <li>Zoology</li> */}
                       </ul>
                     </div>
                   </div>
