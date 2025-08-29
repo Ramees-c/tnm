@@ -1,5 +1,5 @@
 [[redirects]]
   from = "/api/*"
-  to = "http://tnm-test-api.dhanwis.com/:splat"
+  to = "http://tnm-test-api.dhanwis.com/api/:splat"
   status = 200
   force = true
