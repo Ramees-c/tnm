@@ -6,44 +6,27 @@ import FormInput from "../FormInput/FormInput";
 import { Upload, ImageIcon, X } from "lucide-react";
 import axios from "axios";
 
-const subjectsList = [
-  "Mathematics",
-  "Physics",
-  "Chemistry",
-  "Biology",
-  "English",
-  "Computer Science",
-  "History",
-  "Geography",
-  "Economics",
-  "Accountancy",
-  "Political Science",
-  "Sociology",
-  "Psychology",
-  "Business Studies",
-  "Environmental Science",
-];
+const initialFormData = {
+  full_name: "",
+  email: "",
+  password: "",
+  gender: "",
+  countryCode: "91",
+  mobile_number: "",
+  city: "",
+  state: "",
+  pincode: "",
+  qualification: "",
+  experience_years: "",
+  hourly_rate: "",
+  description: "",
+  available_days: [],
+  profile_image: null,
+  categories: [],
+};
 
 function TutorRegisterForm() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    countryCode: "91",
-    phoneNumber: "",
-    password: "",
-    profilePhoto: null,
-    gender: "",
-    city: "",
-    state: "",
-    pincode: "",
-    qualification: "",
-    experience: "",
-    hourlyRate: "",
-    subjects: [],
-    bio: "",
-    availableDays: [],
-  });
-
+  const [formData, setFormData] = useState(initialFormData);
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -55,6 +38,7 @@ function TutorRegisterForm() {
   const [preview, setPreview] = useState(null);
   const [shouldScroll, setShouldScroll] = useState(false);
   const [subjectInput, setSubjectInput] = useState("");
+  const [formMessage, setFormMessage] = useState({ type: "", text: "" });
 
   const errorRefs = {
     name: useRef(null),
@@ -127,14 +111,14 @@ function TutorRegisterForm() {
 
   const handlePhoneChange = (e) => {
     const onlyNums = e.target.value.replace(/\D/g, "");
-    setFormData({ ...formData, phoneNumber: onlyNums });
+    setFormData({ ...formData, mobile_number: onlyNums });
     setErrors((prev) => ({ ...prev, phoneNumber: "" }));
   };
 
   const validateForm = () => {
     let newErrors = {};
 
-    if (!formData.name.trim()) newErrors.name = "Full name is required";
+    if (!formData.full_name.trim()) newErrors.name = "Full name is required";
 
     if (!formData.email) {
       newErrors.email = "Email is required";
@@ -144,7 +128,7 @@ function TutorRegisterForm() {
 
     if (!formData.countryCode)
       newErrors.countryCode = "Country code is required";
-    if (!formData.phoneNumber)
+    if (!formData.mobile_number)
       newErrors.phoneNumber = "Phone number is required";
 
     if (!formData.gender) newErrors.gender = "Gender is required";
@@ -171,110 +155,147 @@ function TutorRegisterForm() {
     if (!formData.pincode) newErrors.pincode = "Pincode is required";
     if (!formData.qualification)
       newErrors.qualification = "Qualification is required";
-    if (!formData.experience) newErrors.experience = "Experience is required";
-    if (!formData.hourlyRate) newErrors.hourlyRate = "Hourly rate is required";
-    if (!formData.subjects) newErrors.subjects = "Subjects are required";
-    if (!formData.availableDays || formData.availableDays.length === 0) {
+    if (!formData.experience_years)
+      newErrors.experience = "Experience is required";
+    if (!formData.hourly_rate) newErrors.hourlyRate = "Hourly rate is required";
+    if (!formData.categories || formData.categories.length === 0) {
+      newErrors.subjects = "Subjects are required";
+    }
+    if (!formData.available_days || formData.available_days.length === 0) {
       newErrors.availableDays = "Please select at least one available day";
     }
-    if (!formData.bio) newErrors.bio = "Bio is required";
+    if (!formData.description) newErrors.bio = "Bio is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   // ✅ Recursive function to flatten categories and all nested subcategories
-  const flattenCategories = (categories, rootCategory = "", chain = []) => {
-    let result = [];
+  const flattenCategories = (
+  categories,
+  rootName = "",
+  chain = [],
+  rootId = null,
+  path = []
+) => {
+  let result = [];
 
-    categories.forEach((category) => {
-      const currentRoot = rootCategory || category.name;
+  categories.forEach((category) => {
+    const isTop = !rootName;
+    const currentRootName = rootName || category.name;
 
-      // build label chain (exclude root from chain list)
-      if (rootCategory) {
-        const cleanChain = [...chain].filter((c) => c !== currentRoot);
+    // 🔹 Preserve the very first rootId across recursion
+    const baseRootId = rootId ?? category.id;
 
-        const label =
-          cleanChain.length > 0
-            ? `${category.name} in ${cleanChain
-                .reverse()
-                .join(" in ")} (${currentRoot})`
-            : `${category.name} (${currentRoot})`;
+    // 🔹 Always build path starting from top-most root
+    const currentPath = isTop ? [category.id] : [...path, category.id];
 
-        result.push({
-          id: category.id,
-          name: category.name,
-          label,
-          parent: currentRoot,
-        });
-      }
+    const hasChildren =
+      category.subcategories && category.subcategories.length > 0;
+    const isLeaf = !hasChildren;
 
-      // Recurse deeper
-      if (category.subcategories && category.subcategories.length > 0) {
-        result = result.concat(
-          flattenCategories(category.subcategories, currentRoot, [
-            ...chain,
-            category.name,
-          ])
-        );
-      }
-    });
+    if (isTop) {
+      // ✅ Root-level item
+      result.push({
+        id: category.id,
+        name: category.name,
+        label: category.name,
+        parent: null,
+        pathIds: [category.id], // root path starts with itself
+        hasChildren,
+        isLeaf, // 🔹 add leaf flag
+      });
+    } else {
+      // ✅ Sub-level item with same "in ... (Root)" label format
+      const cleanChain = [...chain].filter((c) => c !== currentRootName);
 
-    return result;
-  };
+      const label =
+        cleanChain.length > 0
+          ? `${category.name} in ${cleanChain
+              .reverse()
+              .join(" in ")} (${currentRootName})`
+          : `${category.name} (${currentRootName})`;
+
+      result.push({
+        id: category.id,
+        name: category.name,
+        label,
+        parent: currentRootName,
+        pathIds: [baseRootId, ...currentPath.slice(1)],
+        hasChildren,
+        isLeaf, // 🔹 add leaf flag
+      });
+    }
+
+    // 🔹 Recurse deeper if subcategories exist
+    if (hasChildren) {
+      result = result.concat(
+        flattenCategories(
+          category.subcategories,
+          currentRootName,
+          [...chain, category.name],
+          baseRootId, // keep passing the very first root id
+          currentPath
+        )
+      );
+    }
+  });
+
+  return result;
+};
+
 
   // ✅ Subject input change
-  const handleSubjectChange = async (e) => {
-    const value = e.target.value;
-    setSubjectInput(value); // only updates what user sees
-    setErrors((prev) => ({ ...prev, subjects: "" }));
+const handleSubjectChange = async (e) => {
+  const value = e.target.value;
+  setSubjectInput(value);
+  setErrors((prev) => ({ ...prev, subjects: "" }));
 
-    if (!value.trim()) {
+  if (!value.trim()) {
+    setFilteredSubjects([]);
+    setShowSuggestions(false);
+    return;
+  }
+
+  try {
+    const res = await axios.get("/api/category-list/");
+    if (res.data && Array.isArray(res.data)) {
+      const allSubcategories = flattenCategories(res.data);
+
+      // ✅ Only show leaf subjects
+      const matches = allSubcategories.filter((sub) => {
+        const query = value.toLowerCase();
+        return sub.isLeaf && sub.label.toLowerCase().includes(query);
+      });
+
+      setFilteredSubjects(matches);
+      setShowSuggestions(matches.length > 0);
+    } else {
       setFilteredSubjects([]);
       setShowSuggestions(false);
-      return;
     }
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    setFilteredSubjects([]);
+    setShowSuggestions(false);
+  }
+};
 
-    try {
-      const res = await axios.get("/api/category-list/");
-      if (res.data && Array.isArray(res.data)) {
-        const allSubcategories = flattenCategories(res.data);
-        const matches = allSubcategories.filter((sub) =>
-          sub.label.toLowerCase().includes(value.toLowerCase())
-        );
-        setFilteredSubjects(matches);
-        setShowSuggestions(matches.length > 0);
-      } else {
-        setFilteredSubjects([]);
-        setShowSuggestions(false);
-      }
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-      setFilteredSubjects([]);
-      setShowSuggestions(false);
-    }
-  };
+
 
   // ✅ Select subject
-  const handleSelectSubject = (label) => {
-    // Extract root (inside parentheses)
-    const rootMatch = label.match(/\(([^)]+)\)$/);
-    const root = rootMatch ? rootMatch[1].trim() : "";
+  const handleSelectSubject = (subject) => {
+    // ✅ Save the full path of IDs (root -> ... -> selected)
+    setFormData((prev) => ({
+      ...prev,
+      categories: [...subject.pathIds], // ensures proper full hierarchy
+    }));
 
-    // Remove root from label
-    const withoutRoot = label.replace(/\s*\([^)]+\)$/, "").trim();
+    // ✅ Keep the readable label in the input for the user
+    setSubjectInput(subject.label);
 
-    // Break chain by " in "
-    let chain = withoutRoot.split(" in ").map((s) => s.trim());
-
-    // Final array (root first, rest reversed)
-    const subjectsArray = root ? [root, ...chain.reverse()] : chain.reverse();
-
-    // 🔹 Save array in formData
-    setFormData((prev) => ({ ...prev, subjects: subjectsArray }));
-
-    // 🔹 Show ORIGINAL label in input (not joined array)
-    setSubjectInput(label);
+    // ✅ Clear subject error (if any)
+    setErrors((prev) => ({ ...prev, subjects: "" }));
 
     setShowSuggestions(false);
     setFilteredSubjects([]);
@@ -299,17 +320,84 @@ function TutorRegisterForm() {
     }
 
     setIsSubmitting(true);
+    setFormMessage({ type: "", text: "" });
 
     try {
-      const { confirmPassword, ...rest } = formData;
-      const fullPhone = `+${formData.countryCode}${formData.phoneNumber}`;
+      const { countryCode, mobile_number, categories, ...rest } = formData;
+      const formDataToSend = new FormData();
 
-      console.log("📤 Data to submit:", { ...rest, phone: fullPhone });
+      Object.keys(rest).forEach((key) => {
+        if (rest[key] !== null && rest[key] !== undefined) {
+          formDataToSend.append(key, rest[key]);
+        }
+      });
 
-      alert("Registration successful! We'll contact you soon.");
+      formDataToSend.append("mobile_number", `+${countryCode}${mobile_number}`);
+
+      if (Array.isArray(categories)) {
+        categories.forEach((cat) => {
+          formDataToSend.append("categories", cat);
+        });
+      }
+
+      if (formData.profile_image && formData.profile_image instanceof File) {
+        formDataToSend.append("profile_image", formData.profile_image);
+      }
+
+      const res = await axios.post("/api/register/tutor/", formDataToSend, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      console.log("✅ Success:", res.data);
+      setFormMessage({
+        type: "success",
+         text: res.data?.message || "✅ Registration successful!",
+      });
+
+      // 🔹 Reset form after success
+      setFormData(initialFormData); // ⬅️ replace manual reset with this
+      setErrors({});
+      setConfirmPassword(""); // ⬅️ clear confirm password
+      setSubjectInput("");
+      setFilteredSubjects([]);
+      setPreview(null); // ⬅️ clear image preview
     } catch (error) {
-      console.error("❌ Error submitting form:", error);
-      alert("Something went wrong. Please try again.");
+      console.error(
+        "❌ Error submitting form:",
+        error.response?.data || error.message
+      );
+
+      if (error.response?.data) {
+        const apiErrors = error.response.data;
+        let newErrors = {};
+
+        Object.keys(apiErrors).forEach((field) => {
+          const message = Array.isArray(apiErrors[field])
+            ? apiErrors[field][0]
+            : apiErrors[field];
+
+          if (field === "full_name") newErrors.name = message;
+          else if (field === "mobile_number") newErrors.phoneNumber = message;
+          else if (field === "experience_years") newErrors.experience = message;
+          else if (field === "hourly_rate") newErrors.hourlyRate = message;
+          else if (field === "categories") newErrors.subjects = message;
+          else if (field === "description") newErrors.bio = message;
+          else newErrors[field] = message;
+        });
+
+        setErrors((prev) => ({ ...prev, ...newErrors }));
+        setShouldScroll(true);
+
+        setFormMessage({
+          type: "error",
+          text: "⚠️ Please correct the highlighted errors and try again.",
+        });
+      } else {
+        setFormMessage({
+          type: "error",
+          text: "❌ Something went wrong. Please try again later.",
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -361,7 +449,7 @@ function TutorRegisterForm() {
                 <input
                   id="profilePhoto"
                   type="file"
-                  name="profilePhoto"
+                  name="profile_image"
                   accept="image/*"
                   onChange={(e) => {
                     handleChange(e);
@@ -379,7 +467,7 @@ function TutorRegisterForm() {
                   type="button"
                   onClick={() => {
                     setPreview(null);
-                    setFormData((prev) => ({ ...prev, profilePhoto: null }));
+                    setFormData((prev) => ({ ...prev, profile_image: null }));
                     document.getElementById("profilePhoto").value = "";
                   }}
                   className="mt-2 flex items-center gap-1 text-sm text-red-600 hover:text-red-700 transition"
@@ -394,9 +482,9 @@ function TutorRegisterForm() {
             {/* Name & Email */}
             <div ref={errorRefs.name}>
               <FormInput
-                name="name"
+                name="full_name"
                 placeholder="Enter your Full Name"
-                value={formData.name}
+                value={formData.full_name}
                 onChange={handleChange}
                 hasError={errors.name}
                 innerRef={errorRefs.name}
@@ -429,7 +517,13 @@ function TutorRegisterForm() {
                     <PhoneInput
                       country={"in"}
                       value={formData.countryCode}
-                      onChange={handleCountryCodeChange}
+                      onChange={(value, country) => {
+                        setFormData({
+                          ...formData,
+                          countryCode: country.dialCode,
+                        });
+                        setErrors((prev) => ({ ...prev, countryCode: "" }));
+                      }}
                       inputClass={`!w-full !h-12 !text-gray-700 !rounded-md !outline-none !border ${
                         errors.countryCode
                           ? "!border-red-500"
@@ -457,8 +551,8 @@ function TutorRegisterForm() {
                   <div className="flex-1">
                     <input
                       type="tel"
-                      name="phoneNumber"
-                      value={formData.phoneNumber}
+                      name="mobile_number"
+                      value={formData.mobile_number}
                       onChange={handlePhoneChange}
                       placeholder="Phone Number *"
                       ref={errorRefs.phoneNumber}
@@ -624,13 +718,21 @@ function TutorRegisterForm() {
               </div>
               <div ref={errorRefs.experience}>
                 <FormInput
-                  name="experience"
+                  name="experience_years"
                   placeholder="Teaching Experience (years) *"
-                  value={formData.experience}
-                  onChange={handleChange}
+                  value={formData.experience_years}
+                  onChange={(e) => {
+                    const onlyNums = e.target.value.replace(/[^0-9]/g, ""); // ✅ allow digits only
+                    setFormData((prev) => ({
+                      ...prev,
+                      experience_years: onlyNums,
+                    }));
+                    setErrors((prev) => ({ ...prev, experience: "" })); // clear error while typing
+                  }}
                   hasError={errors.experience}
                   innerRef={errorRefs.experience}
                 />
+
                 {errors.experience && (
                   <p className="text-red-500 text-xs mt-1">
                     {errors.experience}
@@ -642,9 +744,9 @@ function TutorRegisterForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div ref={errorRefs.hourlyRate}>
                 <FormInput
-                  name="hourlyRate"
+                  name="hourly_rate"
                   placeholder="Hourly Rate (₹) *"
-                  value={formData.hourlyRate}
+                  value={formData.hourly_rate}
                   onChange={handleChange}
                   hasError={errors.hourlyRate}
                   innerRef={errorRefs.hourlyRate}
@@ -664,7 +766,7 @@ function TutorRegisterForm() {
               >
                 <input
                   type="text"
-                  name="subjects"
+                  name="categories"
                   placeholder="Subjects You Teach *"
                   value={subjectInput}
                   onChange={handleSubjectChange}
@@ -672,8 +774,8 @@ function TutorRegisterForm() {
                   className={`w-full py-2 px-4 border ${
                     errors.subjects ? "border-red-500" : "border-gray-300"
                   } rounded-md placeholder-gray-400 outline-none focus:ring-0 focus:border-primary`}
-                   autocomplete="off"
-                   autocorrect="off"
+                  autoComplete="off"
+                  autoCorrect="off"
                 />
                 {errors.subjects && (
                   <p className="text-red-500 text-xs mt-1">{errors.subjects}</p>
@@ -685,10 +787,10 @@ function TutorRegisterForm() {
                     {filteredSubjects.map((sub) => (
                       <li
                         key={sub.id}
-                        onClick={() => handleSelectSubject(sub.label)}
+                        onClick={() => handleSelectSubject(sub)}
                         className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm"
                         dangerouslySetInnerHTML={{
-                          __html: highlightMatch(sub.label, subjectInput), // ✅ use subjectInput
+                          __html: highlightMatch(sub.label, subjectInput),
                         }}
                       />
                     ))}
@@ -711,7 +813,7 @@ function TutorRegisterForm() {
                   "Saturday",
                   "Sunday",
                 ].map((day) => {
-                  const isChecked = formData.availableDays.includes(day);
+                  const isChecked = formData.available_days.includes(day);
                   return (
                     <label
                       key={day}
@@ -725,12 +827,12 @@ function TutorRegisterForm() {
                           if (e.target.checked) {
                             setFormData((prev) => ({
                               ...prev,
-                              availableDays: [...prev.availableDays, day],
+                              available_days: [...prev.available_days, day],
                             }));
                           } else {
                             setFormData((prev) => ({
                               ...prev,
-                              availableDays: prev.availableDays.filter(
+                              available_days: prev.available_days.filter(
                                 (d) => d !== day
                               ),
                             }));
@@ -763,9 +865,9 @@ function TutorRegisterForm() {
                 Bio *
               </label>
               <textarea
-                name="bio"
+                name="description"
                 placeholder="Tell us about yourself, your teaching style, and experience..."
-                value={formData.bio}
+                value={formData.description}
                 onChange={handleChange}
                 ref={errorRefs.bio}
                 rows="4"
@@ -777,6 +879,18 @@ function TutorRegisterForm() {
                 <p className="text-red-500 text-xs mt-1">{errors.bio}</p>
               )}
             </div>
+
+            {formMessage.text && (
+              <div
+                className={`mb-4 p-3 rounded ${
+                  formMessage.type === "success"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-700"
+                }`}
+              >
+                {formMessage.text}
+              </div>
+            )}
           </div>
 
           {/* Submit */}

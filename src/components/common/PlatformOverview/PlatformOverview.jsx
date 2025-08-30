@@ -76,17 +76,6 @@ const PlatformOverview = () => {
         "Teaching resources",
       ],
     },
-    {
-      title: "For Institutions",
-      content:
-        "Enhance your educational offerings with our platform integration solutions.",
-      benefits: [
-        "Seamless integration",
-        "Performance analytics",
-        "Customizable content",
-        "Administrative tools",
-      ],
-    },
   ];
 
   return (
