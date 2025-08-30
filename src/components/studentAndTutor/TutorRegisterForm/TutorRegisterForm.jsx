@@ -104,6 +104,52 @@ function TutorRegisterForm() {
     setErrors((prev) => ({ ...prev, [name]: "" })); // clear error
   };
 
+const handleProfileInputChange = (e) => {
+  handleChange(e); // keeps existing formData updates
+
+  if (
+    e.target.name === "profile_image" &&
+    e.target.files &&
+    e.target.files[0]
+  ) {
+    const file = e.target.files[0];
+
+    // ✅ Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setErrors((prev) => ({
+        ...prev,
+        profile_image: "File size should not exceed 5MB",
+      }));
+      setFormData((prev) => ({ ...prev, profile_image: null }));
+      setPreview(null);
+      e.target.value = "";
+      return;
+    }
+
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+
+    img.onload = () => {
+      // ✅ Check for landscape orientation
+      if (img.width <= img.height) {
+        setErrors((prev) => ({
+          ...prev,
+          profile_image: "Image must be landscape (width > height)",
+        }));
+        setFormData((prev) => ({ ...prev, profile_image: null }));
+        setPreview(null);
+        e.target.value = "";
+      } else {
+        setFormData((prev) => ({ ...prev, profile_image: file }));
+        setErrors((prev) => ({ ...prev, profile_image: "" }));
+        setPreview(img.src); // ✅ show preview
+      }
+    };
+  }
+};
+
+
   const handleCountryCodeChange = (value) => {
     setFormData({ ...formData, countryCode: value });
     setErrors((prev) => ({ ...prev, countryCode: "" }));
@@ -172,116 +218,113 @@ function TutorRegisterForm() {
 
   // ✅ Recursive function to flatten categories and all nested subcategories
   const flattenCategories = (
-  categories,
-  rootName = "",
-  chain = [],
-  rootId = null,
-  path = []
-) => {
-  let result = [];
+    categories,
+    rootName = "",
+    chain = [],
+    rootId = null,
+    path = []
+  ) => {
+    let result = [];
 
-  categories.forEach((category) => {
-    const isTop = !rootName;
-    const currentRootName = rootName || category.name;
+    categories.forEach((category) => {
+      const isTop = !rootName;
+      const currentRootName = rootName || category.name;
 
-    // 🔹 Preserve the very first rootId across recursion
-    const baseRootId = rootId ?? category.id;
+      // 🔹 Preserve the very first rootId across recursion
+      const baseRootId = rootId ?? category.id;
 
-    // 🔹 Always build path starting from top-most root
-    const currentPath = isTop ? [category.id] : [...path, category.id];
+      // 🔹 Always build path starting from top-most root
+      const currentPath = isTop ? [category.id] : [...path, category.id];
 
-    const hasChildren =
-      category.subcategories && category.subcategories.length > 0;
-    const isLeaf = !hasChildren;
+      const hasChildren =
+        category.subcategories && category.subcategories.length > 0;
+      const isLeaf = !hasChildren;
 
-    if (isTop) {
-      // ✅ Root-level item
-      result.push({
-        id: category.id,
-        name: category.name,
-        label: category.name,
-        parent: null,
-        pathIds: [category.id], // root path starts with itself
-        hasChildren,
-        isLeaf, // 🔹 add leaf flag
-      });
-    } else {
-      // ✅ Sub-level item with same "in ... (Root)" label format
-      const cleanChain = [...chain].filter((c) => c !== currentRootName);
+      if (isTop) {
+        // ✅ Root-level item
+        result.push({
+          id: category.id,
+          name: category.name,
+          label: category.name,
+          parent: null,
+          pathIds: [category.id], // root path starts with itself
+          hasChildren,
+          isLeaf, // 🔹 add leaf flag
+        });
+      } else {
+        // ✅ Sub-level item with same "in ... (Root)" label format
+        const cleanChain = [...chain].filter((c) => c !== currentRootName);
 
-      const label =
-        cleanChain.length > 0
-          ? `${category.name} in ${cleanChain
-              .reverse()
-              .join(" in ")} (${currentRootName})`
-          : `${category.name} (${currentRootName})`;
+        const label =
+          cleanChain.length > 0
+            ? `${category.name} in ${cleanChain
+                .reverse()
+                .join(" in ")} (${currentRootName})`
+            : `${category.name} (${currentRootName})`;
 
-      result.push({
-        id: category.id,
-        name: category.name,
-        label,
-        parent: currentRootName,
-        pathIds: [baseRootId, ...currentPath.slice(1)],
-        hasChildren,
-        isLeaf, // 🔹 add leaf flag
-      });
-    }
+        result.push({
+          id: category.id,
+          name: category.name,
+          label,
+          parent: currentRootName,
+          pathIds: [baseRootId, ...currentPath.slice(1)],
+          hasChildren,
+          isLeaf, // 🔹 add leaf flag
+        });
+      }
 
-    // 🔹 Recurse deeper if subcategories exist
-    if (hasChildren) {
-      result = result.concat(
-        flattenCategories(
-          category.subcategories,
-          currentRootName,
-          [...chain, category.name],
-          baseRootId, // keep passing the very first root id
-          currentPath
-        )
-      );
-    }
-  });
+      // 🔹 Recurse deeper if subcategories exist
+      if (hasChildren) {
+        result = result.concat(
+          flattenCategories(
+            category.subcategories,
+            currentRootName,
+            [...chain, category.name],
+            baseRootId, // keep passing the very first root id
+            currentPath
+          )
+        );
+      }
+    });
 
-  return result;
-};
-
+    return result;
+  };
 
   // ✅ Subject input change
-const handleSubjectChange = async (e) => {
-  const value = e.target.value;
-  setSubjectInput(value);
-  setErrors((prev) => ({ ...prev, subjects: "" }));
+  const handleSubjectChange = async (e) => {
+    const value = e.target.value;
+    setSubjectInput(value);
+    setErrors((prev) => ({ ...prev, subjects: "" }));
 
-  if (!value.trim()) {
-    setFilteredSubjects([]);
-    setShowSuggestions(false);
-    return;
-  }
+    if (!value.trim()) {
+      setFilteredSubjects([]);
+      setShowSuggestions(false);
+      return;
+    }
 
-  try {
-    const res = await axios.get("/api/category-list/");
-    if (res.data && Array.isArray(res.data)) {
-      const allSubcategories = flattenCategories(res.data);
+    try {
+      const res = await axios.get("/api/category-list/");
+      if (res.data && Array.isArray(res.data)) {
+        const allSubcategories = flattenCategories(res.data);
 
-      // ✅ Only show leaf subjects
-      const matches = allSubcategories.filter((sub) => {
-        const query = value.toLowerCase();
-        return sub.isLeaf && sub.label.toLowerCase().includes(query);
-      });
+        // ✅ Only show leaf subjects
+        const matches = allSubcategories.filter((sub) => {
+          const query = value.toLowerCase();
+          return sub.isLeaf && sub.label.toLowerCase().includes(query);
+        });
 
-      setFilteredSubjects(matches);
-      setShowSuggestions(matches.length > 0);
-    } else {
+        setFilteredSubjects(matches);
+        setShowSuggestions(matches.length > 0);
+      } else {
+        setFilteredSubjects([]);
+        setShowSuggestions(false);
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
       setFilteredSubjects([]);
       setShowSuggestions(false);
     }
-  } catch (error) {
-    console.error("Error fetching categories:", error);
-    setFilteredSubjects([]);
-    setShowSuggestions(false);
-  }
-};
-
-
+  };
 
   // ✅ Select subject
   const handleSelectSubject = (subject) => {
@@ -351,7 +394,7 @@ const handleSubjectChange = async (e) => {
       console.log("✅ Success:", res.data);
       setFormMessage({
         type: "success",
-         text: res.data?.message || "✅ Registration successful!",
+        text: res.data?.message || "✅ Registration successful!",
       });
 
       // 🔹 Reset form after success
@@ -451,12 +494,7 @@ const handleSubjectChange = async (e) => {
                   type="file"
                   name="profile_image"
                   accept="image/*"
-                  onChange={(e) => {
-                    handleChange(e);
-                    if (e.target.files && e.target.files[0]) {
-                      setPreview(URL.createObjectURL(e.target.files[0]));
-                    }
-                  }}
+                  onChange={handleProfileInputChange}
                   className="hidden"
                 />
               </label>
@@ -477,6 +515,11 @@ const handleSubjectChange = async (e) => {
               )}
 
               <p className="text-xs text-gray-500 mt-2">PNG, JPG up to 5MB</p>
+              {errors.profile_image && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.profile_image}
+                </p>
+              )}
             </div>
 
             {/* Name & Email */}
@@ -524,7 +567,7 @@ const handleSubjectChange = async (e) => {
                         });
                         setErrors((prev) => ({ ...prev, countryCode: "" }));
                       }}
-                      inputClass={`!w-full !h-12 !text-gray-700 !rounded-md !outline-none !border ${
+                      inputClass={`!w-full !h-11 !text-gray-700 !rounded-md !outline-none !border ${
                         errors.countryCode
                           ? "!border-red-500"
                           : "!border-gray-300"
@@ -744,10 +787,17 @@ const handleSubjectChange = async (e) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div ref={errorRefs.hourlyRate}>
                 <FormInput
+                  type="text" // 👈 stays text
                   name="hourly_rate"
                   placeholder="Hourly Rate (₹) *"
                   value={formData.hourly_rate}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^\d*$/.test(value)) {
+                      // ✅ allow only digits
+                      handleChange(e); // call your existing handler
+                    }
+                  }}
                   hasError={errors.hourlyRate}
                   innerRef={errorRefs.hourlyRate}
                 />
@@ -757,6 +807,7 @@ const handleSubjectChange = async (e) => {
                   </p>
                 )}
               </div>
+
               <div
                 ref={(el) => {
                   errorRefs.subjects.current = el;
