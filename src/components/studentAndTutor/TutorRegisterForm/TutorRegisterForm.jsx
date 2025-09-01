@@ -5,6 +5,7 @@ import "react-phone-input-2/lib/style.css";
 import FormInput from "../FormInput/FormInput";
 import { Upload, ImageIcon, X } from "lucide-react";
 import axios from "axios";
+import OtpModal from "../../common/OtpModal/OtpModal";
 
 const initialFormData = {
   full_name: "",
@@ -39,6 +40,10 @@ function TutorRegisterForm() {
   const [shouldScroll, setShouldScroll] = useState(false);
   const [subjectInput, setSubjectInput] = useState("");
   const [formMessage, setFormMessage] = useState({ type: "", text: "" });
+
+  const [showOtpPopup, setShowOtpPopup] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
 
   const errorRefs = {
     name: useRef(null),
@@ -104,51 +109,50 @@ function TutorRegisterForm() {
     setErrors((prev) => ({ ...prev, [name]: "" })); // clear error
   };
 
-const handleProfileInputChange = (e) => {
-  handleChange(e); // keeps existing formData updates
+  const handleProfileInputChange = (e) => {
+    handleChange(e); // keeps existing formData updates
 
-  if (
-    e.target.name === "profile_image" &&
-    e.target.files &&
-    e.target.files[0]
-  ) {
-    const file = e.target.files[0];
+    if (
+      e.target.name === "profile_image" &&
+      e.target.files &&
+      e.target.files[0]
+    ) {
+      const file = e.target.files[0];
 
-    // ✅ Validate file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024;
-    if (file.size > maxSize) {
-      setErrors((prev) => ({
-        ...prev,
-        profile_image: "File size should not exceed 5MB",
-      }));
-      setFormData((prev) => ({ ...prev, profile_image: null }));
-      setPreview(null);
-      e.target.value = "";
-      return;
-    }
-
-    const img = new Image();
-    img.src = URL.createObjectURL(file);
-
-    img.onload = () => {
-      // ✅ Check for landscape orientation
-      if (img.width <= img.height) {
+      // ✅ Validate file size (max 5MB)
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
         setErrors((prev) => ({
           ...prev,
-          profile_image: "Image must be landscape (width > height)",
+          profile_image: "File size should not exceed 5MB",
         }));
         setFormData((prev) => ({ ...prev, profile_image: null }));
         setPreview(null);
         e.target.value = "";
-      } else {
-        setFormData((prev) => ({ ...prev, profile_image: file }));
-        setErrors((prev) => ({ ...prev, profile_image: "" }));
-        setPreview(img.src); // ✅ show preview
+        return;
       }
-    };
-  }
-};
 
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+
+      img.onload = () => {
+        // ✅ Check for landscape orientation
+        if (img.width <= img.height) {
+          setErrors((prev) => ({
+            ...prev,
+            profile_image: "Image must be landscape (width > height)",
+          }));
+          setFormData((prev) => ({ ...prev, profile_image: null }));
+          setPreview(null);
+          e.target.value = "";
+        } else {
+          setFormData((prev) => ({ ...prev, profile_image: file }));
+          setErrors((prev) => ({ ...prev, profile_image: "" }));
+          setPreview(img.src); // ✅ show preview
+        }
+      };
+    }
+  };
 
   const handleCountryCodeChange = (value) => {
     setFormData({ ...formData, countryCode: value });
@@ -215,6 +219,8 @@ const handleProfileInputChange = (e) => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+  console.log(showOtpPopup);
 
   // ✅ Recursive function to flatten categories and all nested subcategories
   const flattenCategories = (
@@ -314,7 +320,7 @@ const handleProfileInputChange = (e) => {
         });
 
         setFilteredSubjects(matches);
-        setShowSuggestions(matches.length > 0);
+        setShowSuggestions(true);
       } else {
         setFilteredSubjects([]);
         setShowSuggestions(false);
@@ -375,6 +381,7 @@ const handleProfileInputChange = (e) => {
         }
       });
 
+      // backend expects +91xxxxxxxxxx
       formDataToSend.append("mobile_number", `+${countryCode}${mobile_number}`);
 
       if (Array.isArray(categories)) {
@@ -387,28 +394,15 @@ const handleProfileInputChange = (e) => {
         formDataToSend.append("profile_image", formData.profile_image);
       }
 
-      const res = await axios.post("/api/register/tutor/", formDataToSend, {
+      // 🔹 Call Django registration (Step 1)
+      await axios.post("/api/register/tutor/", formDataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      console.log("✅ Success:", res.data);
-      setFormMessage({
-        type: "success",
-        text: res.data?.message || "✅ Registration successful!",
-      });
-
-      // 🔹 Reset form after success
-      setFormData(initialFormData); // ⬅️ replace manual reset with this
-      setErrors({});
-      setConfirmPassword(""); // ⬅️ clear confirm password
-      setSubjectInput("");
-      setFilteredSubjects([]);
-      setPreview(null); // ⬅️ clear image preview
+      // 🔹 Show OTP modal
+      setShowOtpPopup(true);
     } catch (error) {
-      console.error(
-        "❌ Error submitting form:",
-        error.response?.data || error.message
-      );
+      console.error("❌ API error:", error.response?.data || error.message);
 
       if (error.response?.data) {
         const apiErrors = error.response.data;
@@ -419,6 +413,7 @@ const handleProfileInputChange = (e) => {
             ? apiErrors[field][0]
             : apiErrors[field];
 
+          // map backend field names -> frontend state keys
           if (field === "full_name") newErrors.name = message;
           else if (field === "mobile_number") newErrors.phoneNumber = message;
           else if (field === "experience_years") newErrors.experience = message;
@@ -446,11 +441,49 @@ const handleProfileInputChange = (e) => {
     }
   };
 
+  const handleOtpVerify = async (enteredOtp) => {
+    try {
+      const res = await axios.post("/api/register/tutor/", {
+        email: formData.email,
+        otp: enteredOtp,
+      });
+
+      if (res.data?.token) {
+        setShowOtpPopup(false);
+
+        setFormMessage({
+          type: "success",
+          text: "✅ OTP Verified! Registration successful.",
+        });
+
+        // 👉 Store token in localStorage/session if needed
+        localStorage.setItem("authToken", res.data.token);
+
+        // Reset form
+        setFormData(initialFormData);
+        setErrors({});
+        setConfirmPassword("");
+        setSubjectInput("");
+        setFilteredSubjects([]);
+        setPreview(null);
+      }
+    } catch (err) {
+      console.error(
+        "❌ OTP Verification Error:",
+        err.response?.data || err.message
+      );
+      setFormMessage({
+        type: "error",
+        text: err.response?.data?.error || "Invalid or expired OTP.",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center py-8">
       <div className="w-full max-w-4xl bg-white rounded-xl shadow-xl overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-green-500 to-teal-600 p-6 text-center">
+        <div className="bg-gradient-to-r from-green-500 to-green-600 p-6 text-center">
           <h2 className="text-2xl font-bold text-white">Tutor Registration</h2>
           <p className="text-white mt-2">
             Share your knowledge and inspire students
@@ -796,6 +829,7 @@ const handleProfileInputChange = (e) => {
                     if (/^\d*$/.test(value)) {
                       // ✅ allow only digits
                       handleChange(e); // call your existing handler
+                      setErrors((prev) => ({ ...prev, hourlyRate: "" }));
                     }
                   }}
                   hasError={errors.hourlyRate}
@@ -833,18 +867,24 @@ const handleProfileInputChange = (e) => {
                 )}
 
                 {/* ✅ Suggestions Dropdown */}
-                {showSuggestions && filteredSubjects.length > 0 && (
+                {showSuggestions && (
                   <ul className="absolute w-full border rounded-md bg-white shadow-md mt-2 max-h-60 overflow-y-auto z-10">
-                    {filteredSubjects.map((sub) => (
-                      <li
-                        key={sub.id}
-                        onClick={() => handleSelectSubject(sub)}
-                        className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm"
-                        dangerouslySetInnerHTML={{
-                          __html: highlightMatch(sub.label, subjectInput),
-                        }}
-                      />
-                    ))}
+                    {filteredSubjects.length > 0 ? (
+                      filteredSubjects.map((sub) => (
+                        <li
+                          key={sub.id}
+                          onClick={() => handleSelectSubject(sub)}
+                          className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm"
+                          dangerouslySetInnerHTML={{
+                            __html: highlightMatch(sub.label, subjectInput),
+                          }}
+                        />
+                      ))
+                    ) : (
+                      <li className="px-4 py-2 text-gray-400 text-sm italic">
+                        No subjects found
+                      </li>
+                    )}
                   </ul>
                 )}
               </div>
@@ -951,7 +991,7 @@ const handleProfileInputChange = (e) => {
             className={`w-full py-4 px-6 rounded-xl font-medium text-white transition-all flex items-center justify-center ${
               isSubmitting
                 ? "bg-green-400 cursor-not-allowed"
-                : "bg-gradient-to-r from-green-500 to-teal-600 shadow-md hover:shadow-lg"
+                : "bg-gradient-to-r from-green-500 to-green-600 shadow-md hover:shadow-lg"
             }`}
           >
             {isSubmitting ? (
@@ -964,6 +1004,16 @@ const handleProfileInputChange = (e) => {
             )}
           </button>
         </form>
+
+        {/* ✅ OTP Popup */}
+        {showOtpPopup && (
+          <OtpModal
+            isOpen={showOtpPopup}
+            phoneOrEmail="Phone Number"
+            onClose={() => setShowOtpPopup(false)}
+            onSubmit={handleOtpVerify}
+          />
+        )}
       </div>
     </div>
   );

@@ -90,7 +90,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
           <ul className="space-y-1">
             {navItems.map((item, index) => (
               <NavLink
-                key={item.id}
+                key={index}
                 to={item.path}
                 onClick={() => {
                   onClose();
