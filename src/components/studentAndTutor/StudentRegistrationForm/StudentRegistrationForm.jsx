@@ -81,6 +81,18 @@ function StudentRegistrationForm() {
     setShouldScroll(false);
   }, [errors, shouldScroll]);
 
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (subjectRef.current && !subjectRef.current.contains(event.target)) {
+        setShowSuggestions(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   // handle form field change
   const handleChange = (e) => {
     const { name, value, files, type } = e.target;
@@ -407,7 +419,7 @@ function StudentRegistrationForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center py-8">
-      <div className="w-full max-w-4xl bg-white rounded-xl shadow-xl overflow-hidden">
+      <div className="w-full max-w-4xl bg-white rounded-xl shadow-xl">
         {/* Header */}
         <div className="bg-gradient-to-r from-green-500 to-green-600 p-6 text-center">
           <h2 className="text-2xl font-bold text-white">
@@ -664,7 +676,7 @@ function StudentRegistrationForm() {
               <input
                 type="text"
                 name="categories"
-                placeholder="Subjects You Teach *"
+                placeholder="Subjects You Want to Learn*"
                 value={subjectInput}
                 onChange={handleSubjectChange}
                 onFocus={handleSubjectChange}
@@ -681,7 +693,7 @@ function StudentRegistrationForm() {
 
               {/* ✅ Suggestions Dropdown */}
               {showSuggestions && (
-                <ul className="absolute w-full border rounded-md bg-white shadow-md mt-2 max-h-60 overflow-y-auto z-10">
+                <ul className="absolute w-full border rounded-md bg-white shadow-md mt-2 max-h-48 overflow-y-auto z-10">
                   {filteredSubjects.length > 0 ? (
                     filteredSubjects.map((sub) => (
                       <li

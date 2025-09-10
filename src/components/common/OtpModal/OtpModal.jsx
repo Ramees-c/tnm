@@ -8,6 +8,7 @@ function OtpModal({
   phoneOrEmail = "",
   resendInterval = 300,
   otpError,
+  setOtpError,
 }) {
   const OTP_LENGTH = 6;
   const [values, setValues] = useState(Array(OTP_LENGTH).fill(""));
@@ -94,6 +95,8 @@ function OtpModal({
   };
 
   const submitOtp = async () => {
+    setOtpError("");
+
     const otp = joinOtp();
     if (otp.length !== OTP_LENGTH) {
       setError("Please enter a 6-digit code");

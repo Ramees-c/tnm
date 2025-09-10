@@ -404,24 +404,31 @@ function TutorRegisterForm() {
       const phoneWithCode = `+${countryCode}${mobile_number}`;
 
       // Call send OTP
-      await axios.post("/api/send-otp/", {
+      const response = await axios.post("/api/send-otp/", {
         email,
         mobile_number: phoneWithCode,
       });
 
-      // Save a plain object for later (do NOT save FormData)
-      const pending = {
-        ...rest,
-        email,
-        mobile_number: phoneWithCode,
-        categories: Array.isArray(categories) ? categories.slice() : [],
-        // keep the File object if user uploaded one, otherwise null
-        profile_image: profile_image instanceof File ? profile_image : null,
-      };
+      // ✅ Only proceed if backend says OTP sent
+      if (response.data?.message === "OTP sent successfully.") {
+        const pending = {
+          ...rest,
+          email,
+          mobile_number: phoneWithCode,
+          categories: Array.isArray(categories) ? categories.slice() : [],
+          profile_image: profile_image instanceof File ? profile_image : null,
+        };
 
-      setPendingFormData(pending);
-      setShowOtpPopup(true);
-      setOtpError("");
+        setPendingFormData(pending);
+        setShowOtpPopup(true); // ✅ open popup ONLY if OTP is sent
+        setOtpError("");
+      } else {
+        // Backend responded but no OTP sent
+        setFormMessage({
+          type: "error",
+          text: response.data?.error || "❌ Failed to send OTP.",
+        });
+      }
     } catch (error) {
       console.error(
         "❌ Send OTP Error:",
@@ -435,6 +442,9 @@ function TutorRegisterForm() {
         "❌ Failed to send OTP. Try again.";
 
       setFormMessage({ type: "error", text: msg });
+
+      // ❌ Do NOT open popup in error case
+      setShowOtpPopup(false);
     } finally {
       setIsSubmitting(false);
     }
@@ -456,6 +466,7 @@ function TutorRegisterForm() {
   };
 
   const handleOtpVerify = async (enteredOtp) => {
+
     try {
       if (!pendingFormData) throw new Error("No form data found.");
 
@@ -467,7 +478,6 @@ function TutorRegisterForm() {
         if (key === "categories" && Array.isArray(val)) {
           val.forEach((id) => fd.append("categories", id));
         } else if (key === "profile_image") {
-          // append only if it's a File
           if (val instanceof File) fd.append("profile_image", val);
         } else {
           if (val !== null && val !== undefined) fd.append(key, val);
@@ -496,49 +506,26 @@ function TutorRegisterForm() {
         setErrors({});
         setPendingFormData(null);
 
-        // ✅ immediate redirect
-        navigate("/tutorDashboard");
+        navigate("/tutorDashboard"); // ✅ immediate redirect
       }
     } catch (err) {
       console.error(
         "❌ Registration Error:",
         err.response?.data || err.message
       );
+
       const apiErrors = err.response?.data;
 
-      // OTP-specific error (display in modal)
+      // ✅ OTP-specific error (stay inside modal)
       if (apiErrors?.otp) {
-        setOtpError(apiErrors.otp);
+        setOtpError(
+          Array.isArray(apiErrors.otp) ? apiErrors.otp[0] : apiErrors.otp
+        );
         return;
       }
 
-      // other backend validation errors -> show on form (and close modal)
-      if (apiErrors) {
-        const newErrors = {};
-        Object.keys(apiErrors).forEach((field) => {
-          const message = Array.isArray(apiErrors[field])
-            ? apiErrors[field][0]
-            : apiErrors[field];
-
-          if (field === "full_name") newErrors.name = message;
-          else if (field === "mobile_number") newErrors.phoneNumber = message;
-          else if (field === "email") newErrors.email = message;
-          else if (field === "experience_years") newErrors.experience = message;
-          else if (field === "hourly_rate") newErrors.hourlyRate = message;
-          else if (field === "categories") newErrors.subjects = message;
-          else if (field === "description") newErrors.bio = message;
-          else newErrors[field] = message;
-        });
-
-        setErrors(newErrors);
-        setShouldScroll(true);
-        setShowOtpPopup(false);
-        setOtpError("⚠️ Please fix the highlighted errors before proceeding.");
-        return;
-      }
-
-      // fallback
-      setOtpError("❌ Invalid or expired OTP.");
+      // ✅ fallback for OTP failures (invalid / expired OTP)
+      setOtpError("❌ Invalid or expired OTP. Please try again.");
     }
   };
 
@@ -887,17 +874,13 @@ function TutorRegisterForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div ref={errorRefs.hourlyRate}>
                 <FormInput
-                  type="text" // 👈 stays text
+                  type="text"
                   name="hourly_rate"
                   placeholder="Hourly Rate (₹) *"
                   value={formData.hourly_rate}
                   onChange={(e) => {
-                    const value = e.target.value;
-                    if (/^\d*$/.test(value)) {
-                      // ✅ allow only digits
-                      handleChange(e); // call your existing handler
-                      setErrors((prev) => ({ ...prev, hourlyRate: "" }));
-                    }
+                    handleChange(e);
+                    setErrors((prev) => ({ ...prev, hourlyRate: "" }));
                   }}
                   hasError={errors.hourlyRate}
                   innerRef={errorRefs.hourlyRate}
@@ -908,7 +891,6 @@ function TutorRegisterForm() {
                   </p>
                 )}
               </div>
-
               <div
                 ref={(el) => {
                   errorRefs.subjects.current = el;
@@ -1101,11 +1083,12 @@ function TutorRegisterForm() {
         {showOtpPopup && (
           <OtpModal
             isOpen={showOtpPopup}
-            phoneOrEmail={`${formData.email} / +${formData.countryCode}${formData.mobile_number}`}
+            phoneOrEmail={`+${formData.countryCode}${formData.mobile_number}`}
             onClose={() => setShowOtpPopup(false)}
             onSubmit={handleOtpVerify} // ✅ final registration
             onResend={sendOtp} // ✅ resend OTP API
             otpError={otpError}
+            setOtpError={setOtpError}
           />
         )}
       </div>
