@@ -489,7 +489,7 @@ try {
   setPendingFormData(null);
 
   // ✅ immediate redirect
-  navigate("/TutorDashboard");
+  navigate("/tutorDashboard");
 }
 
 } catch (err) {
