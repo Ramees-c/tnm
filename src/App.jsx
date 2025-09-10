@@ -4,7 +4,7 @@ import "aos/dist/aos.css";
 import "./App.css";
 
 import UserHome from "./pages/user/UserHome/UserHome";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import AboutPage from "./pages/user/AboutPage/AboutPage";
 import Userheader from "./components/common/Userheader/Userheader";
 import Footer from "./components/common/Footer/Footer";
@@ -16,18 +16,32 @@ import BlogPge from "./pages/user/BlogPage/BlogPge";
 import BlogSingle from "./pages/user/BlogSingle/BlogSingle";
 import LoginRegisterPage from "./pages/user/LoginRegisterPage/LoginRegisterPage";
 import TestimonialPage from "./pages/user/TestimonialPage/TestimonialPage";
+import StudentDashboardPage from "./pages/user/StudentDashboardPage/StudentDashboardPage";
+import TutorDashboardPage from "./pages/user/TutorDashboardPage/TutorDashboardPage";
+import SubscriptionPage from "./pages/user/SubscriptionPage/SubscriptionPage";
+import AssignedStudentsPage from "./pages/user/AssignedStudentsPage/AssignedStudentsPage";
+import NotificationPage from "./pages/user/NotificationPage/NotificationPage";
+import TutorDocumentPage from "./pages/user/TutorDocumentPage/TutorDocumentPage";
 
 function App() {
+  const location = useLocation();
+
   useEffect(() => {
     AOS.init({
-      duration: 800, 
-      easing: "ease-in-out", 
-      once: true, 
+      duration: 800,
+      easing: "ease-in-out",
+      once: true,
     });
   }, []);
+
+  // 🔹 Paths where header/footer should be hidden
+  const hideLayoutRoutes = ["/studentDashboard", "/tutorDashboard", "/register", "/tutorSubscription", "/assignedStudentsPage", "/tutornotification", "/tutorDocument"];
+
+  const shouldHideLayout = hideLayoutRoutes.includes(location.pathname);
+
   return (
     <div>
-      <Userheader />
+      {!shouldHideLayout && <Userheader />}
       <Routes>
         <Route path="/" element={<UserHome />} />
         <Route path="/about" element={<AboutPage />} />
@@ -39,8 +53,14 @@ function App() {
         <Route path="/blogSingle" element={<BlogSingle />} />
         <Route path="/register" element={<LoginRegisterPage />} />
         <Route path="/testimonial" element={<TestimonialPage />} />
+        <Route path="/studentDashboard" element={<StudentDashboardPage />} />
+        <Route path="/tutorDashboard" element={<TutorDashboardPage />} />
+        <Route path="/tutorSubscription" element={<SubscriptionPage />} />
+        <Route path="/assignedStudentsPage" element={<AssignedStudentsPage />} />
+        <Route path="/tutornotification" element={<NotificationPage role="tutor" />} />
+        <Route path="/tutorDocument" element={<TutorDocumentPage />} />
       </Routes>
-      <Footer />
+      {!shouldHideLayout && <Footer />}
     </div>
   );
 }
