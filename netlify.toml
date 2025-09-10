@@ -1,5 +1,12 @@
+# 🔄 API Proxy
 [[redirects]]
   from = "/api/*"
   to = "http://tnm-test-api.dhanwis.com/api/:splat"
   status = 200
   force = true
+
+# ⚡ SPA Routing Fix (React Router)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
