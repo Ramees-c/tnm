@@ -156,7 +156,7 @@ function StudentDashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen">
       {/* Sidebar */}
       <div className="w-0 lg:w-72">
         <DashboardSidebar
@@ -168,7 +168,7 @@ function StudentDashboardPage() {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 w-full p-4 sm:p-6 transition-all duration-300">
+      <main className="flex-1 w-full lg:w-[calc(100%-18rem)] p-4 sm:p-6 transition-all duration-300 min-h-screen">
         <div className="max-w-6xl mx-auto">
           {/* ✅ Mobile Menu Button + Title */}
           <div className="flex items-center gap-3 mb-6">
@@ -238,6 +238,8 @@ function StudentDashboardPage() {
               ))}
             </div>
           </div>
+
+
           <div className="bg-white rounded-2xl shadow p-6 mb-6">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">
               Popular Tutors
