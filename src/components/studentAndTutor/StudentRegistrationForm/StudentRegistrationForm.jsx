@@ -17,9 +17,9 @@ const initialFormData = {
   city: "",
   state: "",
   pincode: "",
-  grade: "",
+  qualification: "",
   categories: [],
-  profile_image: null,
+  profile_photo: null,
   gender: "",
 };
 
@@ -48,14 +48,14 @@ function StudentRegistrationForm() {
     full_name: useRef(null),
     email: useRef(null),
     countryCode: useRef(null),
-    phoneNumber: useRef(null),
+    mobile_number: useRef(null),
     password: useRef(null),
     confirmPassword: useRef(null),
     city: useRef(null),
     state: useRef(null),
     pincode: useRef(null),
-    grade: useRef(null),
-    subjects: useRef(null),
+    qualification: useRef(null),
+    categories: useRef(null),
     gender: useRef(null),
   };
 
@@ -106,20 +106,20 @@ function StudentRegistrationForm() {
 
   const handleProfileInputChange = (e) => {
     handleChange(e);
-    if (e.target.name === "profile_image" && e.target.files[0]) {
+    if (e.target.name === "profile_photo" && e.target.files[0]) {
       const file = e.target.files[0];
       const maxSize = 5 * 1024 * 1024;
       if (file.size > maxSize) {
         setErrors((prev) => ({
           ...prev,
-          profile_image: "File size should not exceed 5MB",
+          profile_photo: "File size should not exceed 5MB",
         }));
-        setFormData((prev) => ({ ...prev, profile_image: null }));
+        setFormData((prev) => ({ ...prev, profile_photo: null }));
         setPreview(null);
         e.target.value = "";
         return;
       }
-      setFormData((prev) => ({ ...prev, profile_image: file }));
+      setFormData((prev) => ({ ...prev, profile_photo: file }));
       setPreview(URL.createObjectURL(file));
     }
   };
@@ -132,10 +132,10 @@ function StudentRegistrationForm() {
   const handlePhoneChange = (e) => {
     const onlyNums = e.target.value.replace(/\D/g, "");
     setFormData({ ...formData, mobile_number: onlyNums });
-    setErrors((prev) => ({ ...prev, phoneNumber: "" }));
+    setErrors((prev) => ({ ...prev, mobile_number: "" }));
   };
 
-  // validation
+  // ✅ Validation
   const validateForm = () => {
     let newErrors = {};
     if (!formData.full_name.trim())
@@ -148,7 +148,7 @@ function StudentRegistrationForm() {
     if (!formData.countryCode || formData.countryCode.trim() === "")
       newErrors.countryCode = "Country code is required";
     if (!formData.mobile_number)
-      newErrors.phoneNumber = "Phone number is required";
+      newErrors.mobile_number = "Phone number is required"; // fixed
     if (!formData.password) {
       newErrors.password = "Password is required";
     } else if (formData.password.length < 8) {
@@ -163,9 +163,11 @@ function StudentRegistrationForm() {
     if (!formData.city) newErrors.city = "City is required";
     if (!formData.state) newErrors.state = "State is required";
     if (!formData.pincode) newErrors.pincode = "Pincode is required";
-    if (!formData.grade) newErrors.grade = "Class is required";
-    if (!formData.required_subjects)
-      newErrors.required_subjects = "Subjects are required";
+    if (!formData.qualification)
+      newErrors.qualification = "Qualification is required"; // fixed
+    if (!formData.categories || formData.categories.length === 0) {
+      newErrors.categories = "Subjects are required"; // fixed
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -249,7 +251,7 @@ function StudentRegistrationForm() {
   const handleSubjectChange = async (e) => {
     const value = e.target.value;
     setSubjectInput(value);
-    setErrors((prev) => ({ ...prev, subjects: "" }));
+    setErrors((prev) => ({ ...prev, categories: "" }));
 
     try {
       const res = await axios.get("/api/category-list/");
@@ -326,100 +328,150 @@ function StudentRegistrationForm() {
     );
   };
 
-  // submit
+  // ✅ Submit
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) {
-      setShouldScroll(true);
-      return;
+  e.preventDefault();
+  if (!validateForm()) {
+    setShouldScroll(true);
+    return;
+  }
+
+  setIsSubmitting(true);
+  setFormMessage({ type: "", text: "" });
+  setErrors({});
+
+  try {
+    const { countryCode, mobile_number, email, profile_photo, ...rest } =
+      formData;
+    const phoneWithCode = `+${countryCode}${mobile_number}`;
+
+    // ✅ Call send OTP API
+    const response = await axios.post("/api/send-otp/", {
+      email,
+      mobile_number: phoneWithCode,
+    });
+
+    if (response.data?.message === "OTP sent successfully.") {
+      // ✅ Only proceed if OTP sent
+      const pending = {
+        ...rest,
+        email,
+        mobile_number: phoneWithCode,
+        profile_photo: profile_photo instanceof File ? profile_photo : null,
+      };
+
+      setPendingFormData(pending);
+      setShowOtpPopup(true); // open modal only now
+      setOtpError("");
+    } else {
+      // Backend responded but OTP not sent
+      setFormMessage({
+        type: "error",
+        text: response.data?.error || "❌ Failed to send OTP.",
+      });
+      setShowOtpPopup(false);
     }
-    setIsSubmitting(true);
-    console.log(formData, "student");
-    // setFormMessage({ type: "", text: "" });
-    // try {
-    //   const { countryCode, mobile_number, email, profile_image, ...rest } =
-    //     formData;
-    //   const phoneWithCode = `+${countryCode}${mobile_number}`;
+  } catch (error) {
+    const apiErrors = error.response?.data || {};
 
-    //   await axios.post("/api/send-otp/", {
-    //     email,
-    //     mobile_number: phoneWithCode,
-    //   });
+    if (apiErrors.email) {
+      setErrors((prev) => ({ ...prev, email: apiErrors.email }));
+    }
+    if (apiErrors.mobile_number) {
+      setErrors((prev) => ({ ...prev, mobile_number: apiErrors.mobile_number }));
+    }
 
-    //   const pending = {
-    //     ...rest,
-    //     email,
-    //     mobile_number: phoneWithCode,
-    //     profile_image: profile_image instanceof File ? profile_image : null,
-    //   };
+    setFormMessage({
+      type: "error",
+      text: apiErrors.error || "❌ Failed to send OTP. Try again.",
+    });
+    setShowOtpPopup(false);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
-    //   setPendingFormData(pending);
-    //   setShowOtpPopup(true);
-    //   setOtpError("");
-    // } catch (error) {
-    //   const msg =
-    //     error.response?.data?.error || "❌ Failed to send OTP. Try again.";
-    //   setFormMessage({ type: "error", text: msg });
-    // } finally {
-    //   setIsSubmitting(false);
-    // }
+
+  // ✅ Resend OTP
+  const sendOtp = async () => {
+    try {
+      await axios.post("/api/send-otp/", {
+        email: formData.email,
+        mobile_number: `+${formData.countryCode}${formData.mobile_number}`,
+      });
+      setOtpError("✅ OTP resent successfully.");
+    } catch {
+      setOtpError("❌ Failed to resend OTP. Please try again.");
+    }
   };
 
-  // OTP resend
-  //   const sendOtp = async () => {
-  //     try {
-  //       await axios.post("/api/send-otp/", {
-  //         email: formData.email,
-  //         mobile_number: `+${formData.countryCode}${formData.mobile_number}`,
-  //       });
-  //       setOtpError("✅ OTP resent successfully.");
-  //     } catch {
-  //       setOtpError("Failed to resend OTP. Please try again.");
-  //     }
-  //   };
+  // ✅ OTP Verify
+ const handleOtpVerify = async (enteredOtp) => {
+  try {
+    if (!pendingFormData) throw new Error("No form data found.");
 
-  // OTP verify
-  //   const handleOtpVerify = async (enteredOtp) => {
-  //     try {
-  //       if (!pendingFormData) throw new Error("No form data found.");
-  //       const fd = new FormData();
-  //       Object.keys(pendingFormData).forEach((key) => {
-  //         const val = pendingFormData[key];
-  //         if (key === "profile_image" && val instanceof File) {
-  //           fd.append("profile_image", val);
-  //         } else {
-  //           if (val !== null && val !== undefined) fd.append(key, val);
-  //         }
-  //       });
-  //       fd.append("otp", enteredOtp);
+    // Build FormData from pendingFormData
+    const fd = new FormData();
 
-  //       const res = await axios.post("/api/register/student/", fd, {
-  //         headers: { "Content-Type": "multipart/form-data" },
-  //       });
+    Object.keys(pendingFormData).forEach((key) => {
+      const val = pendingFormData[key];
 
-  //       if (res.data?.token) {
-  //         setShowOtpPopup(false);
-  //         localStorage.setItem("authToken", res.data.token);
-  //         setFormData(initialFormData);
-  //         setConfirmPassword("");
-  //         setPreview(null);
-  //         setErrors({});
-  //         setPendingFormData(null);
-  //         navigate("/studentDashboard");
-  //       }
-  //     } catch (err) {
-  //       const apiErrors = err.response?.data;
-  //       if (apiErrors?.otp) {
-  //         setOtpError(apiErrors.otp);
-  //         return;
-  //       }
-  //       setOtpError("❌ Invalid or expired OTP.");
-  //     }
-  //   };
+      if (key === "categories" && Array.isArray(val)) {
+        val.forEach((id) => fd.append("categories", id));
+      } else if (key === "profile_photo") {
+        if (val instanceof File) fd.append("profile_photo", val);
+      } else {
+        if (val !== null && val !== undefined) fd.append(key, val);
+      }
+    });
+
+    // Append OTP
+    fd.append("otp", enteredOtp);
+
+    // Call student registration API
+    const res = await axios.post("/api/register/student/", fd, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    if (res.data?.token) {
+      setShowOtpPopup(false);
+      setOtpError("");
+
+      // Save token & reset form
+      localStorage.setItem("authToken", res.data.token);
+      setFormData(initialFormData);
+      setConfirmPassword("");
+      setSelectedSubjects([]);
+      setPreview(null);
+      setFilteredSubjects([]);
+      setErrors({});
+      setPendingFormData(null);
+
+      navigate("/studentDashboard"); // ✅ redirect after success
+    }
+  } catch (err) {
+    console.error(
+      "❌ Student Registration Error:",
+      err.response?.data || err.message
+    );
+
+    const apiErrors = err.response?.data;
+
+    // OTP-specific error
+    if (apiErrors?.otp) {
+      setOtpError(Array.isArray(apiErrors.otp) ? apiErrors.otp[0] : apiErrors.otp);
+      return;
+    }
+
+    // fallback for invalid/expired OTP
+    setOtpError("❌ Invalid or expired OTP. Please try again.");
+  }
+};
+
 
   return (
     <div className="min-h-screen flex items-center justify-center py-8">
-      <div className="w-full max-w-4xl bg-white rounded-xl shadow-xl">
+      <div className="w-full max-w-4xl bg-white rounded-md shadow-xl overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-green-500 to-green-600 p-6 text-center">
           <h2 className="text-2xl font-bold text-white">
@@ -456,7 +508,7 @@ function StudentRegistrationForm() {
               <input
                 id="profilePhoto"
                 type="file"
-                name="profile_image"
+                name="profile_photo"
                 accept="image/*"
                 onChange={handleProfileInputChange}
                 className="hidden"
@@ -467,16 +519,16 @@ function StudentRegistrationForm() {
                 type="button"
                 onClick={() => {
                   setPreview(null);
-                  setFormData((prev) => ({ ...prev, profile_image: null }));
+                  setFormData((prev) => ({ ...prev, profile_photo: null }));
                 }}
                 className="mt-2 flex items-center gap-1 text-sm text-red-600 hover:text-red-700"
               >
                 <X className="w-4 h-4" /> Remove
               </button>
             )}
-            {errors.profile_image && (
+            {errors.profile_photo && (
               <p className="text-red-500 text-xs mt-1">
-                {errors.profile_image}
+                {errors.profile_photo}
               </p>
             )}
           </div>
@@ -563,14 +615,16 @@ function StudentRegistrationForm() {
                     value={formData.mobile_number}
                     onChange={handlePhoneChange}
                     placeholder="Phone Number *"
-                    ref={errorRefs.phoneNumber}
+                    ref={errorRefs.mobile_number} // ✅ fixed
                     className={`w-full py-2 px-4 border ${
-                      errors.phoneNumber ? "border-red-500" : "border-gray-300"
+                      errors.mobile_number
+                        ? "border-red-500"
+                        : "border-gray-300"
                     } rounded-md placeholder-gray-400 outline-none focus:ring-0 focus:border-green-500`}
                   />
-                  {errors.phoneNumber && (
+                  {errors.mobile_number && (
                     <p className="text-red-500 text-xs mt-1">
-                      {errors.phoneNumber}
+                      {errors.mobile_number}
                     </p>
                   )}
                 </div>
@@ -630,7 +684,10 @@ function StudentRegistrationForm() {
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Confirm Password *"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  setErrors((prev) => ({ ...prev, confirmPassword: "" })); // ✅ clear error
+                }}
                 hasError={errors.confirmPassword}
                 innerRef={errorRefs.confirmPassword}
               />
@@ -649,30 +706,30 @@ function StudentRegistrationForm() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Class */}
-            <div ref={errorRefs.grade}>
+            {/* Qualification */}
+            <div ref={errorRefs.qualification}>
               <FormInput
-                name="grade"
-                placeholder="Class *"
-                value={formData.grade}
+                name="qualification"
+                placeholder="Qualification *"
+                value={formData.qualification}
                 onChange={handleChange}
-                hasError={errors.grade}
-                innerRef={errorRefs.grade}
+                hasError={errors.qualification} // ✅ fixed
+                innerRef={errorRefs.qualification} // ✅ fixed
               />
-              {errors.grade && (
-                <p className="text-red-500 text-xs mt-1">{errors.grade}</p>
+              {errors.qualification && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.qualification}
+                </p>
               )}
             </div>
 
-            {/* Subjects */}
             <div
               ref={(el) => {
-                errorRefs.subjects.current = el;
+                errorRefs.categories.current = el;
                 subjectRef.current = el;
               }}
               className="relative"
             >
-              {/* Input */}
               <input
                 type="text"
                 name="categories"
@@ -680,18 +737,18 @@ function StudentRegistrationForm() {
                 value={subjectInput}
                 onChange={handleSubjectChange}
                 onFocus={handleSubjectChange}
-                ref={errorRefs.subjects}
+                ref={errorRefs.categories}
                 className={`w-full py-2 px-4 border ${
-                  errors.subjects ? "border-red-500" : "border-gray-300"
+                  errors.categories ? "border-red-500" : "border-gray-300"
                 } rounded-md placeholder-gray-400 outline-none focus:ring-0 focus:border-primary`}
                 autoComplete="off"
                 autoCorrect="off"
               />
-              {errors.subjects && (
-                <p className="text-red-500 text-xs mt-1">{errors.subjects}</p>
+              {errors.categories && (
+                <p className="text-red-500 text-xs mt-1">{errors.categories}</p>
               )}
 
-              {/* ✅ Suggestions Dropdown */}
+              {/* Suggestions Dropdown */}
               {showSuggestions && (
                 <ul className="absolute w-full border rounded-md bg-white shadow-md mt-2 max-h-48 overflow-y-auto z-10">
                   {filteredSubjects.length > 0 ? (
@@ -713,7 +770,7 @@ function StudentRegistrationForm() {
                 </ul>
               )}
 
-              {/* ✅ Selected Subjects Chips */}
+              {/* Selected Subjects Chips */}
               {selectedSubjects.length > 0 && (
                 <div className="flex flex-wrap gap-2 border rounded-md p-2 mt-2">
                   {selectedSubjects.map((sub) => (
@@ -821,6 +878,7 @@ function StudentRegistrationForm() {
             onSubmit={handleOtpVerify}
             onResend={sendOtp}
             otpError={otpError}
+            setOtpError={setOtpError}
           />
         )}
       </div>

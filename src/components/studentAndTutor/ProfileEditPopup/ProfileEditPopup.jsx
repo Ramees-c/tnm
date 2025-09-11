@@ -15,11 +15,8 @@ function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
 
   // 🔹 Disable background scroll when modal is open
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
+    if (isOpen) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "auto";
 
     return () => {
       document.body.style.overflow = "auto";
@@ -63,48 +60,50 @@ function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      onClick={(e) => e.stopPropagation()} // stop background click
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+      onClick={(e) => e.stopPropagation()}
     >
       <div
-        className="bg-white w-full max-w-3xl rounded-2xl shadow-lg p-6 relative"
+        className="bg-white w-full max-w-3xl rounded-2xl shadow-lg p-4 sm:p-6 relative max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Header */}
-        <h2 className="text-xl font-bold text-gray-700 mb-4">Edit Profile</h2>
+        <h2 className="text-lg sm:text-xl font-bold text-gray-700 mb-4">
+          Edit Profile
+        </h2>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           {/* Profile Image Upload */}
           <div className="flex flex-col items-center mb-6">
             <label
               htmlFor="profilePhoto"
-              className="relative w-32 h-32 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
+              className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
             >
               {profileImage ? (
                 <img
                   src={profileImage}
                   alt="Preview"
-                  className="w-32 h-32 rounded-full object-cover"
+                  className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover"
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center text-gray-500">
-                  <ImageIcon className="w-10 h-10 mb-1 text-green-600" />
-                  <p className="text-xs">Edit Photo</p>
+                  <ImageIcon className="w-8 h-8 sm:w-10 sm:h-10 mb-1 text-green-600" />
+                  <p className="text-xs sm:text-sm">Edit Photo</p>
                 </div>
               )}
 
               {/* Upload button overlay */}
-              <div className="absolute bottom-2 right-2 bg-green-600 p-2 rounded-full text-white shadow-md">
-                <Upload className="w-4 h-4" />
+              <div className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 bg-green-600 p-1.5 sm:p-2 rounded-full text-white shadow-md">
+                <Upload className="w-3 h-3 sm:w-4 sm:h-4" />
               </div>
 
               {/* Hidden File Input */}
@@ -123,13 +122,14 @@ function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
               <button
                 type="button"
                 onClick={removeImage}
-                className="mt-2 flex items-center gap-1 text-sm text-red-600 hover:text-red-700 transition"
+                className="mt-2 flex items-center gap-1 text-xs sm:text-sm text-red-600 hover:text-red-700 transition"
               >
-                <X className="w-4 h-4" /> Remove
+                <X className="w-3 h-3 sm:w-4 sm:h-4" /> Remove
               </button>
             )}
           </div>
-          {/* Name, Email & Phone */}
+
+          {/* Name & Email */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Full Name */}
             <div>
@@ -159,17 +159,14 @@ function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
                 <p className="text-red-500 text-xs mt-1">{errors.email}</p>
               )}
             </div>
-
-           
           </div>
 
-          {/* City & State */}
+          {/* Phone */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             {/* Phone (Country Code + Number) */}
-            <div >
+            <div>
               <div className="flex gap-3">
                 {/* Country Code */}
-                <div className="w-28" >
+                <div className="w-24 sm:w-28">
                   <PhoneInput
                     country={"in"}
                     value={formData.countryCode}
@@ -178,30 +175,13 @@ function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
                         ...formData,
                         countryCode: country.dialCode,
                       });
-                     
                     }}
-                    inputClass={`!w-full !h-11 !text-gray-700 !rounded-md !outline-none !border ${
-                      errors.countryCode
-                        ? "!border-red-500"
-                        : "!border-gray-300"
-                    } focus:!ring-0 focus:!border-green-500`}
-                    buttonClass={`!h-12 !rounded-md !border ${
-                      errors.countryCode
-                        ? "!border-red-500"
-                        : "!border-gray-300"
-                    } !bg-white`}
+                    inputClass="!w-full !h-10 sm:!h-11 !text-gray-700 !rounded-md !outline-none !border !border-gray-300"
+                    buttonClass="!h-10 sm:!h-11 !rounded-md !border !border-gray-300 !bg-white"
                     dropdownClass="!bg-white !text-gray-700 !rounded-md !border-gray-200 !shadow-md"
                     enableSearch={true}
-                    inputProps={{
-                      name: "countryCode",
-                      
-                    }}
+                    inputProps={{ name: "countryCode" }}
                   />
-                  {errors.countryCode && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.countryCode}
-                    </p>
-                  )}
                 </div>
 
                 {/* Phone Number */}
@@ -210,38 +190,13 @@ function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
                     type="tel"
                     name="mobile_number"
                     value={formData.mobile_number}
+                    onChange={handleChange}
                     placeholder="Phone Number *"
-                    className={`w-full py-2 px-4 border ${
-                      errors.phoneNumber ? "border-red-500" : "border-gray-300"
-                    } rounded-md placeholder-gray-400 outline-none focus:ring-0 focus:border-green-500`}
+                    className="w-full py-2 px-3 sm:px-4 border border-gray-300 rounded-md placeholder-gray-400 outline-none focus:ring-0 focus:border-green-500 text-sm sm:text-base"
                   />
-                  {errors.phoneNumber && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.phoneNumber}
-                    </p>
-                  )}
                 </div>
               </div>
             </div>
-             <div className="relative" ref={errorRefs.password}>
-                <FormInput
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  placeholder="Password *"
-                  value={formData.password}
-                  innerRef={errorRefs.password}
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-3.5 text-gray-500"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
-                {errors.password && (
-                  <p className="text-red-500 text-xs mt-1">{errors.password}</p>
-                )}
-              </div>
           </div>
 
           {/* Bio */}
@@ -255,14 +210,14 @@ function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
               value={formData.description || ""}
               onChange={handleChange}
               rows="3"
-              className="w-full px-4 py-3 border border-gray-300 rounded-md outline-none focus:ring-0 focus:border-green-500 transition"
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-md outline-none focus:ring-0 focus:border-green-500 transition text-sm sm:text-base"
             />
           </div>
 
           {/* Submit */}
           <button
             type="submit"
-            className="w-full py-3 rounded-lg font-medium text-white bg-gradient-to-r from-green-500 to-green-600 shadow-md hover:shadow-lg transition"
+            className="w-full py-2.5 sm:py-3 rounded-lg font-medium text-white bg-gradient-to-r from-green-500 to-green-600 shadow-md hover:shadow-lg transition text-sm sm:text-base"
           >
             Save Changes
           </button>

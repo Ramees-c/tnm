@@ -125,10 +125,10 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
               </button>
             </div>
             <div>
-              <h2 className="text-lg font-semibold truncate max-w-[140px] lg:max-w-full">
+              <h2 className="text-lg md:text-xl font-semibold truncate max-w-[140px] lg:max-w-full">
                 John Doe
               </h2>
-              <p className="text-sm text-white/70">
+              <p className="text-sm md:text-lg text-white/70">
                 {role === "tutor" ? "Tutor" : "Student"}
               </p>
             </div>

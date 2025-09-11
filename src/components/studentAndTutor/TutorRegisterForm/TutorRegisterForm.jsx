@@ -531,7 +531,7 @@ function TutorRegisterForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center py-8">
-      <div className="w-full max-w-4xl bg-white rounded-xl shadow-xl overflow-hidden">
+      <div className="w-full max-w-4xl bg-white rounded-md shadow-xl overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-green-500 to-green-600 p-6 text-center">
           <h2 className="text-2xl font-bold text-white">Tutor Registration</h2>
