@@ -13,7 +13,7 @@ function ChoiceCard({
   };
   return (
     <div
-      className={`w-full max-w-md bg-gradient-to-b ${cardColor} rounded-2xl overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl border border-gray-100`}
+      className={`w-full max-w-md bg-gradient-to-b ${cardColor} rounded-md overflow-hidden shadow-xl transform transition-all duration-300 hover:scale-105 hover:shadow-xl border border-gray-100`}
     >
       <div className="p-8 flex flex-col items-center text-center">
         {/* Icon */}
@@ -32,7 +32,7 @@ function ChoiceCard({
 
         {/* Button */}
         <button
-          className={`${buttonColor} text-white font-medium py-2 px-4 rounded-full transition-all duration-300 transform hover:-translate-y-1 shadow-md hover:shadow-lg text-sm`}
+          className={`${buttonColor} text-white font-medium py-2 px-4 rounded-md transition-all duration-300 transform hover:-translate-y-1 shadow-md hover:shadow-lg text-sm`}
           onClick={() => {
             onRegisterClick();
             handleClick();

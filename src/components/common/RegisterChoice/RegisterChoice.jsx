@@ -4,38 +4,25 @@ import studentImg from "../../../assets/images/logo/tnmlogo.png";
 import ChoiceCard from "../../../pages/user/ChoiceCard/ChoiceCard";
 import { HiAcademicCap, HiBookOpen } from "react-icons/hi";
 
-function RegisterChoice({ onTutorClick, onStudentClick }) {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
+function RegisterChoice({ onTutorClick, onStudentClick, onCreateAccount }) {
   return (
     <div className="min-h-screen flex items-center justify-center py-12 md:py-0">
       <section className="w-full max-w-5xl flex flex-col items-center justify-center">
         {/* Heading */}
-        <div
-          className={`transition-all duration-700 transform ${
-            isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
-          }`}
-        >
+        <div>
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center text-gray-800 mb-2">
             What are you looking for?
           </h2>
           <p className="text-center text-gray-600 mb-10 text-sm md:text-md">
-            Join our platform to either share your knowledge or expand your skills
+            Join our platform to either share your knowledge or expand your
+            skills
           </p>
         </div>
 
         {/* Card Container */}
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 w-full">
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-8 w-full">
           {/* Tutor Card */}
-          <div
-            className={`transition-all duration-700 delay-150 transform ${
-              isVisible ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
-            }`}
-          >
+          <div>
             <ChoiceCard
               image={teacherImg}
               title="I am looking to Teach"
@@ -57,11 +44,7 @@ function RegisterChoice({ onTutorClick, onStudentClick }) {
           </div>
 
           {/* Student Card */}
-          <div
-            className={`transition-all duration-700 delay-300 transform ${
-              isVisible ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
-            }`}
-          >
+          <div>
             <ChoiceCard
               image={studentImg}
               title="I am looking to Learn"
@@ -76,27 +59,21 @@ function RegisterChoice({ onTutorClick, onStudentClick }) {
         </div>
 
         {/* Extra Info */}
-        <div
-          className={`mt-16 text-center transition-all duration-700 delay-500 transform ${
-            isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
-          }`}
-        >
+        <div className={`mt-16 text-center`}>
           <p className="text-gray-600 mb-4">
             Already have an account?{" "}
-            <a href="#" className="text-blue-600 font-medium hover:underline">
+            <a
+              href="#"
+              className="text-green-500 font-medium hover:underline"
+              onClick={onCreateAccount}
+            >
               Sign In
             </a>
           </p>
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-500">
-            <span className="flex items-center">
-              ✅ 5000+ Expert Tutors
-            </span>
-            <span className="flex items-center">
-              ✅ 100+ Subjects
-            </span>
-            <span className="flex items-center">
-              ✅ Secure Payments
-            </span>
+            <span className="flex items-center">✅ 5000+ Expert Tutors</span>
+            <span className="flex items-center">✅ 100+ Subjects</span>
+            <span className="flex items-center">✅ Secure Payments</span>
           </div>
         </div>
       </section>

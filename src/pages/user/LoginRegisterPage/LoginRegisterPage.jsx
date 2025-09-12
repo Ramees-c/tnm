@@ -2,26 +2,22 @@ import React, { useState, useEffect } from "react";
 import RegisterChoice from "../../../components/common/RegisterChoice/RegisterChoice";
 import TutorRegisterForm from "../../../components/studentAndTutor/TutorRegisterForm/TutorRegisterForm";
 import StudentRegistrationForm from "../../../components/studentAndTutor/StudentRegistrationForm/StudentRegistrationForm";
+import LoginForm from "../../../components/studentAndTutor/LoginForm/LoginForm";
 
 function LoginRegisterPage() {
-  // ✅ Initialize from sessionStorage (for refresh) or default to choice
+  // 👉 default to "login"
   const [step, setStep] = useState(() => {
-    return sessionStorage.getItem("registerStep") || "choice";
+    return sessionStorage.getItem("registerStep") || "login";
   });
 
-  // ✅ Save current step to sessionStorage on step change
   useEffect(() => {
     sessionStorage.setItem("registerStep", step);
   }, [step]);
 
-  // ✅ Reset to choice when navigating to this page normally
   useEffect(() => {
-    // Only reset if no session storage (first visit)
     if (!sessionStorage.getItem("registerStep")) {
-      setStep("choice");
+      setStep("login");
     }
-
-    // Clear sessionStorage when leaving the page
     return () => {
       sessionStorage.removeItem("registerStep");
     };
@@ -33,11 +29,15 @@ function LoginRegisterPage() {
         <RegisterChoice
           onTutorClick={() => setStep("tutor")}
           onStudentClick={() => setStep("student")}
+          onCreateAccount={() => setStep("login")}
         />
       )}
 
       {step === "tutor" && <TutorRegisterForm />}
       {step === "student" && <StudentRegistrationForm />}
+      {step === "login" && (
+        <LoginForm onCreateAccount={() => setStep("choice")} />
+      )}
     </div>
   );
 }
