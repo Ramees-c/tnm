@@ -52,44 +52,51 @@ function LoginForm({ onCreateAccount }) {
 
   // ✅ Submit
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
+  e.preventDefault();
+  if (!validate()) return;
 
-    setIsLoading(true);
-    setServerError("");
+  setIsLoading(true);
+  setServerError("");
 
-    try {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  try {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-      let payload = {
-        password: formData.password,
-      };
+    let payload = {
+      password: formData.password,
+    };
 
-      if (emailRegex.test(formData.identifier)) {
-        payload.email = formData.identifier;
-      } else {
-        payload.mobile_number = formData.identifier;
-      }
-
-      const response = await axios.post("/api/login/", payload);
-      console.log("✅ Login success:", response.data);
-
-      if (response.data.token) {
-        localStorage.setItem("authToken", response.data.token);
-      }
-
-      alert("✅ Login Successful!");
-      // window.location.href = "/dashboard";
-    } catch (error) {
-      console.error("❌ Login error:", error);
-      setServerError(
-        error.response?.data?.message ||
-          "Something went wrong. Please try again."
-      );
-    } finally {
-      setIsLoading(false);
+    if (emailRegex.test(formData.identifier)) {
+      payload.email = formData.identifier;
+    } else {
+      payload.mobile_number = formData.identifier;
     }
-  };
+
+    const response = await axios.post("/api/login/", payload);
+    console.log("✅ Login success:", response.data);
+
+    // 🚨 Block admin login
+    if (response.data.role === "admin") {
+      setServerError("Admins are not allowed to login from here.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (response.data.token) {
+      localStorage.setItem("authToken", response.data.token);
+    }
+
+    alert("✅ Login Successful!");
+    // window.location.href = "/dashboard";
+  } catch (error) {
+    console.error("❌ Login error:", error);
+    setServerError(
+      error.response?.data?.message ||
+        "Something went wrong. Please try again."
+    );
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
