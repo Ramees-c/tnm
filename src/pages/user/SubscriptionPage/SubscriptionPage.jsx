@@ -1,29 +1,36 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import DashboardSidebar from "../../../components/studentAndTutor/DashboardSidebar/DashboardSidebar";
 import SubscriptionCard from "../../../components/studentAndTutor/SubscriptionCard/SubscriptionCard";
+import { useAuth } from "../../../Context/userAuthContext";
+import axios from "axios";
 
 function SubscriptionPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [planDetails, setPlanDetails] = useState([]);
 
-  const plans = [
-    {
-      title: "Basic",
-      price: 499,
-      features: ["5 Classes per month", "Email Support", "Community Access"],
-    },
-    {
-      title: "Pro",
-      price: 999,
-      features: ["Unlimited Classes", "Priority Support", "Personal Dashboard"],
-      highlighted: true,
-    },
-    {
-      title: "Enterprise",
-      price: 1999,
-      features: ["Custom Features", "Dedicated Support", "Team Management"],
-    },
-  ];
+  const { token } = useAuth();
+
+  useEffect(() => {
+    const getPlanDetails = async () => {
+      const res = await axios
+        .get("/api/plans/tutors/", {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        })
+        .then((res) => {
+          setPlanDetails(res.data);
+        })
+        .catch((err) => {
+          console.error("Failed to fetch profile:", err);
+        });
+    };
+    getPlanDetails();
+  }, []);
+
+  console.log(planDetails, "planDetails");
+  
 
   const handleSelect = (plan) => {
     alert(`✅ You selected ${plan} plan!`);
@@ -64,13 +71,13 @@ function SubscriptionPage() {
 
           {/* Plans Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {plans.map((plan, i) => (
+            {planDetails?.map((plan) => (
               <SubscriptionCard
-                key={i}
-                title={plan.title}
+                key={plan}
+                title={plan.plan}
                 price={plan.price}
-                features={plan.features}
-                highlighted={plan.highlighted}
+                features={plan.description}
+                duration={plan.duration_unit}
                 onSelect={() => handleSelect(plan.title)}
               />
             ))}

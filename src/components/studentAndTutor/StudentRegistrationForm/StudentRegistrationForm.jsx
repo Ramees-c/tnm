@@ -330,67 +330,69 @@ function StudentRegistrationForm() {
 
   // ✅ Submit
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  if (!validateForm()) {
-    setShouldScroll(true);
-    return;
-  }
+    e.preventDefault();
+    if (!validateForm()) {
+      setShouldScroll(true);
+      return;
+    }
 
-  setIsSubmitting(true);
-  setFormMessage({ type: "", text: "" });
-  setErrors({});
+    setIsSubmitting(true);
+    setFormMessage({ type: "", text: "" });
+    setErrors({});
 
-  try {
-    const { countryCode, mobile_number, email, profile_photo, ...rest } =
-      formData;
-    const phoneWithCode = `+${countryCode}${mobile_number}`;
+    try {
+      const { countryCode, mobile_number, email, profile_photo, ...rest } =
+        formData;
+      const phoneWithCode = `+${countryCode}${mobile_number}`;
 
-    // ✅ Call send OTP API
-    const response = await axios.post("/api/send-otp/", {
-      email,
-      mobile_number: phoneWithCode,
-    });
-
-    if (response.data?.message === "OTP sent successfully.") {
-      // ✅ Only proceed if OTP sent
-      const pending = {
-        ...rest,
+      // ✅ Call send OTP API
+      const response = await axios.post("/api/send-otp/", {
         email,
         mobile_number: phoneWithCode,
-        profile_photo: profile_photo instanceof File ? profile_photo : null,
-      };
+      });
 
-      setPendingFormData(pending);
-      setShowOtpPopup(true); // open modal only now
-      setOtpError("");
-    } else {
-      // Backend responded but OTP not sent
+      if (response.data?.message === "OTP sent successfully.") {
+        // ✅ Only proceed if OTP sent
+        const pending = {
+          ...rest,
+          email,
+          mobile_number: phoneWithCode,
+          profile_photo: profile_photo instanceof File ? profile_photo : null,
+        };
+
+        setPendingFormData(pending);
+        setShowOtpPopup(true); // open modal only now
+        setOtpError("");
+      } else {
+        // Backend responded but OTP not sent
+        setFormMessage({
+          type: "error",
+          text: response.data?.error || "❌ Failed to send OTP.",
+        });
+        setShowOtpPopup(false);
+      }
+    } catch (error) {
+      const apiErrors = error.response?.data || {};
+
+      if (apiErrors.email) {
+        setErrors((prev) => ({ ...prev, email: apiErrors.email }));
+      }
+      if (apiErrors.mobile_number) {
+        setErrors((prev) => ({
+          ...prev,
+          mobile_number: apiErrors.mobile_number,
+        }));
+      }
+
       setFormMessage({
         type: "error",
-        text: response.data?.error || "❌ Failed to send OTP.",
+        text: apiErrors.error || "❌ Failed to send OTP. Try again.",
       });
       setShowOtpPopup(false);
+    } finally {
+      setIsSubmitting(false);
     }
-  } catch (error) {
-    const apiErrors = error.response?.data || {};
-
-    if (apiErrors.email) {
-      setErrors((prev) => ({ ...prev, email: apiErrors.email }));
-    }
-    if (apiErrors.mobile_number) {
-      setErrors((prev) => ({ ...prev, mobile_number: apiErrors.mobile_number }));
-    }
-
-    setFormMessage({
-      type: "error",
-      text: apiErrors.error || "❌ Failed to send OTP. Try again.",
-    });
-    setShowOtpPopup(false);
-  } finally {
-    setIsSubmitting(false);
-  }
-};
-
+  };
 
   // ✅ Resend OTP
   const sendOtp = async () => {
@@ -406,68 +408,69 @@ function StudentRegistrationForm() {
   };
 
   // ✅ OTP Verify
- const handleOtpVerify = async (enteredOtp) => {
-  try {
-    if (!pendingFormData) throw new Error("No form data found.");
+  const handleOtpVerify = async (enteredOtp) => {
+    try {
+      if (!pendingFormData) throw new Error("No form data found.");
 
-    // Build FormData from pendingFormData
-    const fd = new FormData();
+      // Build FormData from pendingFormData
+      const fd = new FormData();
 
-    Object.keys(pendingFormData).forEach((key) => {
-      const val = pendingFormData[key];
+      Object.keys(pendingFormData).forEach((key) => {
+        const val = pendingFormData[key];
 
-      if (key === "categories" && Array.isArray(val)) {
-        val.forEach((id) => fd.append("categories", id));
-      } else if (key === "profile_photo") {
-        if (val instanceof File) fd.append("profile_photo", val);
-      } else {
-        if (val !== null && val !== undefined) fd.append(key, val);
+        if (key === "categories" && Array.isArray(val)) {
+          val.forEach((id) => fd.append("categories", id));
+        } else if (key === "profile_photo") {
+          if (val instanceof File) fd.append("profile_photo", val);
+        } else {
+          if (val !== null && val !== undefined) fd.append(key, val);
+        }
+      });
+
+      // Append OTP
+      fd.append("otp", enteredOtp);
+
+      // Call student registration API
+      const res = await axios.post("/api/register/student/", fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (res.data?.token) {
+        setShowOtpPopup(false);
+        setOtpError("");
+
+        // Save token & reset form
+        localStorage.setItem("authToken", res.data.token);
+        setFormData(initialFormData);
+        setConfirmPassword("");
+        setSelectedSubjects([]);
+        setPreview(null);
+        setFilteredSubjects([]);
+        setErrors({});
+        setPendingFormData(null);
+
+        navigate("/studentDashboard");
       }
-    });
+    } catch (err) {
+      console.error(
+        "❌ Student Registration Error:",
+        err.response?.data || err.message
+      );
 
-    // Append OTP
-    fd.append("otp", enteredOtp);
+      const apiErrors = err.response?.data;
 
-    // Call student registration API
-    const res = await axios.post("/api/register/student/", fd, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+      // OTP-specific error
+      if (apiErrors?.otp) {
+        setOtpError(
+          Array.isArray(apiErrors.otp) ? apiErrors.otp[0] : apiErrors.otp
+        );
+        return;
+      }
 
-    if (res.data?.token) {
-      setShowOtpPopup(false);
-      setOtpError("");
-
-      // Save token & reset form
-      localStorage.setItem("authToken", res.data.token);
-      setFormData(initialFormData);
-      setConfirmPassword("");
-      setSelectedSubjects([]);
-      setPreview(null);
-      setFilteredSubjects([]);
-      setErrors({});
-      setPendingFormData(null);
-
-      navigate("/studentDashboard"); // ✅ redirect after success
+      // fallback for invalid/expired OTP
+      setOtpError("❌ Invalid or expired OTP. Please try again.");
     }
-  } catch (err) {
-    console.error(
-      "❌ Student Registration Error:",
-      err.response?.data || err.message
-    );
-
-    const apiErrors = err.response?.data;
-
-    // OTP-specific error
-    if (apiErrors?.otp) {
-      setOtpError(Array.isArray(apiErrors.otp) ? apiErrors.otp[0] : apiErrors.otp);
-      return;
-    }
-
-    // fallback for invalid/expired OTP
-    setOtpError("❌ Invalid or expired OTP. Please try again.");
-  }
-};
-
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center py-8">

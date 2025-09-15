@@ -12,6 +12,9 @@ import {
 } from "lucide-react";
 import ConfirmMessagePopup from "../../common/ConfirmMessagePopup/ConfirmMessagePopup";
 import ProfileEditPopup from "../ProfileEditPopup/ProfileEditPopup";
+import { useAuth } from "../../../Context/userAuthContext";
+import axios from "axios";
+import { MEDIA_URL } from "../../../API/API";
 
 const tutorLinks = [
   { to: "/tutorDashboard", label: "Dashboard", icon: <Home size={20} /> },
@@ -46,8 +49,12 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const location = useLocation();
+ 
+  const { user, logout, userDetails } = useAuth(); // ✅ Get user + logout from context
 
   const links = role === "tutor" ? tutorLinks : studentLinks;
+
+  
 
   useEffect(() => {
     const handleResize = () => {
@@ -60,31 +67,21 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
   }, [setOpen]);
 
   const handleLogoutYes = () => {
-    console.log("Logged out!");
+    logout(); // ✅ Clear from context + localStorage
     setLogoutModalOpen(false);
+    window.location.href = "/register"; // redirect to login/register
   };
 
   const handleLogoutNo = () => {
     setLogoutModalOpen(false);
   };
 
-  const handleProfileSave = (data) => {
-    console.log("Saved Profile:", data);
-    setEditProfileOpen(false);
-  };
-
-  const userData = {
-    full_name: "Ramees Khan",
-    email: "ramees@example.com",
-    city: "Hyderabad",
-    state: "Telangana",
-    description: "Passionate tutor in Math and Science.",
-  };
-
   const handleSave = (updatedData) => {
     console.log("Updated profile:", updatedData);
-    // 🔹 Call your update API here
+    // 🔹 Optionally call API to update profile, then update context
   };
+
+  console.log("User details:", userDetails);
 
   return (
     <>
@@ -114,22 +111,34 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
         <div className="flex items-center justify-between p-6 border-b border-white/20">
           <div className="flex items-center gap-4">
             <div className="relative">
-              <img
-                src="https://i.pravatar.cc/100?img=12"
-                alt="Profile"
-                className="w-16 h-16 lg:w-24 lg:h-24 rounded-full border-4 border-white shadow-md object-cover"
-              />
+              {userDetails?.role === "student" ? (
+                <img
+                  src={`${MEDIA_URL}${userDetails?.profile_photo}`}
+                  alt="Profile"
+                  className="w-16 h-16 lg:w-24 lg:h-24 rounded-full border-4 border-white shadow-md object-cover"
+                />
+              ) : (
+                <img
+                  src={`${MEDIA_URL}${userDetails?.profile_image}`}
+                  alt="Profile"
+                  className="w-16 h-16 lg:w-24 lg:h-24 rounded-full border-4 border-white shadow-md object-cover"
+                />
+              )}
               {/* Edit Button */}
-              <button className="absolute -bottom-1 -right-1 bg-white text-green-700 p-1 rounded-full shadow hover:bg-green-100 transition-colors">
-                <Edit3 size={14}  onClick={() => setShowEdit(true)} />
+              <button
+                className="absolute -bottom-1 -right-1 bg-white text-green-700 p-1 rounded-full shadow hover:bg-green-100 transition-colors"
+                onClick={() => setShowEdit(true)}
+              >
+                <Edit3 size={14} />
               </button>
             </div>
+
             <div>
               <h2 className="text-lg md:text-xl font-semibold truncate max-w-[140px] lg:max-w-full">
-                John Doe
+                {userDetails?.full_name}
               </h2>
               <p className="text-sm md:text-lg text-white/70">
-                {role === "tutor" ? "Tutor" : "Student"}
+                {userDetails?.role === "tutor" ? "Tutor" : "Student"}
               </p>
             </div>
           </div>
@@ -186,10 +195,11 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
         onNo={handleLogoutNo}
       />
 
+      {/* Profile Edit Popup */}
       <ProfileEditPopup
         isOpen={showEdit}
         onClose={() => setShowEdit(false)}
-        initialData={userData}
+        initialData={user}
         onSubmit={handleSave}
       />
     </>

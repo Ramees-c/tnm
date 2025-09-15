@@ -5,22 +5,34 @@ import StudentRegistrationForm from "../../../components/studentAndTutor/Student
 import LoginForm from "../../../components/studentAndTutor/LoginForm/LoginForm";
 
 function LoginRegisterPage() {
-  // 👉 default to "login"
-  const [step, setStep] = useState(() => {
-    return sessionStorage.getItem("registerStep") || "login";
-  });
+  const [step, setStep] = useState("login"); // 👈 always start with login
 
+  // save current step in history
   useEffect(() => {
     sessionStorage.setItem("registerStep", step);
+
+    if (step === "login" || step === "choice") {
+      // replace so browser back exits to home
+      window.history.replaceState({ step }, "", "");
+    } else {
+      // push new history entries for tutor/student
+      window.history.pushState({ step }, "", "");
+    }
   }, [step]);
 
+  // handle browser back/forward
   useEffect(() => {
-    if (!sessionStorage.getItem("registerStep")) {
-      setStep("login");
-    }
-    return () => {
-      sessionStorage.removeItem("registerStep");
+    const handlePopState = (event) => {
+      if (event.state && event.state.step) {
+        setStep(event.state.step);
+      } else {
+        // no state → leave auth flow and go home
+        window.location.href = "/";
+      }
     };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
   return (
