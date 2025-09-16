@@ -76,7 +76,7 @@ function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
       onClick={(e) => e.stopPropagation()}
     >
       <div
-        className="bg-white w-full max-w-3xl rounded-md shadow-lg p-4 sm:p-6 relative max-h-[100vh] overflow-y-auto"
+        className="bg-white w-full max-w-3xl rounded-md shadow-lg p-4 sm:p-6 relative max-h-[100vh] overflow-y-auto scrollbar-hide"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}

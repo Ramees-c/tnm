@@ -83,7 +83,6 @@ function TutorDocumentPage() {
           setOpen={setSidebarOpen}
         />
       </div>
-
       {/* Overlay for mobile sidebar */}
       {sidebarOpen && (
         <div
@@ -91,7 +90,13 @@ function TutorDocumentPage() {
           onClick={() => setSidebarOpen(false)}
         />
       )}
-
+      {/* Overlay for mobile sidebar */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/30 z-10 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
       {/* Main Content */}
       <main className="flex-1 w-full p-4 sm:p-6 transition-all duration-300">
         <div className="max-w-6xl mx-auto flex flex-col gap-6">

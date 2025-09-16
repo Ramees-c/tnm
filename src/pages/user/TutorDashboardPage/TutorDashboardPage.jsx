@@ -48,6 +48,14 @@ function TutorDashboardPage() {
         />
       </div>
 
+      {/* Overlay for mobile sidebar */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/30 z-10 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Main Content */}
       <main className="flex-1 w-full p-4 sm:p-6 transition-all duration-300">
         <div className="max-w-6xl mx-auto">
@@ -65,12 +73,14 @@ function TutorDashboardPage() {
           <div className="bg-white rounded-md shadow p-4 sm:p-6 mb-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="p-4 bg-blue-100 rounded-lg shadow text-center">
-                <p className="text-lg font-semibold text-blue-700">{loggedTutorDetails?.assigned_students?.length}</p>
+                <p className="text-lg font-semibold text-blue-700">
+                  {loggedTutorDetails?.assigned_students?.length || 0}
+                 </p> 
                 <p className="text-sm text-gray-600">Assigned Students</p>
               </div>
               <div className="p-4 bg-yellow-100 rounded-lg shadow text-center">
                 <p className="text-lg font-semibold text-yellow-700">
-                  {loggedTutorDetails?.categories?.length}
+                  {loggedTutorDetails?.categories?.length || 0}
                 </p>
                 <p className="text-sm text-gray-600">Selected Subjects</p>
               </div>

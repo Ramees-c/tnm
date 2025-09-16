@@ -88,82 +88,79 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
         className={`fixed top-0 bottom-0 ${
           isMobile ? "left-0" : "left-2 top-2 bottom-2"
         } w-72 bg-gradient-to-b from-green-600 to-green-800 text-white shadow-xl rounded-none lg:rounded-md
-        transform transition-transform duration-300 z-50
-        ${
-          isMobile
-            ? open
-              ? "translate-x-0"
-              : "-translate-x-full"
-            : "translate-x-0"
-        }`}
+  transform transition-transform duration-300 z-50
+  ${isMobile ? (open ? "translate-x-0" : "-translate-x-full") : "translate-x-0"}
+  flex flex-col
+  `}
       >
-        {/* Profile */}
-       {/* Profile */}
-<div className="flex flex-col items-center p-6 border-b border-white/20">
-  <div className="relative">
-    {userDetails?.role === "student" ? (
-      <img
-        src={`${MEDIA_URL}${userDetails?.profile_photo}`}
-        alt="Profile"
-        className="w-16 h-16 lg:w-24 lg:h-24 rounded-full border-4 border-white shadow-md object-cover"
-      />
-    ) : (
-      <img
-        src={`${MEDIA_URL}${userDetails?.profile_image}`}
-        alt="Profile"
-        className="w-16 h-16 lg:w-24 lg:h-24 rounded-full border-4 border-white shadow-md object-cover"
-      />
-    )}
-    {/* Edit Button */}
-    <button
-      className="absolute -bottom-1 -right-1 bg-white text-green-700 p-1 rounded-full shadow hover:bg-green-100 transition-colors"
-      onClick={() => setShowEdit(true)}
-    >
-      <Edit3 size={14} />
-    </button>
-  </div>
-
-  <div className="mt-3 text-center">
-    <h2 className="text-lg md:text-xl font-semibold break-words max-w-full">
-      {userDetails?.full_name}
-    </h2>
-    <p className="text-sm md:text-lg text-white/70">
-      {userDetails?.role === "tutor" ? "Tutor" : "Student"}
-    </p>
-  </div>
-
-  {isMobile && (
-    <button
-      onClick={() => setOpen(false)}
-      className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition"
-    >
-      <X size={26} />
-    </button>
-  )}
-</div>
-
-
-        {/* Links */}
-        <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-2">
-          {links.map(({ to, label, icon }) => {
-            const isActive = location.pathname === to;
-            return (
-              <Link
-                key={to}
-                to={to}
-                className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
-                  isActive
-                    ? "bg-white text-green-700 font-semibold shadow-md"
-                    : "hover:bg-white/20"
-                }`}
-                onClick={() => isMobile && setOpen(false)}
+        {/* Sidebar inner container with scroll */}
+        <div className="flex-1 overflow-y-auto scrollbar-hide">
+          {/* Profile */}
+          <div className="flex flex-col items-center p-3 border-b border-white/20">
+            <div className="relative">
+              {userDetails?.role === "student" ? (
+                <img
+                  src={`${MEDIA_URL}${userDetails?.profile_photo}`}
+                  alt="Profile"
+                  className="w-16 h-16 lg:w-24 lg:h-24 rounded-full border-4 border-white shadow-md object-cover"
+                />
+              ) : (
+                <img
+                  src={`${MEDIA_URL}${userDetails?.profile_image}`}
+                  alt="Profile"
+                  className="w-16 h-16 lg:w-24 lg:h-24 rounded-full border-4 border-white shadow-md object-cover"
+                />
+              )}
+              {/* Edit Button */}
+              <button
+                className="absolute -bottom-1 -right-1 bg-white text-green-700 p-1 rounded-full shadow hover:bg-green-100 transition-colors"
+                onClick={() => setShowEdit(true)}
               >
-                {icon}
-                <span>{label}</span>
-              </Link>
-            );
-          })}
-        </nav>
+                <Edit3 size={14} />
+              </button>
+            </div>
+
+            <div className="mt-3 text-center">
+              <h2 className="text-lg md:text-xl font-semibold break-words max-w-full">
+                {userDetails?.full_name}
+              </h2>
+              <p className="text-sm md:text-lg text-white/70">
+                {userDetails?.role === "tutor" ? "Tutor" : "Student"}
+              </p>
+            </div>
+
+            {isMobile && (
+              <button
+                onClick={() => setOpen(false)}
+                className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition"
+              >
+                <X size={26} />
+              </button>
+            )}
+          </div>
+
+          {/* Links */}
+          <nav className="px-4 py-6 space-y-2">
+            {links.map(({ to, label, icon }) => {
+              const isActive = location.pathname === to;
+              return (
+                <Link
+                  key={to}
+                  to={to}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
+                    isActive
+                      ? "bg-white text-green-700 font-semibold shadow-md"
+                      : "hover:bg-white/20"
+                  }`}
+                  onClick={() => isMobile && setOpen(false)}
+                >
+                  {icon}
+                  <span>{label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
 
         {/* Logout */}
         <div className="p-4 border-t border-white/20">
@@ -180,6 +177,7 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
       {/* Logout Confirmation Modal */}
       <ConfirmMessagePopup
         isOpen={logoutModalOpen}
+        type="confirm"
         message="Are you sure you want to logout?"
         onYes={handleLogout}
         onNo={handleLogoutNo}

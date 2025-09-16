@@ -8,6 +8,7 @@ import axios from "axios";
 import OtpModal from "../../common/OtpModal/OtpModal";
 
 import { useNavigate } from "react-router-dom";
+import ConfirmMessagePopup from "../../common/ConfirmMessagePopup/ConfirmMessagePopup";
 
 const initialFormData = {
   full_name: "",
@@ -49,6 +50,8 @@ function TutorRegisterForm() {
   const [otpError, setOtpError] = useState("");
   const [selectedSubjects, setSelectedSubjects] = useState([]);
   const [pendingFormData, setPendingFormData] = useState(null);
+
+  const [showMessagePopup, setShowMessagePopup] = useState(false);
 
   const errorRefs = {
     full_name: useRef(null),
@@ -466,7 +469,6 @@ function TutorRegisterForm() {
   };
 
   const handleOtpVerify = async (enteredOtp) => {
-
     try {
       if (!pendingFormData) throw new Error("No form data found.");
 
@@ -506,7 +508,10 @@ function TutorRegisterForm() {
         setErrors({});
         setPendingFormData(null);
 
-        navigate("/tutorDashboard"); // ✅ immediate redirect
+        // ✅ Check approval
+        if (res.data?.user?.is_approved === false) {
+          setShowMessagePopup(true);
+        }
       }
     } catch (err) {
       console.error(
@@ -1089,6 +1094,18 @@ function TutorRegisterForm() {
             onResend={sendOtp} // ✅ resend OTP API
             otpError={otpError}
             setOtpError={setOtpError}
+          />
+        )}
+
+        {showMessagePopup && (
+          <ConfirmMessagePopup
+            isOpen={true}
+            type="alert"
+            message="Please wait, admin approval is required before accessing the dashboard."
+            onClose={() => {
+              setShowMessagePopup(false);
+              navigate("/"); 
+            }}
           />
         )}
       </div>
