@@ -5,9 +5,11 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import logo from "../../../assets/images/logo/tnmlogo.png";
 import axios from "axios";
 import { useAuth } from "../../../Context/userAuthContext";
+import { useNavigate } from "react-router-dom";
 
 function LoginForm({ onCreateAccount }) {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     identifier: "",
     password: "",
@@ -55,68 +57,70 @@ function LoginForm({ onCreateAccount }) {
   // ✅ Submit
   // ✅ Submit
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
+  e.preventDefault();
+  if (!validate()) return;
 
-    setIsLoading(true);
-    setServerError("");
+  setIsLoading(true);
+  setServerError("");
 
-    try {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  try {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-      let payload = {
-        password: formData.password,
-      };
+    let payload = {
+      password: formData.password,
+    };
 
-      if (emailRegex.test(formData.identifier)) {
-        payload.email = formData.identifier;
-      } else {
-        payload.mobile_number = formData.identifier;
-      }
-
-      const response = await axios.post("/api/login/", payload);
-      console.log("✅ Login success:", response.data);
-
-      // 🚨 Block admin login
-      if (response.data.role === "admin") {
-        setServerError("Admins are not allowed to login from here.");
-        setIsLoading(false);
-        return;
-      }
-
-      if (response.data.token) {
-        login(response.data); 
-      }
-
-      // ✅ Role-based redirect
-      if (response.data.role === "student") {
-        window.location.href = "/studentDashboard";
-      } else if (response.data.role === "tutor") {
-        if (response?.data?.is_approved) {
-          window.location.href = "/tutorDashboard";
-          console.log(
-            "Tutor approved, redirecting to dashboard.",
-            response.data.is_approved
-          );
-        } else {
-          setServerError(
-            "Your account is not approved yet. Please wait for admin approval."
-          );
-          console.log("Tutor not approved:", response);
-        }
-      } else {
-        setServerError("Unknown role. Please contact support.");
-      }
-    } catch (error) {
-      console.error("❌ Login error:", error);
-      setServerError(
-        error.response?.data?.non_field_errors ||
-          "Something went wrong. Please try again."
-      );
-    } finally {
-      setIsLoading(false);
+    if (emailRegex.test(formData.identifier)) {
+      payload.email = formData.identifier;
+    } else {
+      payload.mobile_number = formData.identifier;
     }
-  };
+
+    const response = await axios.post("/api/login/", payload);
+    console.log("✅ Login success:", response.data);
+
+    // 🚨 Block admin login
+    if (response.data.role === "admin") {
+      setServerError("Admins are not allowed to login from here.");
+      setIsLoading(false);
+      return;
+    }
+
+    // ✅ Save auth first
+    if (response.data.token) {
+      login(response.data); 
+    } else {
+      setServerError("No token received. Please try again.");
+      setIsLoading(false);
+      return;
+    }
+
+    // ✅ Redirect after login is saved
+    if (response.data.role === "student") {
+      navigate("/studentDashboard", { replace: true });
+    } else if (response.data.role === "tutor") {
+      if (response?.data?.is_approved) {
+        navigate("/tutorDashboard", { replace: true });
+        console.log("Tutor approved, redirecting to dashboard.");
+      } else {
+        setServerError(
+          "Your account is not approved yet. Please wait for admin approval."
+        );
+      }
+    } else {
+      setServerError("Unknown role. Please contact support.");
+    }
+  } catch (error) {
+    console.error("❌ Login error:", error);
+    setServerError(
+      error.response?.data?.non_field_errors ||
+        "Something went wrong. Please try again."
+    );
+  } finally {
+    setIsLoading(false);
+  }
+};
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-white rounded-md shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl">

@@ -64,7 +64,7 @@ function NotificationPage({ role = "tutor" }) {
             {notifications.map((note) => (
               <div
                 key={note.id}
-                className="bg-white rounded-xl shadow p-4 flex items-center gap-3 hover:shadow-md transition"
+                className="bg-white rounded-md shadow p-4 flex items-center gap-3 hover:shadow-md transition"
               >
                 {/* Icon wrapper for alignment */}
                 <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-gray-100">

@@ -1,5 +1,6 @@
 import { X, Upload, ImageIcon } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import FormInput from "../FormInput/FormInput";
@@ -11,9 +12,14 @@ function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
     initialData?.profileImage || null
   );
 
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false,
+  });
+
   const fileInputRef = useRef(null);
 
-  // 🔹 Disable background scroll when modal is open
   useEffect(() => {
     if (isOpen) document.body.style.overflow = "hidden";
     else document.body.style.overflow = "auto";
@@ -31,7 +37,6 @@ function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  // 🔹 Handle Image Upload
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -46,6 +51,13 @@ function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
     setProfileImage(null);
     setFormData((prev) => ({ ...prev, profileImage: null }));
     if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const togglePasswordVisibility = (field) => {
+    setShowPasswords((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
   };
 
   const handleSubmit = (e) => {
@@ -64,7 +76,7 @@ function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
       onClick={(e) => e.stopPropagation()}
     >
       <div
-        className="bg-white w-full max-w-3xl rounded-2xl shadow-lg p-4 sm:p-6 relative max-h-[90vh] overflow-y-auto"
+        className="bg-white w-full max-w-3xl rounded-md shadow-lg p-4 sm:p-6 relative max-h-[100vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -101,12 +113,10 @@ function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
                 </div>
               )}
 
-              {/* Upload button overlay */}
               <div className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 bg-green-600 p-1.5 sm:p-2 rounded-full text-white shadow-md">
                 <Upload className="w-3 h-3 sm:w-4 sm:h-4" />
               </div>
 
-              {/* Hidden File Input */}
               <input
                 id="profilePhoto"
                 type="file"
@@ -117,7 +127,6 @@ function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
               />
             </label>
 
-            {/* Remove Button */}
             {profileImage && (
               <button
                 type="button"
@@ -131,7 +140,6 @@ function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
 
           {/* Name & Email */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Full Name */}
             <div>
               <FormInput
                 name="full_name"
@@ -145,7 +153,6 @@ function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
               )}
             </div>
 
-            {/* Email */}
             <div>
               <FormInput
                 type="email"
@@ -165,7 +172,6 @@ function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <div className="flex gap-3">
-                {/* Country Code */}
                 <div className="w-24 sm:w-28">
                   <PhoneInput
                     country={"in"}
@@ -184,34 +190,80 @@ function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
                   />
                 </div>
 
-                {/* Phone Number */}
                 <div className="flex-1">
-                  <input
+                  <FormInput
                     type="tel"
                     name="mobile_number"
                     value={formData.mobile_number}
                     onChange={handleChange}
                     placeholder="Phone Number *"
-                    className="w-full py-2 px-3 sm:px-4 border border-gray-300 rounded-md placeholder-gray-400 outline-none focus:ring-0 focus:border-green-500 text-sm sm:text-base"
                   />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Bio */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Bio
-            </label>
-            <textarea
-              name="description"
-              placeholder="Write something about yourself..."
-              value={formData.description || ""}
-              onChange={handleChange}
-              rows="3"
-              className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-md outline-none focus:ring-0 focus:border-green-500 transition text-sm sm:text-base"
-            />
+          {/* 🔹 Reset Password Section */}
+          <div className="pt-4 border-t border-gray-200">
+            <h3 className="text-md sm:text-lg font-semibold text-gray-700 mb-3">
+              Reset Password
+            </h3>
+
+            <div className="space-y-4">
+              {/* Current Password */}
+              <div className="relative">
+                <FormInput
+                  type={showPasswords.current ? "text" : "password"}
+                  name="currentPassword"
+                  placeholder="Current Password"
+                  value={formData.currentPassword || ""}
+                  onChange={handleChange}
+                />
+                <button
+                  type="button"
+                  onClick={() => togglePasswordVisibility("current")}
+                  className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
+                >
+                  {showPasswords.current ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+
+              {/* New Password */}
+              <div className="relative">
+                <FormInput
+                  type={showPasswords.new ? "text" : "password"}
+                  name="newPassword"
+                  placeholder="New Password"
+                  value={formData.newPassword || ""}
+                  onChange={handleChange}
+                />
+                <button
+                  type="button"
+                  onClick={() => togglePasswordVisibility("new")}
+                  className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
+                >
+                  {showPasswords.new ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+
+              {/* Confirm New Password */}
+              <div className="relative">
+                <FormInput
+                  type={showPasswords.confirm ? "text" : "password"}
+                  name="confirmNewPassword"
+                  placeholder="Confirm New Password"
+                  value={formData.confirmNewPassword || ""}
+                  onChange={handleChange}
+                />
+                <button
+                  type="button"
+                  onClick={() => togglePasswordVisibility("confirm")}
+                  className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
+                >
+                  {showPasswords.confirm ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Submit */}

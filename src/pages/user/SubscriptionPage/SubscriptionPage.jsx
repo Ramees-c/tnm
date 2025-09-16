@@ -52,7 +52,7 @@ function SubscriptionPage() {
       <main className="flex-1 w-full p-4 sm:p-6 transition-all duration-300">
         <div className="max-w-6xl mx-auto">
           {/* ✅ Mobile Menu Button before Title */}
-          <div className="flex items-center gap-3 mb-6">
+          <div className="flex items-center gap-3 mb-3">
             <button
               onClick={() => setSidebarOpen(true)}
               className="lg:hidden p-2 rounded-lg shadow bg-white hover:bg-gray-100 transition"

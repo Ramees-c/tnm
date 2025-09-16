@@ -435,7 +435,7 @@ function StudentRegistrationForm() {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      if (res.data?.token) {
+      if (res.data?.token && res.data?.role === "student") {
         setShowOtpPopup(false);
         setOtpError("");
 
@@ -876,7 +876,7 @@ function StudentRegistrationForm() {
         {showOtpPopup && (
           <OtpModal
             isOpen={showOtpPopup}
-            phoneOrEmail={`${formData.email} / +${formData.countryCode}${formData.mobile_number}`}
+            phoneOrEmail={`+${formData.countryCode}${formData.mobile_number}`}
             onClose={() => setShowOtpPopup(false)}
             onSubmit={handleOtpVerify}
             onResend={sendOtp}

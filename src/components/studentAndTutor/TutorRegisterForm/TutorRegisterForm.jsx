@@ -492,7 +492,7 @@ function TutorRegisterForm() {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      if (res.data?.token) {
+      if (res.data?.token && res.data?.role === "tutor") {
         setShowOtpPopup(false);
         setOtpError("");
 

@@ -7,7 +7,7 @@ function SubscriptionCard({ title, price, features, onSelect, duration }) {
   return (
     <div
       className={`
-        flex flex-col rounded-2xl shadow-lg p-6 border
+        flex flex-col rounded-md shadow-lg p-6 border
        
       `}
     >

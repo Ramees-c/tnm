@@ -26,7 +26,7 @@ function DocumentUpload({ onUpload }) {
 
   return (
     <div className="flex items-center justify-center w-full">
-      <label className="flex flex-col items-center px-6 py-4 bg-gray-100 text-gray-600 rounded-lg shadow cursor-pointer hover:bg-gray-200 transition">
+      <label className="flex flex-col items-center px-6 py-4 bg-gray-100 text-gray-600 rounded-md shadow cursor-pointer hover:bg-gray-200 transition">
         <Upload size={24} className="mb-2 text-green-600" />
         <span className="text-sm font-medium">Select PDF or DOC</span>
         <input

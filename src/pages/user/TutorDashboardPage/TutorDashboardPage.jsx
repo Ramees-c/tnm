@@ -30,7 +30,7 @@ function TutorDashboardPage() {
     setSelectedSubjects((prev) => prev.filter((_, i) => i !== index));
   };
 
-  console.log(loggedTutorDetails.categories);
+  console.log(loggedTutorDetails);
 
   loggedTutorDetails?.categories?.map((subject) => {
     return console.log(subject, "fsdfsdhl");
@@ -62,10 +62,10 @@ function TutorDashboardPage() {
           </div>
 
           {/* Overview Cards */}
-          <div className="bg-white rounded-2xl shadow p-4 sm:p-6 mb-6">
+          <div className="bg-white rounded-md shadow p-4 sm:p-6 mb-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="p-4 bg-blue-100 rounded-lg shadow text-center">
-                <p className="text-lg font-semibold text-blue-700">12</p>
+                <p className="text-lg font-semibold text-blue-700">{loggedTutorDetails?.assigned_students?.length}</p>
                 <p className="text-sm text-gray-600">Assigned Students</p>
               </div>
               <div className="p-4 bg-yellow-100 rounded-lg shadow text-center">
@@ -82,7 +82,7 @@ function TutorDashboardPage() {
           </div>
 
           {/* ✅ Selected Subjects Section */}
-          <div className="bg-white rounded-2xl shadow p-4 sm:p-6 mb-6">
+          <div className="bg-white rounded-md shadow p-4 sm:p-6 mb-6">
             <h2 className="text-lg sm:text-xl font-semibold mb-3">
               Selected Subjects
             </h2>
@@ -106,7 +106,7 @@ function TutorDashboardPage() {
           </div>
 
           {/* Subscription Status */}
-          <div className="bg-white rounded-2xl shadow-md p-6 sm:p-8 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 border border-green-100">
+          <div className="bg-white rounded-md shadow-md p-6 sm:p-8 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 border border-green-100">
             <div>
               <h2 className="text-xl font-bold text-gray-800 mb-4">
                 Subscription
@@ -155,7 +155,7 @@ function TutorDashboardPage() {
           </div>
 
           {/* Active/Inactive Toggle */}
-          <div className="bg-white rounded-2xl shadow p-4 sm:p-6 mb-6 flex justify-between items-center">
+          <div className="bg-white rounded-md shadow p-4 sm:p-6 mb-6 flex justify-between items-center">
             <h2 className="text-lg sm:text-xl font-semibold">Profile Status</h2>
             <button
               onClick={() => setActive(!active)}
@@ -174,7 +174,7 @@ function TutorDashboardPage() {
           </div>
 
           {/* Stats Section */}
-          <div className="bg-white rounded-2xl shadow p-4 sm:p-6 mb-6">
+          <div className="bg-white rounded-md shadow p-4 sm:p-6 mb-6">
             <h2 className="text-lg sm:text-xl font-semibold mb-4 flex items-center gap-2">
               <BarChart2 size={20} /> Stats
             </h2>
@@ -195,7 +195,7 @@ function TutorDashboardPage() {
           </div>
 
           {/* Notifications Preview */}
-          <div className="bg-white rounded-2xl shadow p-4 sm:p-6">
+          <div className="bg-white rounded-md shadow p-4 sm:p-6">
             <h2 className="text-lg sm:text-xl font-semibold mb-4 flex items-center gap-2">
               <Bell size={20} /> Notifications
             </h2>

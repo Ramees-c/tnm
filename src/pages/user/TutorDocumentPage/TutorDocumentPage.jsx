@@ -109,14 +109,14 @@ function TutorDocumentPage() {
           </div>
 
           {/* Upload Section */}
-          <div className="bg-white rounded-xl shadow p-4 sm:p-6">
+          <div className="bg-white rounded-md shadow p-4 sm:p-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">
               Upload Document
             </h2>
             <DocumentUpload onUpload={handleFileSelect} />
 
             {selectedFile && (
-              <div className="mt-4 w-full sm:w-full md:w-80 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden relative mx-auto">
+              <div className="mt-4 w-full sm:w-full md:w-80 bg-white rounded-md shadow-lg border border-gray-200 overflow-hidden relative mx-auto">
                 {/* Header */}
                 <div className="px-4 py-2 bg-gray-100 flex flex-col gap-1 border-b border-gray-200">
                   <p className="text-gray-800 font-medium truncate">
