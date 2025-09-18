@@ -61,6 +61,19 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
 
   const navigate = useNavigate();
 
+  
+useEffect(() => {
+  if (isMobile && open) {
+    document.body.style.overflow = "hidden"; // 🔒 stop background scroll
+  } else {
+    document.body.style.overflow = "auto"; // 🔓 restore scroll
+  }
+
+  return () => {
+    document.body.style.overflow = "auto"; // cleanup on unmount
+  };
+}, [open, isMobile]);
+
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth < 1024;
