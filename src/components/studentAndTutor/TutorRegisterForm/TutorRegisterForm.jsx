@@ -509,7 +509,7 @@ function TutorRegisterForm() {
         setPendingFormData(null);
 
         // ✅ Check approval
-        if (res.data?.user?.is_approved === false) {
+        if (res.data?.is_approved === false) {
           setShowMessagePopup(true);
         }
       }

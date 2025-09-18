@@ -1,11 +1,18 @@
 import { X, Upload, ImageIcon } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, use } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import FormInput from "../FormInput/FormInput";
+import { useAuth } from "../../../Context/userAuthContext";
+import { MEDIA_URL } from "../../../API/API";
 
 function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
+
+  const { userDetails } = useAuth();
+
+  console.log(userDetails, "userDetails in profile edit popup");
+
   const [formData, setFormData] = useState(initialData || {});
   const [errors, setErrors] = useState({});
   const [profileImage, setProfileImage] = useState(
@@ -102,7 +109,9 @@ function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
             >
               {profileImage ? (
                 <img
-                  src={profileImage}
+                  src={userDetails?.role === "student"
+                    ? `${MEDIA_URL}${userDetails?.profile_photo}`
+                    : `${MEDIA_URL}${userDetails?.profile_image}`}
                   alt="Preview"
                   className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover"
                 />
@@ -144,7 +153,7 @@ function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
               <FormInput
                 name="full_name"
                 placeholder="Full Name"
-                value={formData.full_name || ""}
+                value={userDetails.full_name || ""}
                 onChange={handleChange}
                 hasError={errors.full_name}
               />
@@ -158,7 +167,7 @@ function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
                 type="email"
                 name="email"
                 placeholder="Email"
-                value={formData.email || ""}
+                value={userDetails.email || ""}
                 onChange={handleChange}
                 hasError={errors.email}
               />
@@ -194,7 +203,7 @@ function ProfileEditPopup({ isOpen, onClose, initialData, onSubmit }) {
                   <FormInput
                     type="tel"
                     name="mobile_number"
-                    value={formData.mobile_number}
+                    value={userDetails.mobile_number}
                     onChange={handleChange}
                     placeholder="Phone Number *"
                   />

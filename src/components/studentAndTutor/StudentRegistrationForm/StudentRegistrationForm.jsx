@@ -7,6 +7,7 @@ import { Upload, ImageIcon, X } from "lucide-react";
 import axios from "axios";
 import OtpModal from "../../common/OtpModal/OtpModal";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../Context/userAuthContext";
 
 const initialFormData = {
   full_name: "",
@@ -24,6 +25,9 @@ const initialFormData = {
 };
 
 function StudentRegistrationForm() {
+
+  const { login } = useAuth();
+
   const navigate = useNavigate();
   const [formData, setFormData] = useState(initialFormData);
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -409,68 +413,66 @@ function StudentRegistrationForm() {
 
   // ✅ OTP Verify
   const handleOtpVerify = async (enteredOtp) => {
-    try {
-      if (!pendingFormData) throw new Error("No form data found.");
+  try {
+    if (!pendingFormData) throw new Error("No form data found.");
 
-      // Build FormData from pendingFormData
-      const fd = new FormData();
+    // Build FormData
+    const fd = new FormData();
+    Object.keys(pendingFormData).forEach((key) => {
+      const val = pendingFormData[key];
 
-      Object.keys(pendingFormData).forEach((key) => {
-        const val = pendingFormData[key];
-
-        if (key === "categories" && Array.isArray(val)) {
-          val.forEach((id) => fd.append("categories", id));
-        } else if (key === "profile_photo") {
-          if (val instanceof File) fd.append("profile_photo", val);
-        } else {
-          if (val !== null && val !== undefined) fd.append(key, val);
-        }
-      });
-
-      // Append OTP
-      fd.append("otp", enteredOtp);
-
-      // Call student registration API
-      const res = await axios.post("/api/register/student/", fd, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      if (res.data?.token && res.data?.role === "student") {
-        setShowOtpPopup(false);
-        setOtpError("");
-
-        // Save token & reset form
-        localStorage.setItem("authToken", res.data.token);
-        setFormData(initialFormData);
-        setConfirmPassword("");
-        setSelectedSubjects([]);
-        setPreview(null);
-        setFilteredSubjects([]);
-        setErrors({});
-        setPendingFormData(null);
-
-        navigate("/studentDashboard");
+      if (key === "categories" && Array.isArray(val)) {
+        val.forEach((id) => fd.append("categories", id));
+      } else if (key === "profile_photo") {
+        if (val instanceof File) fd.append("profile_photo", val);
+      } else {
+        if (val !== null && val !== undefined) fd.append(key, val);
       }
-    } catch (err) {
-      console.error(
-        "❌ Student Registration Error:",
-        err.response?.data || err.message
-      );
+    });
 
-      const apiErrors = err.response?.data;
+    // Append OTP
+    fd.append("otp", enteredOtp);
 
-      // OTP-specific error
-      if (apiErrors?.otp) {
-        setOtpError(
-          Array.isArray(apiErrors.otp) ? apiErrors.otp[0] : apiErrors.otp
-        );
-        return;
-      }
+    // Call student registration API
+    const res = await axios.post("/api/register/student/", fd, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
 
-      // fallback for invalid/expired OTP
-      setOtpError("❌ Invalid or expired OTP. Please try again.");
+    if (res.data?.token && res.data?.role === "student") {
+      setShowOtpPopup(false);
+      setOtpError("");
+
+      // ✅ Use context login instead of manual localStorage
+      login(res.data);
+
+      // Reset form...
+      setFormData(initialFormData);
+      setConfirmPassword("");
+      setSelectedSubjects([]);
+      setPreview(null);
+      setFilteredSubjects([]);
+      setErrors({});
+      setPendingFormData(null);
+
+      // Redirect
+      navigate("/studentDashboard", { replace: true });
     }
-  };
+  } catch (err) {
+    console.error(
+      "❌ Student Registration Error:",
+      err.response?.data || err.message
+    );
+
+    const apiErrors = err.response?.data;
+
+    if (apiErrors?.otp) {
+      setOtpError(Array.isArray(apiErrors.otp) ? apiErrors.otp[0] : apiErrors.otp);
+      return;
+    }
+
+    setOtpError("❌ Invalid or expired OTP. Please try again.");
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center py-8">

@@ -47,7 +47,7 @@ function AssignedStudentCard({
         <div className=" text-sm text-gray-600 mt-3">
           {categories && categories.length > 0 ? (
             categories.map((subject, idx) => (
-              <div key={idx} className="flex items-center gap-1 mb-1">
+              <div key={idx} className="flex flex-col md:flex-row md:items-center gap-1 mb-1">
                 <BookOpen size={16} className="text-green-600" />
                 <span>{subject}</span>
               </div>

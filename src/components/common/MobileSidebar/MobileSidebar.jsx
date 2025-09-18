@@ -9,27 +9,27 @@ const MobileSidebar = ({ isOpen, onClose }) => {
     {
       name: "Home",
       path: "/",
-      icon: <FiHome className="text-primary text-lg" />,
+      icon: <FiHome className="text-lg" />,
     },
     {
       name: "About",
       path: "/about",
-      icon: <FiUser className="text-primary text-lg" />,
+      icon: <FiUser className="text-lg" />,
     },
     {
       name: "Blogs",
       path: "/blog",
-      icon: <FiBook className="text-primary text-lg" />,
+      icon: <FiBook className="text-lg" />,
     },
     {
       name: "Testimonials",
       path: "/testimonial",
-      icon: <FiStar className="text-primary text-lg" />,
+      icon: <FiStar className="text-lg" />,
     },
     {
       name: "Contact",
       path: "/contact",
-      icon: <FiMail className="text-primary text-lg" />,
+      icon: <FiMail className="text-lg" />,
     },
   ];
 
@@ -63,7 +63,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-[100vh] w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:hidden ${
+        className={`fixed top-0 left-0 h-[100vh] w-72 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:hidden ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -99,12 +99,18 @@ const MobileSidebar = ({ isOpen, onClose }) => {
                 className={({ isActive }) =>
                   `flex items-center p-3 rounded-md transition-colors duration-200 group ${
                     isActive
-                      ? "bg-secondary/70 text-white font-semibold"
-                      : "hover:bg-secondary/60"
+                      ? "bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold"
+                      : "hover:bg-gradient-to-r from-green-500 to-green-600"
                   }`
                 }
               >
-                <span className="group-hover:scale-110 transition-transform">
+                <span
+                  className={({ isActive }) =>
+                    `flex items-center gap-2 transition-colors ${
+                      isActive ? "text-white" : "text-primary hover:text-white"
+                    }`
+                  }
+                >
                   {item.icon}
                 </span>
                 <span className="ml-3 font-medium group-hover:text-primary text-lg">

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Home,
+  LayoutDashboard,
   BookOpen,
   Users,
   MessageSquare,
@@ -17,7 +18,11 @@ import axios from "axios";
 import { MEDIA_URL } from "../../../API/API";
 
 const tutorLinks = [
-  { to: "/tutorDashboard", label: "Dashboard", icon: <Home size={20} /> },
+  {
+    to: "/tutorDashboard",
+    label: "Dashboard",
+    icon: <LayoutDashboard size={20} />,
+  },
   {
     to: "/tutorSubscription",
     label: "Subscription",
@@ -37,7 +42,7 @@ const tutorLinks = [
 ];
 
 const studentLinks = [
-  { to: "/dashboard", label: "Dashboard", icon: <Home size={20} /> },
+  { to: "/dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
   { to: "/courses", label: "My Courses", icon: <BookOpen size={20} /> },
   { to: "/tutors", label: "Tutors", icon: <Users size={20} /> },
   { to: "/messages", label: "Messages", icon: <MessageSquare size={20} /> },
@@ -53,6 +58,8 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
   const { user, handleLogout, userDetails } = useAuth(); // ✅ Get user + logout from context
 
   const links = role === "tutor" ? tutorLinks : studentLinks;
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleResize = () => {
@@ -93,28 +100,44 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
   flex flex-col
   `}
       >
+
+         {/* Close Button (only visible on mobile) */}
+  {isMobile && (
+    <button
+      onClick={() => setOpen(false)}
+      className="absolute top-3 right-3 p-2 rounded-full bg-white/20 hover:bg-white/30 transition"
+      title="Close Sidebar"
+    >
+      <X size={20} />
+    </button>
+  )}
         {/* Sidebar inner container with scroll */}
         <div className="flex-1 overflow-y-auto scrollbar-hide">
+          {/* 🔹 Top-left Home Button */}
+          <button
+            onClick={() => navigate("/")}
+            className="absolute top-3 left-2 p-2 rounded-full bg-white/20 transition"
+            title="Go to Home"
+          >
+            <Home size={24} />
+          </button>
           {/* Profile */}
-          <div className="flex flex-col items-center p-3 border-b border-white/20">
+          <div className="flex flex-col items-center mt-12 border-b border-white/20 relative">
             <div className="relative">
-              {userDetails?.role === "student" ? (
-                <img
-                  src={`${MEDIA_URL}${userDetails?.profile_photo}`}
-                  alt="Profile"
-                  className="w-16 h-16 lg:w-24 lg:h-24 rounded-full border-4 border-white shadow-md object-cover"
-                />
-              ) : (
-                <img
-                  src={`${MEDIA_URL}${userDetails?.profile_image}`}
-                  alt="Profile"
-                  className="w-16 h-16 lg:w-24 lg:h-24 rounded-full border-4 border-white shadow-md object-cover"
-                />
-              )}
+              <img
+                src={
+                  userDetails?.role === "student"
+                    ? `${MEDIA_URL}${userDetails?.profile_photo}`
+                    : `${MEDIA_URL}${userDetails?.profile_image}`
+                }
+                alt="Profile"
+                className="w-16 h-16 lg:w-24 lg:h-24 rounded-full border-4 border-white shadow-md object-cover"
+              />
               {/* Edit Button */}
               <button
                 className="absolute -bottom-1 -right-1 bg-white text-green-700 p-1 rounded-full shadow hover:bg-green-100 transition-colors"
                 onClick={() => setShowEdit(true)}
+                title="Edit Profile"
               >
                 <Edit3 size={14} />
               </button>
@@ -128,15 +151,6 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
                 {userDetails?.role === "tutor" ? "Tutor" : "Student"}
               </p>
             </div>
-
-            {isMobile && (
-              <button
-                onClick={() => setOpen(false)}
-                className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/20 transition"
-              >
-                <X size={26} />
-              </button>
-            )}
           </div>
 
           {/* Links */}

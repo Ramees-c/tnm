@@ -10,9 +10,6 @@ function DocumentCard({ file, onView, onDelete }) {
         </div>
         <div>
           <p className="font-semibold text-gray-800">{file.name}</p>
-          <p className="text-xs text-gray-500">
-            {(file.size / 1024).toFixed(1)} KB
-          </p>
         </div>
       </div>
 

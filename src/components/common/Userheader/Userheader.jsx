@@ -7,12 +7,17 @@ import DefaultButton from "../DefaultButton/DefaultButton";
 import MobileSidebar from "../MobileSidebar/MobileSidebar";
 import axios from "axios";
 import { API_URL } from "../../../API/API";
+import { useAuth } from "../../../Context/userAuthContext";
 
 function Userheader() {
+  const { userDetails } = useAuth();
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showHeader, setShowHeader] = useState(true);
   const [category, setCategory] = useState([]);
   const dropdownRef = useRef(null);
+
+  console.log("user in header", category);
 
   const handleClick = () => {
     window.scrollTo(0, 0);
@@ -43,12 +48,31 @@ function Userheader() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // useEffect(() => {
+  //   const getCategory = async () => {
+  //     const data = await axios.get(`/api/tutors/subjects/`);
+  //     setCategory(data.data);
+  //   };
+  //   getCategory();
+  // }, []);
+
   useEffect(() => {
-    const getCategory = async () => {
-      const data = await axios.get(`/api/tutors/subjects/`);
-      setCategory(data.data);
+    const fetchCategories = async () => {
+      try {
+        const { data } = await axios.get("/api/category-list/");
+        const mappedData = data.map((category) => {
+          const columns = category.subcategories.map((subcat) => ({
+            heading: subcat.name,
+            links: subcat.subcategories.map((sub) => sub.name),
+          }));
+          return { title: category.name, columns };
+        });
+        setCategory(mappedData);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
     };
-    getCategory();
+    fetchCategories();
   }, []);
 
   return (
@@ -66,10 +90,10 @@ function Userheader() {
                 className="lg:hidden mr-4"
                 onClick={() => setSidebarOpen(true)}
               >
-                <FaBars size={30} />
+                <FaBars size={25} />
               </button>
               <NavLink to="/" className="flex items-center">
-                <img src={logo} alt="Logo" className="h-10 md:h-20" />
+                <img src={logo} alt="Logo" className="h-14 md:h-20" />
               </NavLink>
             </div>
           </div>
@@ -109,44 +133,44 @@ function Userheader() {
               </li>
 
               {/* Find Tutors Dropdown (just example – you can wrap NavLink inside each item in grid) */}
-              <li className="group relative">
+              {/* <li className="group relative">
                 <div className="flex items-center cursor-pointer text-sm xl:text-lg font-medium font-montserrat hover:text-primary hover:font-bold duration-300">
                   Find Tutors
                   <FiChevronDown className="ml-2 text-lg" />
                 </div>
-                <div
-                  className="absolute top-full left-0 mt-2 bg-white shadow-lg rounded-md p-6 hidden group-hover:block z-50 
-                min-w-[600px] max-w-[90vw]"
-                >
+                <div className="absolute top-full left-0 mt-2 bg-white shadow-lg rounded-md p-6 hidden group-hover:block z-50 w-[90vw]">
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-12 gap-y-6">
-                    <div>
-                      <h4 className="font-bold mb-3 text-gray-800">Tuition</h4>
-                      <ul className="space-y-3">
-                        {category.map((item) => (
-                          <li key={item.subject}>
-                            <NavLink
-                              to={`/tutors/${item.subject.toLowerCase()}`}
-                              className={({ isActive }) =>
-                                `block py-1 ${
-                                  isActive ? "text-primary" : "text-gray-700"
-                                }`
-                              }
-                            >
-                              {item.subject}
-                            </NavLink>
-                          </li>
-                        ))}
+                    {category.map((cat) => (
+                      <div key={cat.title}>
+                        <h4 className="font-bold mb-3 text-gray-800">
+                          {cat.title}
+                        </h4>
 
-                        {/* <li>Mathamatics</li>
-                        <li>Hindi</li>
-                        <li>English</li>
-                        <li>Botony</li>
-                        <li>Zoology</li> */}
-                      </ul>
-                    </div>
+                        <ul className="space-y-2">
+                          {cat.columns.map((col, i) => (
+                            <li key={i}>
+                              <NavLink
+                                to={`/tutors/${col.heading
+                                  .toLowerCase()
+                                  .replace(/\s+/g, "-")}`}
+                                className={({ isActive }) =>
+                                  `block text-sm py-1 ${
+                                    isActive
+                                      ? "text-primary font-semibold"
+                                      : "text-gray-700"
+                                  }`
+                                }
+                              >
+                                {col.heading}
+                              </NavLink>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              </li>
+              </li> */}
 
               <li>
                 <NavLink
@@ -196,11 +220,28 @@ function Userheader() {
             </ul>
           </div>
 
-          {/* Login/Register Button */}
+          {/* Login/Register OR Dashboard Button */}
           <div className="flex">
-            <Link to="/register" onClick={handleClick}>
-              <DefaultButton buttonText="Login/Register" />
-            </Link>
+            {userDetails && userDetails.role ? (
+              // If userDetails exists and has a valid role, show Dashboard
+              <Link
+                to={
+                  userDetails.role === "tutor"
+                    ? "/tutorDashboard"
+                    : userDetails.role === "student"
+                    ? "/studentDashboard"
+                    : "/" // fallback
+                }
+                onClick={handleClick}
+              >
+                <DefaultButton buttonText="Dashboard" />
+              </Link>
+            ) : (
+              // If userDetails is empty/null/invalid, show Login/Register
+              <Link to="/register" onClick={handleClick}>
+                <DefaultButton buttonText="Login/Register" />
+              </Link>
+            )}
           </div>
         </div>
 
