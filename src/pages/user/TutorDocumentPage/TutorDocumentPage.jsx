@@ -186,7 +186,7 @@ const handleUpload = async () => {
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <div className="w-0 lg:w-72">
+      <div className="w-0 lg:w-64 xl:w-72">
         <DashboardSidebar
           role={role}
           open={sidebarOpen}

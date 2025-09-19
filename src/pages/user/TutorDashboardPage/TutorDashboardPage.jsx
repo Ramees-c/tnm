@@ -39,7 +39,7 @@ function TutorDashboardPage() {
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
-      <div className="w-0 lg:w-72">
+      <div className="w-0 lg:w-64 xl:w-72">
         <DashboardSidebar
           role="tutor"
           open={sidebarOpen}
@@ -102,7 +102,7 @@ function TutorDashboardPage() {
                 {loggedTutorDetails?.categories?.map((subject) => (
                   <span
                     key={subject.id}
-                    className="flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1 rounded-md text-md font-medium shadow-sm"
+                    className="flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1 rounded-md text-sm md:text-md font-medium shadow-sm"
                   >
                     {subject}
                   </span>
@@ -116,12 +116,12 @@ function TutorDashboardPage() {
           </div>
 
           {/* Subscription Status */}
-          <div className="bg-white rounded-md shadow-md p-6 sm:p-8 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 border border-green-100">
+          <div className="bg-white rounded-md shadow-md p-6 sm:p-8 mb-6 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border border-green-100">
             <div>
               <h2 className="text-xl font-bold text-gray-800 mb-4">
                 Subscription
               </h2>
-              <div className="grid lg:grid-cols-3 gap-8 text-gray-700">
+              <div className="grid xl:grid-cols-3 gap-8 text-gray-700">
                 <p className="flex items-center gap-2">
                   <CreditCard size={18} className="text-green-600" />
                   Plan:{" "}
@@ -131,16 +131,16 @@ function TutorDashboardPage() {
                 </p>
                 <p className="flex items-center gap-2">
                   <CreditCard size={18} className="text-blue-600" />
-                  Price: <span className="font-medium">₹499 / month</span>
+                  Price: <span className="font-medium text-sm md:text-md">₹499 / month</span>
                 </p>
                 <p className="flex items-center gap-2">
                   <Calendar size={18} className="text-purple-600" />
-                  Start Date: <span className="font-medium">01 Sep 2025</span>
+                  Start Date: <span className="font-medium text-sm md:text-md">01 Sep 2025</span>
                 </p>
                 <p className="flex items-center gap-2">
                   <Calendar size={18} className="text-red-600" />
                   Expiry Date:{" "}
-                  <span className="font-medium text-red-500">30 Sep 2025</span>
+                  <span className="font-medium text-red-500 text-sm md:text-md">30 Sep 2025</span>
                 </p>
                 <p className="flex items-center gap-2">
                   <CheckCircle size={18} className="text-green-600" />
@@ -151,14 +151,14 @@ function TutorDashboardPage() {
                 </p>
                 <p className="flex items-center gap-2">
                   <ArrowUpCircle size={18} className="text-indigo-600" />
-                  Next Billing: <span className="font-medium">01 Oct 2025</span>
+                  Next Billing: <span className="font-medium text-sm md:text-md">01 Oct 2025</span>
                 </p>
               </div>
             </div>
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3">
-              <button className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-green-700 transition">
+              <button className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-green-700 transition text-sm md:text-md">
                 <ArrowUpCircle size={18} /> Upgrade
               </button>
             </div>

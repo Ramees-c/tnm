@@ -12,7 +12,7 @@ function AssignedStudentsPage() {
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
-      <div className="w-0 lg:w-72">
+      <div className="w-0 lg:w-64 xl:w-72">
         <DashboardSidebar
           role="tutor"
           open={sidebarOpen}

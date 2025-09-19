@@ -107,7 +107,7 @@ useEffect(() => {
       <div
         className={`fixed top-0 bottom-0 ${
           isMobile ? "left-0" : "left-2 top-2 bottom-2"
-        } w-72 bg-gradient-to-b from-green-600 to-green-800 text-white shadow-xl rounded-none lg:rounded-md
+        } lg:w-64 xl:w-72 bg-gradient-to-b from-green-600 to-green-800 text-white shadow-xl rounded-none lg:rounded-md
   transform transition-transform duration-300 z-50
   ${isMobile ? (open ? "translate-x-0" : "-translate-x-full") : "translate-x-0"}
   flex flex-col
@@ -157,7 +157,7 @@ useEffect(() => {
             </div>
 
             <div className="mt-3 text-center">
-              <h2 className="text-lg md:text-xl font-semibold break-words max-w-full">
+              <h2 className="text-md xl:text-xl font-semibold break-words max-w-full">
                 {userDetails?.full_name}
               </h2>
               <p className="text-sm md:text-lg text-white/70">
@@ -174,7 +174,7 @@ useEffect(() => {
                 <Link
                   key={to}
                   to={to}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all ${
+                  className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all text-xs lg:text-sm xl:text-md ${
                     isActive
                       ? "bg-white text-green-700 font-semibold shadow-md"
                       : "hover:bg-white/20"
