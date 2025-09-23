@@ -2,10 +2,9 @@
 import axios from "axios";
 import { createContext, useContext, useState, useEffect } from "react";
 
-const AuthContext = createContext();
+const AuthContext = createContext(null); // ✅ provide default value
 
 export const AuthProvider = ({ children }) => {
-  // ✅ Load token and user from localStorage on init
   const [token, setToken] = useState(localStorage.getItem("token") || null);
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
@@ -14,42 +13,38 @@ export const AuthProvider = ({ children }) => {
   const [userDetails, setUserDetails] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // 🔹 Fetch profile if token exists
+  const refreshUserDetails = async () => {
+    if (!token) return;
+    try {
+      const res = await axios.get("/api/profile/", {
+        headers: { Authorization: `Token ${token}` },
+      });
+      setUserDetails(res.data);
+    } catch (err) {
+      console.error("Failed to refresh profile:", err);
+    }
+  };
+
   useEffect(() => {
     if (token) {
-      axios
-        .get("/api/profile/", {
-          headers: { Authorization: `Token ${token}` },
-        })
-        .then((res) => {
-          setUserDetails(res.data);
-        })
-        .catch((err) => {
-          console.error("Failed to fetch profile:", err);
-          // If token invalid, clear it
-          handleLogout();
-        })
-        .finally(() => setLoading(false));
+      setLoading(true);
+      refreshUserDetails().finally(() => setLoading(false));
     } else {
       setLoading(false);
     }
   }, [token]);
 
-  // ✅ Login function
   const login = (data) => {
     const userData = {
       role: data.role,
       is_approved: data.is_approved ?? false,
     };
-
     setUser(userData);
     setToken(data.token);
-
     localStorage.setItem("token", data.token);
     localStorage.setItem("user", JSON.stringify(userData));
   };
 
-  // ✅ Logout function
   const handleLogout = async () => {
     try {
       const storedToken = localStorage.getItem("token");
@@ -63,7 +58,6 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       console.error("❌ Logout failed:", err.response?.data || err.message);
     } finally {
-      // Clear everything anyway
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       setUser(null);
@@ -72,6 +66,9 @@ export const AuthProvider = ({ children }) => {
       window.location.href = "/register";
     }
   };
+
+  console.log(token);
+  
 
   return (
     <AuthContext.Provider
@@ -82,7 +79,8 @@ export const AuthProvider = ({ children }) => {
         login,
         handleLogout,
         userDetails,
-        loading, // useful for ProtectedRoute
+        refreshUserDetails,
+        loading,
       }}
     >
       {children}
@@ -90,4 +88,11 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+// ✅ Export the hook separately, NOT inline
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}

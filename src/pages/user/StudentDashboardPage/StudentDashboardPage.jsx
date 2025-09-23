@@ -5,6 +5,7 @@ import FormInput from "../../../components/studentAndTutor/FormInput/FormInput";
 import DashboardSidebar from "../../../components/studentAndTutor/DashboardSidebar/DashboardSidebar";
 import DefaultButton from "../../../components/common/DefaultButton/DefaultButton";
 import TutorSmallCard from "../../../components/studentAndTutor/TutorSmallCard/TutorSmallCard";
+import { useAuth } from "../../../Context/userAuthContext";
 
 const tutors = [
   {
@@ -153,7 +154,11 @@ const tutors = [
 ];
 
 function StudentDashboardPage() {
+  const { userDetails } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  console.log(userDetails, "userDetails in student dashboard");
+  
 
   return (
     <div className="flex min-h-screen">
@@ -183,25 +188,25 @@ function StudentDashboardPage() {
 
           {/* Quick Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="p-4 bg-green-100 rounded-xl shadow text-center">
-              <p className="text-lg font-semibold text-green-700">25</p>
-              <p className="text-sm text-gray-600">Tutors Browsed</p>
+            <div className="p-4 bg-green-100 rounded-md shadow text-center">
+              <p className="text-lg font-semibold text-green-700">{userDetails?.assigned_tutors?.length || 0}</p>
+              <p className="text-sm text-gray-600">Assigned Tutors</p>
             </div>
-            <div className="p-4 bg-blue-100 rounded-xl shadow text-center">
+            <div className="p-4 bg-blue-100 rounded-md shadow text-center">
               <p className="text-lg font-semibold text-blue-700">7</p>
-              <p className="text-sm text-gray-600">Enquiries Sent</p>
+              <p className="text-sm text-gray-600">Recommended Tutors</p>
             </div>
-            <div className="p-4 bg-yellow-100 rounded-xl shadow text-center">
+            <div className="p-4 bg-yellow-100 rounded-md shadow text-center">
               <p className="text-lg font-semibold text-yellow-700">4</p>
-              <p className="text-sm text-gray-600">Favourites</p>
+              <p className="text-sm text-gray-600">Favourite Tutors</p>
             </div>
-            <div className="p-4 bg-purple-100 rounded-xl shadow text-center">
+            <div className="p-4 bg-purple-100 rounded-md shadow text-center">
               <p className="text-lg font-semibold text-purple-700">10</p>
-              <p className="text-sm text-gray-600">Search History</p>
+              <p className="text-sm text-gray-600">Notifications</p>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow p-6 mb-6">
+          <div className="bg-white rounded-md shadow p-6 mb-6">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">
               Find Tutors
             </h2>
@@ -221,7 +226,7 @@ function StudentDashboardPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow p-6 mb-6">
+          <div className="bg-white rounded-md shadow p-6 mb-6">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">
               Recommended Tutors
             </h2>
@@ -240,7 +245,7 @@ function StudentDashboardPage() {
           </div>
 
 
-          <div className="bg-white rounded-2xl shadow p-6 mb-6">
+          <div className="bg-white rounded-md shadow p-6 mb-6">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">
               Popular Tutors
             </h2>
@@ -259,13 +264,13 @@ function StudentDashboardPage() {
           </div>
 
           {/* Notifications */}
-          <div className="bg-white rounded-2xl shadow p-6">
+          <div className="bg-white rounded-md shadow p-6">
             <h2 className="text-lg sm:text-xl font-semibold mb-4 flex items-center gap-2">
               <Bell size={20} /> Notifications
             </h2>
             <ul className="space-y-3">
               <li className="p-3 bg-gray-50 rounded-lg shadow-sm">
-                📢 New tutor available:{" "}
+                <Bell size={18} className="text-green-600" /> New tutor available:{" "}
                 <span className="font-medium">Mr. Sharma</span>
               </li>
               <li className="p-3 bg-gray-50 rounded-lg shadow-sm">

@@ -59,7 +59,7 @@ function TutorDocumentPage({ role = "tutor" }) {
   };
 
   // 🔹 Upload file to API
-const handleUpload = async () => {
+ const handleUpload = async () => {
   if (!selectedFile) {
     setUploadError("❌ Please select a file first.");
     return;
@@ -76,41 +76,27 @@ const handleUpload = async () => {
       },
     });
 
-    // Normalize based on API response
-    let uploaded = res.data;
+    console.log("Upload response:", res.data);
 
-    // If API returns an array, take the first
-    if (Array.isArray(uploaded)) {
-      uploaded = uploaded[0];
-    }
-
-    // If wrapped inside "documents"
-    if (uploaded.documents) {
-      uploaded = uploaded.documents[0];
-    }
-
-    if (!uploaded?.file) {
-      throw new Error("Invalid upload response");
-    }
-
-    const newDoc = {
-      id: uploaded.id,
-      name: uploaded.file.split("/").pop(),
-      url: uploaded.file,
-    };
-
-    setUploadedDocuments((prev) => [...prev, newDoc]);
-
-    setSelectedFile(null);
+   const uploaded = res.data?.uploaded?.[0];
+if (uploaded) {
+  const newDoc = {
+    id: uploaded.id,
+    name: uploaded.file.split("/").pop(),
+    url: uploaded.file,
+  };
+  setUploadedDocuments((prev) => [...prev, newDoc]);
+  setShowUploadPopup(true);
+  setSelectedFile(null);
     setUploadError("");
-    setShowUploadPopup(true);
+} else if (res.data?.skipped?.length > 0) {
+  setUploadError(`File name already exists. Please rename and try again.`);
+}
   } catch (error) {
     console.error("Upload failed:", error);
-    setUploadError("❌ Upload failed. Please try again.");
+    setUploadError(error.message || "❌ Upload failed. Please try again.");
   }
 };
-
-
 
   // 🔹 View file
   const handleView = (file) => {

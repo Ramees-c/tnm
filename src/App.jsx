@@ -24,6 +24,7 @@ import NotificationPage from "./pages/user/NotificationPage/NotificationPage";
 import TutorDocumentPage from "./pages/user/TutorDocumentPage/TutorDocumentPage";
 import TutorEditPage from "./pages/user/TutorEditPage/TutorEditPage";
 import ProtectedRoute from "./components/common/ProtectedRoute/ProtectedRoute";
+import AssignedTutorsPage from "./pages/user/AssignedTutorsPage/AssignedTutorsPage";
 
 function App() {
   const location = useLocation();
@@ -46,6 +47,7 @@ function App() {
     "/tutornotification",
     "/tutorDocument",
     "/tutorEditProfile",
+    "/assignedTutorsPage"
   ];
 
   // ✅ also hides for nested routes (e.g., /tutorDashboard/settings)
@@ -126,6 +128,16 @@ function App() {
             <ProtectedRoute allowedRole="tutor">
               <TutorEditPage />
             </ProtectedRoute>
+          }
+        />
+
+         <Route
+          path="/assignedTutorsPage"
+          element={
+            <ProtectedRoute allowedRole="student">
+              <AssignedTutorsPage />
+            </ProtectedRoute>
+        
           }
         />
       </Routes>

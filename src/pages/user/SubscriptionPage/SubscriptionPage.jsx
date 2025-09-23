@@ -29,7 +29,6 @@ function SubscriptionPage() {
     getPlanDetails();
   }, []);
 
-  console.log(planDetails, "planDetails");
 
   const handleSelect = (plan) => {
     alert(`✅ You selected ${plan} plan!`);
@@ -78,12 +77,12 @@ function SubscriptionPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {planDetails?.map((plan) => (
               <SubscriptionCard
-                key={plan}
+                key={plan.id}
                 title={plan.plan}
                 price={plan.price}
                 features={plan.description}
                 duration={plan.duration_unit}
-                onSelect={() => handleSelect(plan.title)}
+                onSelect={() => handleSelect(plan.plan)}
               />
             ))}
           </div>

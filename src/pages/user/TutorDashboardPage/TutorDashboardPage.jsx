@@ -75,7 +75,7 @@ function TutorDashboardPage() {
               <div className="p-4 bg-blue-100 rounded-lg shadow text-center">
                 <p className="text-lg font-semibold text-blue-700">
                   {loggedTutorDetails?.assigned_students?.length || 0}
-                 </p> 
+                </p>
                 <p className="text-sm text-gray-600">Assigned Students</p>
               </div>
               <div className="p-4 bg-yellow-100 rounded-lg shadow text-center">
@@ -131,16 +131,24 @@ function TutorDashboardPage() {
                 </p>
                 <p className="flex items-center gap-2">
                   <CreditCard size={18} className="text-blue-600" />
-                  Price: <span className="font-medium text-sm md:text-md">₹499 / month</span>
+                  Price:{" "}
+                  <span className="font-medium text-sm md:text-md">
+                    ₹499 / month
+                  </span>
                 </p>
                 <p className="flex items-center gap-2">
                   <Calendar size={18} className="text-purple-600" />
-                  Start Date: <span className="font-medium text-sm md:text-md">01 Sep 2025</span>
+                  Start Date:{" "}
+                  <span className="font-medium text-sm md:text-md">
+                    01 Sep 2025
+                  </span>
                 </p>
                 <p className="flex items-center gap-2">
                   <Calendar size={18} className="text-red-600" />
                   Expiry Date:{" "}
-                  <span className="font-medium text-red-500 text-sm md:text-md">30 Sep 2025</span>
+                  <span className="font-medium text-red-500 text-sm md:text-md">
+                    30 Sep 2025
+                  </span>
                 </p>
                 <p className="flex items-center gap-2">
                   <CheckCircle size={18} className="text-green-600" />
@@ -151,7 +159,10 @@ function TutorDashboardPage() {
                 </p>
                 <p className="flex items-center gap-2">
                   <ArrowUpCircle size={18} className="text-indigo-600" />
-                  Next Billing: <span className="font-medium text-sm md:text-md">01 Oct 2025</span>
+                  Next Billing:{" "}
+                  <span className="font-medium text-sm md:text-md">
+                    01 Oct 2025
+                  </span>
                 </p>
               </div>
             </div>
@@ -207,18 +218,20 @@ function TutorDashboardPage() {
           {/* Notifications Preview */}
           <div className="bg-white rounded-md shadow p-4 sm:p-6">
             <h2 className="text-lg sm:text-xl font-semibold mb-4 flex items-center gap-2">
-              <Bell size={20} /> Notifications
+              Notifications
             </h2>
             <ul className="space-y-3">
-              <li className="p-3 bg-gray-50 rounded-lg shadow-sm">
-                📢 New student enquiry from{" "}
-                <span className="font-medium">Alex</span>.
+              <li className="p-3 bg-green-100 rounded-md shadow-sm flex items-center gap-2">
+                <Bell size={18} className="text-green-600" /> New student
+                enquiry from <span className="font-medium">Alex</span>.
               </li>
-              <li className="p-3 bg-gray-50 rounded-lg shadow-sm">
-                ✅ Subscription renewed successfully.
+              <li className="p-3 bg-green-100 rounded-md shadow-sm flex items-center gap-2">
+                <Bell size={18} className="text-green-600" /> New student
+                enquiry from <span className="font-medium">Alex</span>.
               </li>
-              <li className="p-3 bg-gray-50 rounded-lg shadow-sm">
-                📅 Upcoming class scheduled for tomorrow.
+              <li className="p-3 bg-green-100 rounded-md shadow-sm flex items-center gap-2">
+                <Bell size={18} className="text-green-600" /> New student
+                enquiry from <span className="font-medium">Alex</span>.
               </li>
             </ul>
           </div>

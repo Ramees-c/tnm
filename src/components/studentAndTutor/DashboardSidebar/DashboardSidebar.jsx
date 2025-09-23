@@ -42,11 +42,10 @@ const tutorLinks = [
 ];
 
 const studentLinks = [
-  { to: "/dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
-  { to: "/courses", label: "My Courses", icon: <BookOpen size={20} /> },
-  { to: "/tutors", label: "Tutors", icon: <Users size={20} /> },
-  { to: "/messages", label: "Messages", icon: <MessageSquare size={20} /> },
-  { to: "/settings", label: "Settings", icon: <Settings size={20} /> },
+  { to: "/studentDashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
+  { to: "/assignedTutorsPage", label: "Assigned Tutors", icon: <Users size={20} /> },
+  { to: "", label: "Tutors", icon: <Users size={20} /> },
+  { to: "", label: "Notifications", icon: <MessageSquare size={20} /> },
 ];
 
 function DashboardSidebar({ role = "student", open, setOpen }) {
@@ -61,18 +60,17 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
 
   const navigate = useNavigate();
 
-  
-useEffect(() => {
-  if (isMobile && open) {
-    document.body.style.overflow = "hidden"; // 🔒 stop background scroll
-  } else {
-    document.body.style.overflow = "auto"; // 🔓 restore scroll
-  }
+  useEffect(() => {
+    if (isMobile && open) {
+      document.body.style.overflow = "hidden"; // 🔒 stop background scroll
+    } else {
+      document.body.style.overflow = "auto"; // 🔓 restore scroll
+    }
 
-  return () => {
-    document.body.style.overflow = "auto"; // cleanup on unmount
-  };
-}, [open, isMobile]);
+    return () => {
+      document.body.style.overflow = "auto"; // cleanup on unmount
+    };
+  }, [open, isMobile]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -86,11 +84,6 @@ useEffect(() => {
 
   const handleLogoutNo = () => {
     setLogoutModalOpen(false);
-  };
-
-  const handleSave = (updatedData) => {
-    console.log("Updated profile:", updatedData);
-    // 🔹 Optionally call API to update profile, then update context
   };
 
   return (
@@ -113,17 +106,16 @@ useEffect(() => {
   flex flex-col
   `}
       >
-
-         {/* Close Button (only visible on mobile) */}
-  {isMobile && (
-    <button
-      onClick={() => setOpen(false)}
-      className="absolute top-3 right-3 p-2 rounded-full bg-white/20 hover:bg-white/30 transition"
-      title="Close Sidebar"
-    >
-      <X size={20} />
-    </button>
-  )}
+        {/* Close Button (only visible on mobile) */}
+        {isMobile && (
+          <button
+            onClick={() => setOpen(false)}
+            className="absolute top-3 right-3 p-2 rounded-full bg-white/20 hover:bg-white/30 transition"
+            title="Close Sidebar"
+          >
+            <X size={20} />
+          </button>
+        )}
         {/* Sidebar inner container with scroll */}
         <div className="flex-1 overflow-y-auto scrollbar-hide">
           {/* 🔹 Top-left Home Button */}
@@ -168,11 +160,11 @@ useEffect(() => {
 
           {/* Links */}
           <nav className="px-4 py-6 space-y-2">
-            {links.map(({ to, label, icon }) => {
+            {links.map(({ to, label, icon },i) => {
               const isActive = location.pathname === to;
               return (
                 <Link
-                  key={to}
+                  key={i}
                   to={to}
                   className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all text-xs lg:text-sm xl:text-md ${
                     isActive
@@ -215,7 +207,6 @@ useEffect(() => {
         isOpen={showEdit}
         onClose={() => setShowEdit(false)}
         initialData={user}
-        onSubmit={handleSave}
       />
     </>
   );
