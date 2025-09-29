@@ -30,6 +30,7 @@ import Footer from "../../../components/common/Footer/Footer";
 import TopHeader from "../../../components/common/TopHeader/TopHeader";
 import DefaultButton from "../../../components/common/DefaultButton/DefaultButton";
 import Loading from "../../../components/common/Loading/Loading";
+import axios from "axios";
 
 function UserHome() {
   const features = [
@@ -58,122 +59,122 @@ function UserHome() {
       delay: "300",
     },
   ];
-  const tutors = [
-    {
-      id: 1,
-      name: "Dr. Sarah Johnson",
-      specialization: "Mathematics Professor",
-      rating: 4.9,
-      bio: "PhD in Applied Mathematics with 10+ years of teaching experience. Specialized in Calculus and Linear Algebra.",
-      subjects: ["Calculus", "Algebra", "Statistics", "Geometry"],
-      students: 1245,
-      courses: 8,
-      price: 45,
-      image:
-        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8cHJvZmlsZXxlbnwwfHwwfHx8MA%3D%3D",
-    },
-    {
-      id: 2,
-      name: "James Wilson",
-      specialization: "English Literature",
-      rating: 4.7,
-      bio: "MA in English Literature with expertise in creative writing and classic literature analysis.",
-      subjects: ["Literature", "Creative Writing", "Grammar", "Poetry"],
-      students: 892,
-      courses: 5,
-      price: 35,
-      image:
-        "https://plus.unsplash.com/premium_photo-1689539137236-b68e436248de?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OTN8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D",
-    },
-    {
-      id: 3,
-      name: "Aisha Khan",
-      specialization: "Physics Lecturer",
-      rating: 4.8,
-      bio: "MSc in Physics, specializing in Quantum Mechanics and Thermodynamics. Passionate about making physics fun and engaging.",
-      subjects: ["Quantum Mechanics", "Thermodynamics", "Optics", "Mechanics"],
-      students: 1023,
-      courses: 6,
-      price: 40,
-      image:
-        "https://plus.unsplash.com/premium_photo-1688350808212-4e6908a03925?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTA1fHxwcm9maWxlfGVufDB8fDB8fHww",
-    },
-    {
-      id: 4,
-      name: "Carlos Martinez",
-      specialization: "Chemistry Expert",
-      rating: 4.6,
-      bio: "PhD in Organic Chemistry with 8 years of research and teaching experience.",
-      subjects: ["Organic Chemistry", "Inorganic Chemistry", "Biochemistry"],
-      students: 765,
-      courses: 4,
-      price: 38,
-      image:
-        "https://plus.unsplash.com/premium_photo-1690086519096-0594592709d3?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTQ5fHxwcm9maWxlfGVufDB8fDB8fHww",
-    },
-    {
-      id: 5,
-      name: "Emily Zhang",
-      specialization: "Computer Science Instructor",
-      rating: 4.9,
-      bio: "BSc in Computer Science with expertise in web development, algorithms, and data structures.",
-      subjects: [
-        "Web Development",
-        "JavaScript",
-        "Algorithms",
-        "Data Structures",
-      ],
-      students: 1560,
-      courses: 9,
-      price: 50,
-      image:
-        "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=600&auto=format&fit=crop&q=60",
-    },
-    {
-      id: 6,
-      name: "Liam O'Connor",
-      specialization: "History Professor",
-      rating: 4.5,
-      bio: "MA in World History, specializing in medieval and modern European history.",
-      subjects: [
-        "Medieval History",
-        "Modern History",
-        "World Wars",
-        "Ancient Civilizations",
-      ],
-      students: 678,
-      courses: 3,
-      price: 30,
-      image:
-        "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=600&auto=format&fit=crop&q=60",
-    },
-    {
-      id: 7,
-      name: "Sophia Roberts",
-      specialization: "Art & Design Teacher",
-      rating: 4.8,
-      bio: "BA in Fine Arts with 6 years of experience in teaching painting, sketching, and digital design.",
-      subjects: ["Painting", "Sketching", "Digital Art", "Graphic Design"],
-      students: 934,
-      courses: 7,
-      price: 42,
-      image:
-        "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&auto=format&fit=crop&q=60",
-    },
-    {
-      id: 8,
-      name: "Michael Anderson",
-      specialization: "Music Instructor",
-      rating: 4.7,
-      bio: "Diploma in Music Theory with 12 years of experience teaching piano and guitar.",
-      subjects: ["Piano", "Guitar", "Music Theory", "Songwriting"],
-      students: 512,
-      courses: 5,
-      price: 37,
-      image:
-        "https://images.unsplash.com/photo-1520975918318-3e1c9dcd99cc?w=600&auto=format&fit=crop&q=60",
-    },
-  ];
+  // const tutors = [
+  //   {
+  //     id: 1,
+  //     name: "Dr. Sarah Johnson",
+  //     specialization: "Mathematics Professor",
+  //     rating: 4.9,
+  //     bio: "PhD in Applied Mathematics with 10+ years of teaching experience. Specialized in Calculus and Linear Algebra.",
+  //     subjects: ["Calculus", "Algebra", "Statistics", "Geometry"],
+  //     students: 1245,
+  //     courses: 8,
+  //     price: 45,
+  //     image:
+  //       "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8cHJvZmlsZXxlbnwwfHwwfHx8MA%3D%3D",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "James Wilson",
+  //     specialization: "English Literature",
+  //     rating: 4.7,
+  //     bio: "MA in English Literature with expertise in creative writing and classic literature analysis.",
+  //     subjects: ["Literature", "Creative Writing", "Grammar", "Poetry"],
+  //     students: 892,
+  //     courses: 5,
+  //     price: 35,
+  //     image:
+  //       "https://plus.unsplash.com/premium_photo-1689539137236-b68e436248de?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OTN8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Aisha Khan",
+  //     specialization: "Physics Lecturer",
+  //     rating: 4.8,
+  //     bio: "MSc in Physics, specializing in Quantum Mechanics and Thermodynamics. Passionate about making physics fun and engaging.",
+  //     subjects: ["Quantum Mechanics", "Thermodynamics", "Optics", "Mechanics"],
+  //     students: 1023,
+  //     courses: 6,
+  //     price: 40,
+  //     image:
+  //       "https://plus.unsplash.com/premium_photo-1688350808212-4e6908a03925?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTA1fHxwcm9maWxlfGVufDB8fDB8fHww",
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Carlos Martinez",
+  //     specialization: "Chemistry Expert",
+  //     rating: 4.6,
+  //     bio: "PhD in Organic Chemistry with 8 years of research and teaching experience.",
+  //     subjects: ["Organic Chemistry", "Inorganic Chemistry", "Biochemistry"],
+  //     students: 765,
+  //     courses: 4,
+  //     price: 38,
+  //     image:
+  //       "https://plus.unsplash.com/premium_photo-1690086519096-0594592709d3?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTQ5fHxwcm9maWxlfGVufDB8fDB8fHww",
+  //   },
+  //   {
+  //     id: 5,
+  //     name: "Emily Zhang",
+  //     specialization: "Computer Science Instructor",
+  //     rating: 4.9,
+  //     bio: "BSc in Computer Science with expertise in web development, algorithms, and data structures.",
+  //     subjects: [
+  //       "Web Development",
+  //       "JavaScript",
+  //       "Algorithms",
+  //       "Data Structures",
+  //     ],
+  //     students: 1560,
+  //     courses: 9,
+  //     price: 50,
+  //     image:
+  //       "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=600&auto=format&fit=crop&q=60",
+  //   },
+  //   {
+  //     id: 6,
+  //     name: "Liam O'Connor",
+  //     specialization: "History Professor",
+  //     rating: 4.5,
+  //     bio: "MA in World History, specializing in medieval and modern European history.",
+  //     subjects: [
+  //       "Medieval History",
+  //       "Modern History",
+  //       "World Wars",
+  //       "Ancient Civilizations",
+  //     ],
+  //     students: 678,
+  //     courses: 3,
+  //     price: 30,
+  //     image:
+  //       "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=600&auto=format&fit=crop&q=60",
+  //   },
+  //   {
+  //     id: 7,
+  //     name: "Sophia Roberts",
+  //     specialization: "Art & Design Teacher",
+  //     rating: 4.8,
+  //     bio: "BA in Fine Arts with 6 years of experience in teaching painting, sketching, and digital design.",
+  //     subjects: ["Painting", "Sketching", "Digital Art", "Graphic Design"],
+  //     students: 934,
+  //     courses: 7,
+  //     price: 42,
+  //     image:
+  //       "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&auto=format&fit=crop&q=60",
+  //   },
+  //   {
+  //     id: 8,
+  //     name: "Michael Anderson",
+  //     specialization: "Music Instructor",
+  //     rating: 4.7,
+  //     bio: "Diploma in Music Theory with 12 years of experience teaching piano and guitar.",
+  //     subjects: ["Piano", "Guitar", "Music Theory", "Songwriting"],
+  //     students: 512,
+  //     courses: 5,
+  //     price: 37,
+  //     image:
+  //       "https://images.unsplash.com/photo-1520975918318-3e1c9dcd99cc?w=600&auto=format&fit=crop&q=60",
+  //   },
+  // ];
 
   const categories = [
     {
@@ -365,34 +366,36 @@ function UserHome() {
     },
   ];
 
-  const testimonials = [
-    {
-      id: 1,
-      name: "Sarah Johnson",
-      position: "Student, Class 12",
-      text: "Tutilon completely transformed my learning experience. The interactive lessons and expert teachers helped me score 95% in my board exams! fdsgfadsgsdgsdgfsadg",
-      rating: 5,
-      avatar: "https://randomuser.me/api/portraits/women/43.jpg",
-    },
-    {
-      id: 2,
-      name: "Raj Patel",
-      position: "BTech Student",
-      text: "The quality of courses is exceptional. I was able to land an internship at a top tech company thanks to the skills I learned here.",
-      rating: 4,
-      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-    },
-    {
-      id: 3,
-      name: "Priya Sharma",
-      position: "Parent",
-      text: "My child's grades improved significantly after joining Tutilon. The teachers are patient and explain concepts very clearly.",
-      rating: 5,
-      avatar: "https://randomuser.me/api/portraits/women/65.jpg",
-    },
-  ];
+  // const testimonials = [
+  //   {
+  //     id: 1,
+  //     name: "Sarah Johnson",
+  //     position: "Student, Class 12",
+  //     text: "Tutilon completely transformed my learning experience. The interactive lessons and expert teachers helped me score 95% in my board exams! fdsgfadsgsdgsdgfsadg",
+  //     rating: 5,
+  //     avatar: "https://randomuser.me/api/portraits/women/43.jpg",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Raj Patel",
+  //     position: "BTech Student",
+  //     text: "The quality of courses is exceptional. I was able to land an internship at a top tech company thanks to the skills I learned here.",
+  //     rating: 4,
+  //     avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Priya Sharma",
+  //     position: "Parent",
+  //     text: "My child's grades improved significantly after joining Tutilon. The teachers are patient and explain concepts very clearly.",
+  //     rating: 5,
+  //     avatar: "https://randomuser.me/api/portraits/women/65.jpg",
+  //   },
+  // ];
 
   const [isLoading, setIsLoading] = useState(true);
+  const [testimonials, setTestimonials] = useState([]);
+  const [tutors, setTutors] = useState([]);
 
   useEffect(() => {
     // Simulate page loading
@@ -401,6 +404,44 @@ function UserHome() {
     }, 1000); // 2 seconds loading time
 
     return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const fetchTutors = async () => {
+      try {
+        const res = await axios.get("/api/tutors_list/");
+        console.log(res.data, "tutors");
+
+        // ✅ Only keep approved tutors
+        const approvedTutors = res.data.filter(
+          (tutor) => tutor.is_approved === true
+        );
+
+        setTutors(approvedTutors);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchTutors();
+  }, []);
+
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const res = await axios.get("/api/testimonials/");
+        // Filter only those to show on homepage
+        const homepageTestimonials = res.data.filter(
+          (testimonial) => testimonial.add_to_homepage === true
+        );
+        setTestimonials(homepageTestimonials);
+      } catch (err) {
+        console.error("Failed to fetch testimonials:", err);
+        setError("Failed to load testimonials");
+      }
+    };
+
+    fetchTestimonials();
   }, []);
 
   if (isLoading) {

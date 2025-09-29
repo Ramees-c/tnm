@@ -67,7 +67,7 @@ function App() {
         <Route path="/faq" element={<FaqPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/blog" element={<BlogPge />} />
-        <Route path="/blogSingle" element={<BlogSingle />} />
+        <Route path="/blogSingle/:id" element={<BlogSingle />} />
         <Route path="/register" element={<LoginRegisterPage />} />
         <Route path="/testimonial" element={<TestimonialPage />} />
 

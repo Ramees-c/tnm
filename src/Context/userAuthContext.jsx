@@ -6,12 +6,14 @@ const AuthContext = createContext(null); // ✅ provide default value
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token") || null);
+
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
   });
   const [userDetails, setUserDetails] = useState({});
   const [loading, setLoading] = useState(true);
+  const [isMailVerified, setIsMailVerified] = useState("");
 
   const refreshUserDetails = async () => {
     if (!token) return;
@@ -20,6 +22,12 @@ export const AuthProvider = ({ children }) => {
         headers: { Authorization: `Token ${token}` },
       });
       setUserDetails(res.data);
+      if (res.data?.mail_verified === false) {
+        setIsMailVerified(
+          "Your mail is not verified. Please verify.",
+          "warning"
+        );
+      }
     } catch (err) {
       console.error("Failed to refresh profile:", err);
     }
@@ -68,7 +76,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   console.log(token);
-  
 
   return (
     <AuthContext.Provider
@@ -80,6 +87,7 @@ export const AuthProvider = ({ children }) => {
         handleLogout,
         userDetails,
         refreshUserDetails,
+        isMailVerified,
         loading,
       }}
     >

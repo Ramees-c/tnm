@@ -4,6 +4,8 @@ import DefaultButton from "../DefaultButton/DefaultButton";
 
 function TutorCard({ tutor }) {
   const [isHovered, setIsHovered] = useState(false);
+  console.log(tutor, "incard");
+  
 
   return (
     <div
@@ -16,8 +18,8 @@ function TutorCard({ tutor }) {
       {/* Tutor Image */}
       <div className="relative overflow-hidden h-[250px]">
         <img
-          src={tutor.image}
-          alt={tutor.name}
+          src={tutor.profile_image}
+          alt={tutor.full_name}
           className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
         />
       </div>
@@ -27,15 +29,15 @@ function TutorCard({ tutor }) {
         <div>
           <div className="flex justify-between items-start mb-3">
             <div>
-              <h3 className="text-xl font-bold text-gray-800">{tutor.name}</h3>
-              <p className="text-gray-600 text-sm">{tutor.specialization}</p>
+              <h3 className="text-xl font-bold text-gray-800">{tutor.full_name}</h3>
+              <p className="text-gray-600 text-sm">{tutor.qualification}</p>
             </div>
-            <div className="flex items-center bg-primary/10 px-3 py-1 rounded-full">
+            {/* <div className="flex items-center bg-primary/10 px-3 py-1 rounded-full">
               <FaStar className="text-yellow-400 mr-1" />
               <span className="font-semibold text-gray-800">
                 {tutor.rating}
               </span>
-            </div>
+            </div> */}
           </div>
 
           {/* Updated bio section with two-line limit */}
@@ -48,15 +50,15 @@ function TutorCard({ tutor }) {
                 WebkitBoxOrient: "vertical",
               }}
             >
-              {tutor.bio}
+              {tutor.description}
             </p>
-            {tutor.bio.length > 120 && (
+            {tutor.description.length > 120 && (
               <span className="text-xs text-gray-400 mt-1">(Read more)</span>
             )}
           </div>
 
           <div className="flex flex-wrap gap-2 mb-4">
-            {tutor.subjects.slice(0, 4).map((subject, index) => (
+            {tutor.categories.slice(0, 1).map((subject, index) => (
               <span
                 key={index}
                 className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
@@ -64,9 +66,9 @@ function TutorCard({ tutor }) {
                 {subject}
               </span>
             ))}
-            {tutor.subjects.length > 3 && (
+            {tutor.categories.length > 1 && (
               <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
-                +{tutor.subjects.length - 3} more
+                +{tutor.categories.length - 1} more
               </span>
             )}
           </div>
@@ -76,11 +78,11 @@ function TutorCard({ tutor }) {
           <div className="flex items-center justify-between border-t border-gray-100 pt-4">
             <div className="flex items-center text-gray-600">
               <FaChalkboardTeacher className="mr-2" />
-              <span className="text-sm">{tutor.students} students</span>
+              <span className="text-sm">{tutor.assigned_students.length} students</span>
             </div>
             <div className="flex items-center text-gray-600">
               <FaBookOpen className="mr-2" />
-              <span className="text-sm">{tutor.courses} courses</span>
+              <span className="text-sm">{tutor.categories.length} courses</span>
             </div>
           </div>
 
@@ -88,7 +90,7 @@ function TutorCard({ tutor }) {
             <div>
               <span className="text-gray-500 text-sm">Starting from</span>
               <p className="text-xl font-bold text-primary">
-                ${tutor.price}/hr
+                ${tutor.hourly_rate}/hr
               </p>
             </div>
             <DefaultButton buttonText="Register Now" buttonSmall={true} />

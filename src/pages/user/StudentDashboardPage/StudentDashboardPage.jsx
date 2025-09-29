@@ -192,6 +192,10 @@ function StudentDashboardPage() {
               <p className="text-lg font-semibold text-green-700">{userDetails?.assigned_tutors?.length || 0}</p>
               <p className="text-sm text-gray-600">Assigned Tutors</p>
             </div>
+            <div className="p-4 bg-purple-100 rounded-md shadow text-center">
+              <p className="text-lg font-semibold text-purple-700">{userDetails?.categories?.length || 0}</p>
+              <p className="text-sm text-gray-600">Selected Subjects</p>
+            </div>
             <div className="p-4 bg-blue-100 rounded-md shadow text-center">
               <p className="text-lg font-semibold text-blue-700">7</p>
               <p className="text-sm text-gray-600">Recommended Tutors</p>
@@ -200,11 +204,33 @@ function StudentDashboardPage() {
               <p className="text-lg font-semibold text-yellow-700">4</p>
               <p className="text-sm text-gray-600">Favourite Tutors</p>
             </div>
-            <div className="p-4 bg-purple-100 rounded-md shadow text-center">
-              <p className="text-lg font-semibold text-purple-700">10</p>
-              <p className="text-sm text-gray-600">Notifications</p>
-            </div>
+            
           </div>
+
+          {/* ✅ Selected Subjects Section */}
+<div className="bg-white rounded-md shadow p-4 sm:p-6 mb-6">
+  <h2 className="text-lg sm:text-xl font-semibold mb-3">
+    Selected Subjects
+  </h2>
+
+  {userDetails?.categories?.length > 0 ? (
+    <div className="flex flex-wrap gap-3 rounded-md p-3 bg-gray-50">
+      {userDetails.categories.map((category, idx) => (
+        <span
+          key={idx}
+          className="flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1 rounded-md text-sm md:text-md font-medium shadow-sm"
+        >
+          {category}
+        </span>
+      ))}
+    </div>
+  ) : (
+    <p className="text-gray-500 text-sm italic">
+      No subjects selected yet.
+    </p>
+  )}
+</div>
+
 
           <div className="bg-white rounded-md shadow p-6 mb-6">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">

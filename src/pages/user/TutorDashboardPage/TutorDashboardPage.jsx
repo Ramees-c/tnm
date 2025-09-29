@@ -11,13 +11,19 @@ import {
 import { CreditCard, Calendar, CheckCircle, ArrowUpCircle } from "lucide-react";
 import DashboardSidebar from "../../../components/studentAndTutor/DashboardSidebar/DashboardSidebar";
 import { useAuth } from "../../../Context/userAuthContext";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import ToastMessage from "../../../components/studentAndTutor/ToastMessage/ToastMessage";
 
 function TutorDashboardPage() {
   const [active, setActive] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loggedTutorDetails, setLoggedTutorDetails] = useState({});
+  const [notifications, setNotifications] = useState([]);
+  const [toastOpen, setToastOpen] = useState(false);
 
-  const { userDetails } = useAuth();
+  const { userDetails, token, isMailVerified } = useAuth();
+
 
   useEffect(() => {
     if (userDetails?.role === "tutor") {
@@ -25,16 +31,77 @@ function TutorDashboardPage() {
     }
   }, [userDetails]);
 
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const res = await axios.get("/api/notify/", {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        });
+
+        // take only latest 5
+        setNotifications(res.data.slice(0, 5));
+      } catch (err) {
+        console.error("Failed to load notifications", err);
+        setError("Unable to fetch notifications.");
+      }
+    };
+
+    fetchNotifications();
+  }, [token]);
+
+   useEffect(() => {
+    if (isMailVerified) {
+      setToastOpen(true);
+    }
+  }, [isMailVerified]);
+
   // ✅ Remove subject
   const handleRemoveSubject = (index) => {
     setSelectedSubjects((prev) => prev.filter((_, i) => i !== index));
   };
 
-  console.log(loggedTutorDetails);
+  // Function to calculate months between two dates
+  const getDurationInMonths = (created_at, expiry_date) => {
+    if (!created_at || !expiry_date) return "";
 
-  loggedTutorDetails?.categories?.map((subject) => {
-    return console.log(subject, "fsdfsdhl");
-  });
+    // Parse DD-MM-YYYY
+    const [cDay, cMonth, cYear] = created_at.split(" ")[0].split("-");
+    const [eDay, eMonth, eYear] = expiry_date.split(" ")[0].split("-");
+
+    const startDate = new Date(`${cYear}-${cMonth}-${cDay}`);
+    const endDate = new Date(`${eYear}-${eMonth}-${eDay}`);
+
+    // Calculate difference in months
+    let months;
+    months = (endDate.getFullYear() - startDate.getFullYear()) * 12;
+    months -= startDate.getMonth();
+    months += endDate.getMonth();
+
+    // If partial month, round up
+    if (endDate.getDate() >= startDate.getDate()) months += 0;
+    else months -= 1;
+
+    return months;
+  };
+
+  function timeAgo(dateString) {
+    const [day, month, yearAndTime] = dateString.split("-");
+    const [year, time, ampm] = yearAndTime.split(" ");
+    const dateObj = new Date(`${year}-${month}-${day} ${time} ${ampm}`);
+
+    const diff = Date.now() - dateObj.getTime();
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (days > 0) return `${days} day${days > 1 ? "s" : ""} ago`;
+    if (hours > 0) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    if (minutes > 0) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    return "Just now";
+  }
 
   return (
     <div className="flex min-h-screen">
@@ -85,7 +152,9 @@ function TutorDashboardPage() {
                 <p className="text-sm text-gray-600">Selected Subjects</p>
               </div>
               <div className="p-4 bg-green-100 rounded-lg shadow text-center">
-                <p className="text-lg font-semibold text-green-700">8</p>
+                <p className="text-lg font-semibold text-green-700">
+                  {notifications.length || 0}
+                </p>
                 <p className="text-sm text-gray-600">Notifications</p>
               </div>
             </div>
@@ -116,64 +185,70 @@ function TutorDashboardPage() {
           </div>
 
           {/* Subscription Status */}
-          <div className="bg-white rounded-md shadow-md p-6 sm:p-8 mb-6 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border border-green-100">
-            <div>
-              <h2 className="text-xl font-bold text-gray-800 mb-4">
-                Subscription
-              </h2>
-              <div className="grid xl:grid-cols-3 gap-8 text-gray-700">
-                <p className="flex items-center gap-2">
-                  <CreditCard size={18} className="text-green-600" />
-                  Plan:{" "}
-                  <span className="font-semibold text-green-700">
-                    Basic Monthly
-                  </span>
-                </p>
-                <p className="flex items-center gap-2">
-                  <CreditCard size={18} className="text-blue-600" />
-                  Price:{" "}
-                  <span className="font-medium text-sm md:text-md">
-                    ₹499 / month
-                  </span>
-                </p>
-                <p className="flex items-center gap-2">
-                  <Calendar size={18} className="text-purple-600" />
-                  Start Date:{" "}
-                  <span className="font-medium text-sm md:text-md">
-                    01 Sep 2025
-                  </span>
-                </p>
-                <p className="flex items-center gap-2">
-                  <Calendar size={18} className="text-red-600" />
-                  Expiry Date:{" "}
-                  <span className="font-medium text-red-500 text-sm md:text-md">
-                    30 Sep 2025
-                  </span>
-                </p>
-                <p className="flex items-center gap-2">
-                  <CheckCircle size={18} className="text-green-600" />
-                  Status:{" "}
-                  <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                    Active
-                  </span>
-                </p>
-                <p className="flex items-center gap-2">
-                  <ArrowUpCircle size={18} className="text-indigo-600" />
-                  Next Billing:{" "}
-                  <span className="font-medium text-sm md:text-md">
-                    01 Oct 2025
-                  </span>
-                </p>
+          {userDetails?.payment_history ? (
+            <div className="bg-white rounded-md shadow-md p-6 sm:p-8 mb-6 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border border-green-100">
+              <div>
+                <h2 className="text-xl font-bold text-gray-800 mb-4">
+                  Subscription
+                </h2>
+                <div className="grid xl:grid-cols-3 gap-8 text-gray-700">
+                  <p className="flex items-center gap-2">
+                    <CreditCard size={18} className="text-green-600" />
+                    Plan:{" "}
+                    <span className="font-semibold text-green-700">
+                      {userDetails.payment_history.plan_name}
+                    </span>
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <CreditCard size={18} className="text-blue-600" />
+                    Price:{" "}
+                    <span className="font-medium text-sm md:text-md">
+                      {userDetails.payment_history.actual_price} /{" "}
+                      {getDurationInMonths(
+                        userDetails.payment_history.created_at,
+                        userDetails.payment_history.expiry_date
+                      )}{" "}
+                      months
+                    </span>
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <Calendar size={18} className="text-purple-600" />
+                    Start Date:{" "}
+                    <span className="font-medium text-sm md:text-md">
+                      {userDetails.payment_history.created_at?.split(" ")[0]}
+                    </span>
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <Calendar size={18} className="text-red-600" />
+                    Expiry Date:{" "}
+                    <span className="font-medium text-red-500 text-sm md:text-md">
+                      {userDetails.payment_history.expiry_date?.split(" ")[0]}
+                    </span>
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <CheckCircle size={18} className="text-green-600" />
+                    Status:{" "}
+                    <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                      Active
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link to="/tutorSubscription">
+                  <button className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-green-700 transition text-sm md:text-md">
+                    <ArrowUpCircle size={18} /> Upgrade
+                  </button>
+                </Link>
               </div>
             </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-green-700 transition text-sm md:text-md">
-                <ArrowUpCircle size={18} /> Upgrade
-              </button>
+          ) : (
+            <div className="bg-white rounded-md shadow-md p-6 sm:p-8 mb-6 text-center text-gray-600">
+              No plan subscribed
             </div>
-          </div>
+          )}
 
           {/* Active/Inactive Toggle */}
           <div className="bg-white rounded-md shadow p-4 sm:p-6 mb-6 flex justify-between items-center">
@@ -220,22 +295,36 @@ function TutorDashboardPage() {
             <h2 className="text-lg sm:text-xl font-semibold mb-4 flex items-center gap-2">
               Notifications
             </h2>
-            <ul className="space-y-3">
-              <li className="p-3 bg-green-100 rounded-md shadow-sm flex items-center gap-2">
-                <Bell size={18} className="text-green-600" /> New student
-                enquiry from <span className="font-medium">Alex</span>.
-              </li>
-              <li className="p-3 bg-green-100 rounded-md shadow-sm flex items-center gap-2">
-                <Bell size={18} className="text-green-600" /> New student
-                enquiry from <span className="font-medium">Alex</span>.
-              </li>
-              <li className="p-3 bg-green-100 rounded-md shadow-sm flex items-center gap-2">
-                <Bell size={18} className="text-green-600" /> New student
-                enquiry from <span className="font-medium">Alex</span>.
-              </li>
-            </ul>
+            <div className="space-y-4">
+              {notifications.map((note) => (
+                <div
+                  key={note.id}
+                  className="p-3 bg-green-100 rounded-md shadow-sm flex items-center gap-3"
+                >
+                  <Bell size={18} className="text-green-600" />
+
+                  {/* Message + Time */}
+                  <div className="flex-1">
+                    <p className="text-gray-800">{note.message}</p>
+                    <span className="text-xs text-gray-500">
+                      {" "}
+                      {timeAgo(note.created_at)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
+
+        {toastOpen && (
+        <ToastMessage
+          message={isMailVerified}
+          isOpen={toastOpen}
+          onClose={() => setToastOpen(false)}
+          type="warning"  
+        />
+      )}
       </main>
     </div>
   );

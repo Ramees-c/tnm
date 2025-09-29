@@ -7,7 +7,7 @@ import axios from "axios";
 import { useAuth } from "../../../Context/userAuthContext";
 import { useNavigate } from "react-router-dom";
 
-function LoginForm({ onCreateAccount }) {
+function LoginForm({ onCreateAccount, onForgotPassword }) {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -170,12 +170,12 @@ function LoginForm({ onCreateAccount }) {
                 >
                   Password
                 </label>
-                <a
-                  href="#"
-                  className="text-sm text-green-500 hover:underline transition-colors duration-200"
+                <p
+                  onClick={onForgotPassword}
+                  className="text-sm text-green-500 hover:underline transition-colors duration-200 cursor-pointer"
                 >
                   Forgot Password?
-                </a>
+                </p>
               </div>
               <div className="relative">
                 <FormInput

@@ -1,40 +1,60 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Bell, Menu } from "lucide-react";
 import DashboardSidebar from "../../../components/studentAndTutor/DashboardSidebar/DashboardSidebar";
-
-const notifications = [
-  {
-    id: 1,
-    type: "info",
-    icon: <Bell size={18} className="text-green-600" />,
-    message: "New student enquiry from Alex Johnson.",
-    time: "2 hours ago",
-  },
-  {
-    id: 2,
-    type: "success",
-    icon: <Bell size={18} className="text-green-600" />,
-    message: "Subscription renewed successfully.",
-    time: "Yesterday",
-  },
-  {
-    id: 3,
-    type: "warning",
-    icon: <Bell size={18} className="text-green-600" />,
-    message: "Upcoming class scheduled for Friday at 7 PM.",
-    time: "3 days ago",
-  },
-  {
-    id: 4,
-    type: "error",
-    icon: <Bell size={18} className="text-green-600" />,
-    message: "Payment failed. Please update billing details.",
-    time: "1 week ago",
-  },
-];
+import axios from "axios";
+import { useAuth } from "../../../Context/userAuthContext";
+import Loading from "../../../components/common/Loading/Loading";
+import ToastMessage from "../../../components/studentAndTutor/ToastMessage/ToastMessage";
 
 function NotificationPage({ role = "tutor" }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [error, setError] = useState("");
+  const [toastOpen, setToastOpen] = useState(false);
+
+  const { token, isMailVerified } = useAuth();
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const res = await axios.get("/api/notify/", {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        });
+        setNotifications(res.data);
+      } catch (err) {
+        console.error("Failed to load notifications", err);
+        setError("Unable to fetch notifications.");
+      } finally {
+      }
+    };
+
+    fetchNotifications();
+  }, [token]);
+
+  useEffect(() => {
+    if (isMailVerified) {
+      setToastOpen(true);
+    }
+  }, [isMailVerified]);
+
+  function timeAgo(dateString) {
+    const [day, month, yearAndTime] = dateString.split("-");
+    const [year, time, ampm] = yearAndTime.split(" ");
+    const dateObj = new Date(`${year}-${month}-${day} ${time} ${ampm}`);
+
+    const diff = Date.now() - dateObj.getTime();
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (days > 0) return `${days} day${days > 1 ? "s" : ""} ago`;
+    if (hours > 0) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    if (minutes > 0) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    return "Just now";
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -46,6 +66,7 @@ function NotificationPage({ role = "tutor" }) {
           setOpen={setSidebarOpen}
         />
       </div>
+
       {/* Overlay for mobile sidebar */}
       {sidebarOpen && (
         <div
@@ -53,10 +74,11 @@ function NotificationPage({ role = "tutor" }) {
           onClick={() => setSidebarOpen(false)}
         />
       )}
+
       {/* Main Content */}
       <main className="flex-1 w-full p-4 sm:p-6 transition-all duration-300">
         <div className="max-w-6xl mx-auto">
-          {/* Header with Mobile Menu */}
+          {/* Header */}
           <div className="flex items-center gap-3 mb-6">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -65,32 +87,42 @@ function NotificationPage({ role = "tutor" }) {
               <Menu size={24} />
             </button>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 flex items-center gap-2">
-              {role === "tutor" ? "Tutor" : "Student"} Notifications
+              Notifications
             </h1>
           </div>
 
-          {/* Notifications List */}
+          {/* Content */}
+
           <div className="space-y-4">
             {notifications.map((note) => (
               <div
                 key={note.id}
-                className="bg-white rounded-md shadow p-4 flex items-center gap-3 hover:shadow-md transition"
+                className="p-3 bg-green-100 rounded-md shadow-sm flex items-center gap-3"
               >
-                {/* Icon wrapper for alignment */}
-                <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-gray-100">
-                  {note.icon}
-                </div>
+                <Bell size={18} className="text-green-600" />
 
                 {/* Message + Time */}
                 <div className="flex-1">
                   <p className="text-gray-800">{note.message}</p>
-                  <span className="text-xs text-gray-500">{note.time}</span>
+                  <span className="text-xs text-gray-500">
+                    {" "}
+                    {timeAgo(note.created_at)}
+                  </span>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </main>
+
+      {toastOpen && (
+        <ToastMessage
+          message={isMailVerified}
+          isOpen={toastOpen}
+          onClose={() => setToastOpen(false)}
+          type="warning"
+        />
+      )}
     </div>
   );
 }

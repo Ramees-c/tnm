@@ -7,9 +7,10 @@ import axios from "axios";
 import { useAuth } from "../../../Context/userAuthContext";
 import ConfirmMessagePopup from "../../../components/common/ConfirmMessagePopup/ConfirmMessagePopup";
 import { MEDIA_URL } from "../../../API/API";
+import ToastMessage from "../../../components/studentAndTutor/ToastMessage/ToastMessage";
 
 function TutorDocumentPage({ role = "tutor" }) {
-  const { token, userDetails } = useAuth();
+  const { token, userDetails, isMailVerified } = useAuth();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [files, setFiles] = useState([]);
@@ -20,6 +21,7 @@ function TutorDocumentPage({ role = "tutor" }) {
 
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [fileToDelete, setFileToDelete] = useState(null);
+  const [toastOpen, setToastOpen] = useState(false);
 
   // ✅ Normalize uploaded documents
   const [uploadedDocuments, setUploadedDocuments] = useState(() => {
@@ -41,6 +43,12 @@ function TutorDocumentPage({ role = "tutor" }) {
       return doc;
     });
   });
+
+   useEffect(() => {
+    if (isMailVerified) {
+      setToastOpen(true);
+    }
+  }, [isMailVerified]);
 
   // 🔹 File select validation
   const handleFileSelect = (file) => {
@@ -273,6 +281,14 @@ if (uploaded) {
             )}
           </div>
         </div>
+         {toastOpen && (
+        <ToastMessage
+          message={isMailVerified}
+          isOpen={toastOpen}
+          onClose={() => setToastOpen(false)}
+          type="warning"  
+        />
+      )}
       </main>
 
       {/* Popups */}

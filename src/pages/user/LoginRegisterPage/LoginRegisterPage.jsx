@@ -3,6 +3,7 @@ import RegisterChoice from "../../../components/common/RegisterChoice/RegisterCh
 import TutorRegisterForm from "../../../components/studentAndTutor/TutorRegisterForm/TutorRegisterForm";
 import StudentRegistrationForm from "../../../components/studentAndTutor/StudentRegistrationForm/StudentRegistrationForm";
 import LoginForm from "../../../components/studentAndTutor/LoginForm/LoginForm";
+import ForgotPasswordForm from "../../../components/studentAndTutor/ForgotPasswordForm/ForgotPasswordForm";
 
 function LoginRegisterPage() {
   const [step, setStep] = useState("login"); // 👈 always start with login
@@ -48,7 +49,10 @@ function LoginRegisterPage() {
       {step === "tutor" && <TutorRegisterForm />}
       {step === "student" && <StudentRegistrationForm />}
       {step === "login" && (
-        <LoginForm onCreateAccount={() => setStep("choice")} />
+        <LoginForm onCreateAccount={() => setStep("choice")} onForgotPassword={() => setStep("forgot")} />
+      )}
+      {step === "forgot" && (
+        <ForgotPasswordForm onBackToLogin={() => setStep("login")} />
       )}
     </div>
   );

@@ -1,39 +1,52 @@
-import React from "react";
-import { FaQuoteLeft, FaStar } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import TestimonialCard from "../../../components/common/TestimonialCard/TestimonialCard";
 import PageHeader from "../../../components/common/PageHeader/PageHeader";
-
-const testimonials = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    position: "Student, Class 12",
-    text: "Tutilon completely transformed my learning experience. The interactive lessons and expert teachers helped me score 95% in my board exams! fdsgfadsgsdgsdgfsadg",
-    rating: 5,
-    avatar: "https://randomuser.me/api/portraits/women/43.jpg",
-  },
-  {
-    id: 2,
-    name: "Raj Patel",
-    position: "BTech Student",
-    text: "The quality of courses is exceptional. I was able to land an internship at a top tech company thanks to the skills I learned here.",
-    rating: 4,
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-  },
-  {
-    id: 3,
-    name: "Priya Sharma",
-    position: "Parent",
-    text: "My child's grades improved significantly after joining Tutilon. The teachers are patient and explain concepts very clearly.",
-    rating: 5,
-    avatar: "https://randomuser.me/api/portraits/women/65.jpg",
-  },
-];
+import Loading from "../../../components/common/Loading/Loading";
 
 function TestimonialPage() {
+  const [testimonials, setTestimonials] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const res = await axios.get("/api/testimonials/");
+        setTestimonials(res.data); // assuming res.data is an array
+      } catch (err) {
+        console.error("Failed to fetch testimonials:", err);
+        setError("Failed to load testimonials");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTestimonials();
+  }, []);
+
+  console.log(testimonials);
+  
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loading />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
+
   return (
     <div>
-        <PageHeader
+      <PageHeader
         title="Testimonials"
         headerBg="https://images.unsplash.com/photo-1417733403748-83bbc7c05140?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDR8fHJldmlld3xlbnwwfHwwfHx8MA%3D%3D"
       />

@@ -85,7 +85,7 @@ function AssignedTutorCard({
             {categories.map((subject, idx) => (
               <span
                 key={idx}
-                className="flex flex-col md:flex-row md:items-center gap-1 bg-green-100 text-green-700 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium"
+                className="flex flex-col md:flex-row md:items-center gap-1 bg-green-100 text-green-700 px-2 sm:px-3 py-1 rounded-md text-xs sm:text-sm font-medium"
               >
                 <BookOpen size={14} />
                 {subject}

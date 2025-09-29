@@ -134,14 +134,14 @@ function OtpModal({
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
 
       {/* modal */}
-      <div className="relative z-10 w-full max-w-md mx-auto bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all p-4 sm:p-6">
+      <div className="relative z-10 w-full max-w-md mx-auto bg-white rounded-md shadow-lg overflow-hidden transform transition-all p-4 sm:p-6">
         {/* header */}
         <div className="flex flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
           <div>
-            <h2 className="text-sm sm:text-xl font-semibold text-gray-800">
+            <h2 className="text-sm md:text-lg font-semibold text-gray-800">
               Enter verification code
             </h2>
-            <p className="mt-1 text-xs sm:text-base text-gray-500">
+            <p className="mt-1 text-xs md:text-md text-gray-500">
               We sent a 6-digit code to{" "}
               <span className="font-medium text-gray-700">{phoneOrEmail}</span>
             </p>
@@ -174,7 +174,7 @@ function OtpModal({
                 value={val}
                 onChange={(e) => handleChange(e, idx)}
                 onKeyDown={(e) => handleKeyDown(e, idx)}
-                className={`w-10 sm:w-12 md:w-14 h-10 sm:h-12 md:h-14 text-center text-base sm:text-lg md:text-xl font-medium rounded-xl border transition focus:scale-105 focus:outline-none ${
+                className={`w-10 sm:w-12 md:w-14 h-10 sm:h-12 md:h-14 text-center text-base sm:text-lg md:text-xl font-medium rounded-md border transition focus:scale-105 focus:outline-none ${
                   val
                     ? "border-green-400 bg-green-50"
                     : "border-gray-200 bg-white"
@@ -204,12 +204,12 @@ function OtpModal({
         </div>
 
         {/* actions */}
-        <div className="mt-6 flex flex-col sm:flex-row items-center gap-3">
+        <div className="mt-6 flex flex-row items-center gap-3">
           <button
             type="button"
             onClick={submitOtp}
             disabled={isSubmitting}
-            className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold shadow hover:brightness-95 disabled:opacity-60"
+            className="flex-1 text-xs md:text-md inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold shadow hover:brightness-95 disabled:opacity-60"
           >
             {isSubmitting ? "Verifying..." : "Verify"}
           </button>
@@ -220,14 +220,14 @@ function OtpModal({
               firstInputRef.current?.focus();
               setError("");
             }}
-            className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border text-sm text-gray-700 hover:bg-gray-50"
+            className="flex-1 text-xs md:text-md inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border text-gray-700 hover:bg-gray-50"
           >
             Clear
           </button>
         </div>
 
         {/* resend & cancel */}
-        <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-gray-600">
+        <div className="mt-4 flex flex-row items-center justify-between gap-2 text-xs text-gray-600">
           <div>
             Didn’t receive it?{" "}
             {canResend ? (

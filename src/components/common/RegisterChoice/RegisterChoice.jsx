@@ -62,13 +62,12 @@ function RegisterChoice({ onTutorClick, onStudentClick, onCreateAccount }) {
         <div className={`mt-16 text-center`}>
           <p className="text-gray-600 mb-4">
             Already have an account?{" "}
-            <a
-              href="#"
-              className="text-green-500 font-medium hover:underline"
+            <span
+              className="text-green-500 font-medium hover:underline cursor-pointer"
               onClick={onCreateAccount}
             >
               Sign In
-            </a>
+            </span>
           </p>
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-500">
             <span className="flex items-center">✅ 5000+ Expert Tutors</span>

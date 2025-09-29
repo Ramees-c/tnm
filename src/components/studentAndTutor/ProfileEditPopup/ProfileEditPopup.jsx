@@ -8,9 +8,10 @@ import axios from "axios";
 import { MEDIA_URL } from "../../../API/API";
 import { useAuth } from "../../../Context/userAuthContext";
 import OtpModal from "../../common/OtpModal/OtpModal";
+import Loading from "../../common/Loading/Loading";
 
 function ProfileEditPopup({ isOpen, onClose }) {
-  const { token, refreshUserDetails} = useAuth();
+  const { token, refreshUserDetails } = useAuth();
 
   const [formData, setFormData] = useState({
     profile_image: null,
@@ -42,6 +43,7 @@ function ProfileEditPopup({ isOpen, onClose }) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
+      setErrors("")
       fetchUserDetails();
     } else {
       document.body.style.overflow = "auto";
@@ -52,37 +54,35 @@ function ProfileEditPopup({ isOpen, onClose }) {
   }, [isOpen]);
 
   const fetchUserDetails = async () => {
-  try {
-    setLoading(true);
-    const res = await axios.get(`/api/profile/edit/`, {
-      headers: { Authorization: `Token ${token}` },
-    });
+    try {
+      setLoading(true);
+      const res = await axios.get(`/api/profile/edit/`, {
+        headers: { Authorization: `Token ${token}` },
+      });
 
-    const data = res.data;
+      const data = res.data;
 
-    setFormData({
-      ...data,
-      is_mail_verified: data.is_mail_verified,
-      email_verified_initial: data.is_mail_verified,
-    });
+      setFormData({
+        ...data,
+        is_mail_verified: data.is_mail_verified,
+        email_verified_initial: data.is_mail_verified,
+      });
 
-    setOriginalPhone(data.mobile_number || "");
-    setOriginalEmail(data.email || "");
+      setOriginalPhone(data.mobile_number || "");
+      setOriginalEmail(data.email || "");
 
-    // Determine image key immediately after fetching API
-    const key = data.role === "tutor" ? "profile_image" : "profile_photo";
-    setImageKey(key);
+      // Determine image key immediately after fetching API
+      const key = data.role === "tutor" ? "profile_image" : "profile_photo";
+      setImageKey(key);
 
-    // Set profile image immediately
-    setProfileImage(data[key] ? `${MEDIA_URL}${data[key]}` : null);
-
-  } catch (error) {
-    console.error("Failed to fetch user details ❌", error);
-  } finally {
-    setLoading(false);
-  }
-};
-
+      // Set profile image immediately
+      setProfileImage(data[key] ? `${MEDIA_URL}${data[key]}` : null);
+    } catch (error) {
+      console.error("Failed to fetch user details ❌", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // console.log(formData.profile_image);
 
@@ -119,52 +119,51 @@ function ProfileEditPopup({ isOpen, onClose }) {
   };
 
   const handleImageUpload = (e) => {
-  const file = e.target.files[0];
+    const file = e.target.files[0];
 
-  if (!file) {
-    setFormData((prev) => ({ ...prev, [imageKey]: null }));
-    setProfileImage(null);
-    return;
-  }
+    if (!file) {
+      setFormData((prev) => ({ ...prev, [imageKey]: null }));
+      setProfileImage(null);
+      return;
+    }
 
-  const maxSize = 5 * 1024 * 1024;
-  if (file.size > maxSize) {
-    setErrors((prev) => ({
-      ...prev,
-      [imageKey]: "File size should not exceed 5MB",
-    }));
-    setFormData((prev) => ({ ...prev, [imageKey]: null }));
-    setProfileImage(null);
-    e.target.value = "";
-    return;
-  }
-
-  const img = new Image();
-  img.src = URL.createObjectURL(file);
-
-  img.onload = () => {
-    if (img.width <= img.height) {
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
       setErrors((prev) => ({
         ...prev,
-        [imageKey]: "Image must be landscape (width > height)",
+        [imageKey]: "File size should not exceed 5MB",
       }));
       setFormData((prev) => ({ ...prev, [imageKey]: null }));
       setProfileImage(null);
       e.target.value = "";
-    } else {
-      setFormData((prev) => ({ ...prev, [imageKey]: file }));
-      setErrors((prev) => ({ ...prev, [imageKey]: "" }));
-      setProfileImage(img.src);
+      return;
     }
+
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+
+    img.onload = () => {
+      if (img.width <= img.height) {
+        setErrors((prev) => ({
+          ...prev,
+          [imageKey]: "Image must be landscape (width > height)",
+        }));
+        setFormData((prev) => ({ ...prev, [imageKey]: null }));
+        setProfileImage(null);
+        e.target.value = "";
+      } else {
+        setFormData((prev) => ({ ...prev, [imageKey]: file }));
+        setErrors((prev) => ({ ...prev, [imageKey]: "" }));
+        setProfileImage(img.src);
+      }
+    };
   };
-};
 
-const removeImage = () => {
-  setProfileImage(null);
-  setFormData((prev) => ({ ...prev, [imageKey]: "" }));
-  if (fileInputRef.current) fileInputRef.current.value = "";
-};
-
+  const removeImage = () => {
+    setProfileImage(null);
+    setFormData((prev) => ({ ...prev, [imageKey]: "" }));
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const togglePasswordVisibility = (field) => {
     setShowPasswords((prev) => ({
@@ -188,10 +187,15 @@ const removeImage = () => {
       setShowOtpPopup(true); // open OTP modal
     } catch (err) {
       console.error(
-        "Failed to request OTP ❌",
-        err.response?.data || err.message
+        err.response?.data?.non_field_errors?.[0] ||
+        "Failed to send OTP. Try again.",
       );
-      alert("Failed to send OTP. Try again.");
+       setErrors((prev) => ({
+      ...prev,
+      email:
+        err.response?.data?.non_field_errors?.[0] ||
+        "Failed to send OTP. Try again.",
+    }));
     }
   };
 
@@ -218,10 +222,17 @@ const removeImage = () => {
     } catch (err) {
       console.error(
         "Failed to request phone OTP ❌",
-        err.response?.data || err.message
+        err.response?.data.non_field_errors
       );
-      alert("Failed to send OTP. Try again.");
+        setErrors((prev) => ({
+      ...prev,
+      mobile_number:
+        err.response?.data?.non_field_errors?.[0] ||
+        "Failed to send OTP. Try again.",
+    }));
     }
+
+   
   };
 
   const handleOtpVerify = async (otp) => {
@@ -361,7 +372,7 @@ const removeImage = () => {
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+          className="absolute top-3 right-3 z-50 text-gray-500 hover:text-gray-700"
         >
           <X className="w-5 h-5" />
         </button>
@@ -371,8 +382,8 @@ const removeImage = () => {
         </h2>
 
         {loading ? (
-          <div className="lg:max-h-[90vh] 2xl:[100vh] bg-white">
-            <p className="text-center text-gray-500">Loading...</p>
+          <div className="flex items-center justify-center h-screen">
+            <Loading />
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -464,7 +475,7 @@ const removeImage = () => {
                       Verify
                     </button>
                     <p className="mt-1 text-xs text-red-600">
-                      Email is not verified
+                      {errors.email ? errors.email : "Email is not verified"}
                     </p>
                   </>
                 )}
@@ -520,13 +531,13 @@ const removeImage = () => {
                       </button>
                     )}
 
-                  {/* Error Message */}
-                  {formData.mobile_number &&
-                    formData.is_phone_verified === false && (
-                      <p className="mt-1 text-xs text-red-600">
-                        Phone number is not verified
-                      </p>
-                    )}
+                  {(errors.mobile_number ||
+  (formData.mobile_number && formData.is_phone_verified === false)) && (
+  <p className="mt-1 text-xs text-red-600">
+    {errors.mobile_number ||
+      "Phone number is not verified"}
+  </p>
+)}
                 </div>
               </div>
             </div>

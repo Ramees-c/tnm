@@ -2,7 +2,16 @@ import React, { useEffect, useRef, useState } from "react";
 import { CheckCircle2, ChevronDown, ChevronUp } from "lucide-react";
 import DefaultButton from "../../common/DefaultButton/DefaultButton";
 
-function SubscriptionCard({ title, price, features, onSelect, duration }) {
+function SubscriptionCard({
+  title,
+  price,
+  features,
+  onSelect,
+  duration,
+  disabled,
+  isChosen,
+  userCurrentPrice,
+}) {
   const listRef = useRef(null);
   const [atBottom, setAtBottom] = useState(false);
   const [isScrollable, setIsScrollable] = useState(false);
@@ -38,8 +47,38 @@ function SubscriptionCard({ title, price, features, onSelect, duration }) {
     }
   };
 
+  // Button logic combining isChosen and price comparison
+  let buttonText = "Choose Plan";
+  let isButtonDisabled = disabled;
+
+  const planPrice = Number(price);
+  const currentPrice = Number(userCurrentPrice);
+
+  if (isChosen) {
+    buttonText = "Choosed";
+    isButtonDisabled = true;
+  } else if (!isNaN(currentPrice)) {
+    if (currentPrice === 0) {
+      buttonText = "Choose Plan";
+      isButtonDisabled = false;
+    } else if (planPrice === currentPrice) {
+      buttonText = "Choosed";
+      isButtonDisabled = true;
+    } else if (planPrice > currentPrice) {
+      buttonText = "Update Plan";
+      isButtonDisabled = false;
+    } else if (planPrice < currentPrice) {
+      buttonText = "Choose Plan";
+      isButtonDisabled = true; // can’t downgrade
+    }
+  }
+
   return (
-    <div className="flex flex-col rounded-md shadow-lg p-6 border relative">
+    <div
+      className={`flex flex-col rounded-md shadow-lg p-6 border-2 ${
+        isChosen && "border-green-600"
+      } relative`}
+    >
       {/* Title */}
       <h3 className="text-xl font-bold text-gray-800 mb-2">{title}</h3>
 
@@ -65,7 +104,7 @@ function SubscriptionCard({ title, price, features, onSelect, duration }) {
           ))}
         </ul>
 
-        {/* Single Scroll Button */}
+        {/* Scroll Button */}
         {isScrollable && (
           <button
             onClick={atBottom ? handleScrollUp : handleScrollDown}
@@ -80,11 +119,16 @@ function SubscriptionCard({ title, price, features, onSelect, duration }) {
         )}
 
         {/* Choose Plan Button */}
-        <DefaultButton
-          buttonText="Choose Plan"
+        <button
+          type="button"
           onClick={onSelect}
-          buttonFullwidth={true}
-        />
+          disabled={isButtonDisabled}
+          className={`px-4 py-2 rounded-md bg-green-600 text-white hover:bg-green-700 transition ${
+            isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+        >
+          {buttonText}
+        </button>
       </div>
     </div>
   );

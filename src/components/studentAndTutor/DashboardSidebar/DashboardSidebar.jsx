@@ -100,7 +100,7 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
       <div
         className={`fixed top-0 bottom-0 ${
           isMobile ? "left-0" : "left-2 top-2 bottom-2"
-        } lg:w-64 xl:w-72 bg-gradient-to-b from-green-600 to-green-800 text-white shadow-xl rounded-none lg:rounded-md
+        } w-72 lg:w-64 xl:w-72 bg-gradient-to-b from-green-600 to-green-800 text-white shadow-xl rounded-none lg:rounded-md
   transform transition-transform duration-300 z-50
   ${isMobile ? (open ? "translate-x-0" : "-translate-x-full") : "translate-x-0"}
   flex flex-col
@@ -162,20 +162,31 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
           <nav className="px-4 py-6 space-y-2">
             {links.map(({ to, label, icon },i) => {
               const isActive = location.pathname === to;
+              const isNotification = label === "Notifications"; 
+    const notificationCount = userDetails?.notification_count || 0; 
               return (
                 <Link
-                  key={i}
-                  to={to}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all text-xs lg:text-sm xl:text-md ${
-                    isActive
-                      ? "bg-white text-green-700 font-semibold shadow-md"
-                      : "hover:bg-white/20"
-                  }`}
-                  onClick={() => isMobile && setOpen(false)}
-                >
-                  {icon}
-                  <span>{label}</span>
-                </Link>
+        key={i}
+        to={to}
+        className={`flex items-center justify-between gap-3 px-4 py-3 rounded-md transition-all text-xs lg:text-sm xl:text-md ${
+          isActive
+            ? "bg-white text-green-700 font-semibold shadow-md"
+            : "hover:bg-white/20"
+        }`}
+        onClick={() => isMobile && setOpen(false)}
+      >
+        <div className="flex items-center gap-3">
+          {icon}
+          <span>{label}</span>
+        </div>
+
+        {/* 🔔 Notification Badge */}
+        {isNotification && notificationCount > 0 && (
+          <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+            {notificationCount}
+          </span>
+        )}
+      </Link>
               );
             })}
           </nav>

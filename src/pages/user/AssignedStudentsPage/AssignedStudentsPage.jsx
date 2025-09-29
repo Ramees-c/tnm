@@ -1,13 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import DashboardSidebar from "../../../components/studentAndTutor/DashboardSidebar/DashboardSidebar";
 import AssignedStudentCard from "../../../components/studentAndTutor/AssignedStudentCard/AssignedStudentCard";
 import { useAuth } from "../../../Context/userAuthContext";
+import ToastMessage from "../../../components/studentAndTutor/ToastMessage/ToastMessage";
 
 function AssignedStudentsPage() {
-  const { userDetails } = useAuth();
+  const { userDetails, isMailVerified } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [assignedStudents] = useState(userDetails?.assigned_students || []);
+  const [toastOpen, setToastOpen] = useState(false);
+
+  useEffect(() => {
+    if (isMailVerified) {
+      setToastOpen(true);
+    }
+  }, [isMailVerified]);
 
   return (
     <div className="flex min-h-screen">
@@ -61,6 +69,15 @@ function AssignedStudentsPage() {
             </div>
           )}
         </div>
+
+        {toastOpen && (
+          <ToastMessage
+            message={isMailVerified}
+            isOpen={toastOpen}
+            onClose={() => setToastOpen(false)}
+            type="warning"
+          />
+        )}
       </main>
     </div>
   );
