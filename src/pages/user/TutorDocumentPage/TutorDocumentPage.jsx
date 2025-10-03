@@ -44,11 +44,13 @@ function TutorDocumentPage({ role = "tutor" }) {
     });
   });
 
-   useEffect(() => {
-    if (isMailVerified) {
+  useEffect(() => {
+    if (userDetails?.mail_verified === false) {
       setToastOpen(true);
+    } else {
+      setToastOpen(false);
     }
-  }, [isMailVerified]);
+  }, [userDetails]);
 
   // 🔹 File select validation
   const handleFileSelect = (file) => {
@@ -67,44 +69,46 @@ function TutorDocumentPage({ role = "tutor" }) {
   };
 
   // 🔹 Upload file to API
- const handleUpload = async () => {
-  if (!selectedFile) {
-    setUploadError("❌ Please select a file first.");
-    return;
-  }
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      setUploadError("❌ Please select a file first.");
+      return;
+    }
 
-  const formData = new FormData();
-  formData.append("files", selectedFile);
+    const formData = new FormData();
+    formData.append("files", selectedFile);
 
-  try {
-    const res = await axios.post("/api/tutor/documents/upload/", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Token ${token}`,
-      },
-    });
+    try {
+      const res = await axios.post("/api/tutor/documents/upload/", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Token ${token}`,
+        },
+      });
 
-    console.log("Upload response:", res.data);
+      console.log("Upload response:", res.data);
 
-   const uploaded = res.data?.uploaded?.[0];
-if (uploaded) {
-  const newDoc = {
-    id: uploaded.id,
-    name: uploaded.file.split("/").pop(),
-    url: uploaded.file,
+      const uploaded = res.data?.uploaded?.[0];
+      if (uploaded) {
+        const newDoc = {
+          id: uploaded.id,
+          name: uploaded.file.split("/").pop(),
+          url: uploaded.file,
+        };
+        setUploadedDocuments((prev) => [...prev, newDoc]);
+        setShowUploadPopup(true);
+        setSelectedFile(null);
+        setUploadError("");
+      } else if (res.data?.skipped?.length > 0) {
+        setUploadError(
+          `File name already exists. Please rename and try again.`
+        );
+      }
+    } catch (error) {
+      console.error("Upload failed:", error);
+      setUploadError(error.message || "❌ Upload failed. Please try again.");
+    }
   };
-  setUploadedDocuments((prev) => [...prev, newDoc]);
-  setShowUploadPopup(true);
-  setSelectedFile(null);
-    setUploadError("");
-} else if (res.data?.skipped?.length > 0) {
-  setUploadError(`File name already exists. Please rename and try again.`);
-}
-  } catch (error) {
-    console.error("Upload failed:", error);
-    setUploadError(error.message || "❌ Upload failed. Please try again.");
-  }
-};
 
   // 🔹 View file
   const handleView = (file) => {
@@ -178,7 +182,7 @@ if (uploaded) {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen">
       {/* Sidebar */}
       <div className="w-0 lg:w-64 xl:w-72">
         <DashboardSidebar
@@ -203,9 +207,9 @@ if (uploaded) {
           <div className="flex items-center gap-3 mb-6">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-lg shadow bg-white hover:bg-gray-100 transition"
+              className="lg:hidden"
             >
-              <Menu size={24} />
+              <Menu size={27} />
             </button>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
               Tutor Documents
@@ -281,14 +285,14 @@ if (uploaded) {
             )}
           </div>
         </div>
-         {toastOpen && (
-        <ToastMessage
-          message={isMailVerified}
-          isOpen={toastOpen}
-          onClose={() => setToastOpen(false)}
-          type="warning"  
-        />
-      )}
+        {toastOpen && (
+          <ToastMessage
+            message={isMailVerified}
+            isOpen={toastOpen}
+            onClose={() => setToastOpen(false)}
+            type="warning"
+          />
+        )}
       </main>
 
       {/* Popups */}

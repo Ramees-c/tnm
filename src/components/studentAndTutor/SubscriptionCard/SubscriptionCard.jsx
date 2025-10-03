@@ -55,11 +55,11 @@ function SubscriptionCard({
   const currentPrice = Number(userCurrentPrice);
 
   if (isChosen) {
-    buttonText = "Choosed";
+    buttonText = "Subscribed";
     isButtonDisabled = true;
   } else if (!isNaN(currentPrice)) {
     if (currentPrice === 0) {
-      buttonText = "Choose Plan";
+      buttonText = "Subscribe";
       isButtonDisabled = false;
     } else if (planPrice === currentPrice) {
       buttonText = "Choosed";
@@ -68,7 +68,7 @@ function SubscriptionCard({
       buttonText = "Update Plan";
       isButtonDisabled = false;
     } else if (planPrice < currentPrice) {
-      buttonText = "Choose Plan";
+      buttonText = "Subscribe";
       isButtonDisabled = true; // can’t downgrade
     }
   }

@@ -1,11 +1,22 @@
-import { useState } from "react";
-import { Bell, Menu, Search, Star, History, Users, Send } from "lucide-react";
+import { useEffect, useState } from "react";
+import {
+  Bell,
+  Menu,
+  Search,
+  Star,
+  History,
+  Users,
+  Send,
+  X,
+} from "lucide-react";
 
 import FormInput from "../../../components/studentAndTutor/FormInput/FormInput";
 import DashboardSidebar from "../../../components/studentAndTutor/DashboardSidebar/DashboardSidebar";
 import DefaultButton from "../../../components/common/DefaultButton/DefaultButton";
 import TutorSmallCard from "../../../components/studentAndTutor/TutorSmallCard/TutorSmallCard";
 import { useAuth } from "../../../Context/userAuthContext";
+import axios from "axios";
+import ToastMessage from "../../../components/studentAndTutor/ToastMessage/ToastMessage";
 
 const tutors = [
   {
@@ -154,11 +165,206 @@ const tutors = [
 ];
 
 function StudentDashboardPage() {
-  const { userDetails } = useAuth();
+  const { userDetails, token, refreshUserDetails, isMailVerified } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [recommentedTutors, setRecommentedTutors] = useState([]);
+  const [toastOpen, setToastOpen] = useState(false);
 
-  console.log(userDetails, "userDetails in student dashboard");
-  
+  const [searchQuery, setSearchQuery] = useState("");
+  const [tutors, setTutors] = useState([]);
+  const [filteredTutors, setFilteredTutors] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+
+  const recommendedTutorsList = [
+    {
+      id: 1,
+      full_name: "Ananya Sharma",
+      email: "ananya.sharma@example.com",
+      mobile_number: "+91 9876543210",
+      gender: "Female",
+      city: "Bengaluru",
+      state: "Karnataka",
+      qualification: "M.Sc. Mathematics",
+      categories: ["Mathematics", "Physics"],
+      profile_image: "https://randomuser.me/api/portraits/women/44.jpg",
+      is_approved: true,
+      mail_verified: true,
+    },
+    {
+      id: 2,
+      full_name: "Rahul Verma",
+      email: "rahul.verma@example.com",
+      mobile_number: "+91 9123456789",
+      gender: "Male",
+      city: "Mumbai",
+      state: "Maharashtra",
+      qualification: "B.Tech Computer Science",
+      categories: ["Programming", "Data Structures", "Web Development"],
+      profile_image: "https://randomuser.me/api/portraits/men/32.jpg",
+      is_approved: true,
+      mail_verified: false,
+    },
+    {
+      id: 3,
+      full_name: "Priya Nair",
+      email: "priya.nair@example.com",
+      mobile_number: "+91 9988776655",
+      gender: "Female",
+      city: "Kochi",
+      state: "Kerala",
+      qualification: "Ph.D. English Literature",
+      categories: ["English", "Creative Writing"],
+      profile_image: "https://randomuser.me/api/portraits/women/68.jpg",
+      is_approved: false,
+      mail_verified: true,
+    },
+  ];
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const res = await axios.get("/api/notify/", {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        });
+
+        // take only latest 5
+        setNotifications(res.data.slice(0, 5));
+      } catch (err) {
+        console.error("Failed to load notifications", err);
+      }
+    };
+
+    fetchNotifications();
+  }, [token]);
+
+  useEffect(() => {
+    if (userDetails?.mail_verified === false) {
+      setToastOpen(true);
+    } else {
+      setToastOpen(false);
+    }
+  }, [userDetails]);
+
+  // useEffect(() => {
+  //   const fetchRecommentedStudents = async () => {
+  //     try {
+  //       const res = await axios.get("/api/recommendations/", {
+  //         headers: {
+  //           Authorization: `Token ${token}`,
+  //         },
+  //       });
+
+  //       console.log(res.data.recommendations, "sfjkd");
+  //       setRecommentedTutors(res.data.recommendations, "sfjkd")
+  //     } catch (err) {
+  //       console.error("Failed to load recommented tutors", err);
+  //     }
+  //   };
+
+  //   fetchRecommentedStudents();
+  // }, [token]);
+
+  // ✅ Fetch all approved tutors on mount
+  // Filter tutors based on multiple fields
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredTutors([]);
+      setHasSearched(false); // no query typed
+      return;
+    }
+
+    const fetchTutors = async () => {
+      setLoading(true);
+      setHasSearched(true);
+
+      try {
+        const res = await axios.get(
+          `/api/tutors/search/?q=${searchQuery.trim()}`,
+          {
+            headers: {
+              Authorization: `Token ${token}`,
+            },
+          }
+        );
+        setFilteredTutors(res.data);
+      } catch (err) {
+        console.error("Search failed", err);
+        setFilteredTutors([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Optional: debounce typing (300ms delay)
+    const debounce = setTimeout(fetchTutors, 300);
+    return () => clearTimeout(debounce);
+  }, [searchQuery, token]);
+
+  // 🔹 Filter tutors based on multiple fields
+  const handleSearch = async (e) => {
+    e.preventDefault();
+
+    const query = searchQuery.trim();
+    if (!query) {
+      setFilteredTutors([]); // do not show all tutors
+      setHasSearched(true); // still show "Search result"
+      return;
+    }
+
+    setLoading(true);
+    setHasSearched(true);
+
+    try {
+      const res = await axios.get(`/api/tutors/search/?q=${query}`, {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      });
+      setFilteredTutors(res.data);
+    } catch (err) {
+      console.error("Search failed", err);
+      setFilteredTutors([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  function timeAgo(dateString) {
+    const [day, month, yearAndTime] = dateString.split("-");
+    const [year, time, ampm] = yearAndTime.split(" ");
+    const dateObj = new Date(`${year}-${month}-${day} ${time} ${ampm}`);
+
+    const diff = Date.now() - dateObj.getTime();
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (days > 0) return `${days} day${days > 1 ? "s" : ""} ago`;
+    if (hours > 0) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    if (minutes > 0) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    return "Just now";
+  }
+
+  // Delete notification API
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`/api/notify-delete/${id}/`, {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      });
+      // Update UI immediately
+      setNotifications((prev) => prev.filter((note) => note.id !== id));
+      await refreshUserDetails();
+    } catch (err) {
+      console.error("Failed to delete notification", err);
+    }
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -178,7 +384,7 @@ function StudentDashboardPage() {
           {/* ✅ Mobile Menu Button + Title */}
           <div className="flex items-center gap-3 mb-6">
             <button onClick={() => setSidebarOpen(true)} className="lg:hidden">
-              <Menu size={24} />
+              <Menu size={27} />
             </button>
 
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
@@ -189,11 +395,15 @@ function StudentDashboardPage() {
           {/* Quick Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div className="p-4 bg-green-100 rounded-md shadow text-center">
-              <p className="text-lg font-semibold text-green-700">{userDetails?.assigned_tutors?.length || 0}</p>
+              <p className="text-lg font-semibold text-green-700">
+                {userDetails?.tutors?.length || 0}
+              </p>
               <p className="text-sm text-gray-600">Assigned Tutors</p>
             </div>
             <div className="p-4 bg-purple-100 rounded-md shadow text-center">
-              <p className="text-lg font-semibold text-purple-700">{userDetails?.categories?.length || 0}</p>
+              <p className="text-lg font-semibold text-purple-700">
+                {userDetails?.categories?.length || 0}
+              </p>
               <p className="text-sm text-gray-600">Selected Subjects</p>
             </div>
             <div className="p-4 bg-blue-100 rounded-md shadow text-center">
@@ -204,33 +414,31 @@ function StudentDashboardPage() {
               <p className="text-lg font-semibold text-yellow-700">4</p>
               <p className="text-sm text-gray-600">Favourite Tutors</p>
             </div>
-            
           </div>
 
           {/* ✅ Selected Subjects Section */}
-<div className="bg-white rounded-md shadow p-4 sm:p-6 mb-6">
-  <h2 className="text-lg sm:text-xl font-semibold mb-3">
-    Selected Subjects
-  </h2>
+          <div className="bg-white rounded-md shadow p-4 sm:p-6 mb-6">
+            <h2 className="text-lg sm:text-xl font-semibold mb-3">
+              Selected Subjects
+            </h2>
 
-  {userDetails?.categories?.length > 0 ? (
-    <div className="flex flex-wrap gap-3 rounded-md p-3 bg-gray-50">
-      {userDetails.categories.map((category, idx) => (
-        <span
-          key={idx}
-          className="flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1 rounded-md text-sm md:text-md font-medium shadow-sm"
-        >
-          {category}
-        </span>
-      ))}
-    </div>
-  ) : (
-    <p className="text-gray-500 text-sm italic">
-      No subjects selected yet.
-    </p>
-  )}
-</div>
-
+            {userDetails?.categories?.length > 0 ? (
+              <div className="flex flex-wrap gap-3 rounded-md p-3 bg-gray-50">
+                {userDetails.categories.map((category, idx) => (
+                  <span
+                    key={idx}
+                    className="flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1 rounded-md text-sm md:text-md font-medium shadow-sm"
+                  >
+                    {category}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-sm italic">
+                No subjects selected yet.
+              </p>
+            )}
+          </div>
 
           <div className="bg-white rounded-md shadow p-6 mb-6">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">
@@ -238,17 +446,38 @@ function StudentDashboardPage() {
             </h2>
 
             {/* Search & Filter */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              {/* Search Input */}
+            <form
+              className="flex flex-col sm:flex-row gap-4"
+              onSubmit={handleSearch}
+            >
               <div className="flex-1">
                 <FormInput
                   name="search"
-                  placeholder="Search tutors by name, subject, or city..."
+                  placeholder="Search tutors by name, subjects, city, state or pincode..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)} // 🔹 dynamic update
                 />
               </div>
+              <DefaultButton buttonText="Search" type="submit" />
+            </form>
 
-              {/* Search Button */}
-              <DefaultButton buttonText="Search" />
+            {/* Tutors Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
+              {loading ? (
+                <p className="col-span-full text-center">Loading...</p>
+              ) : !hasSearched ? (
+                <p className="col-span-full text-center text-gray-500">
+                  Search result
+                </p>
+              ) : filteredTutors.length > 0 ? (
+                filteredTutors.map((tutor) => (
+                  <TutorSmallCard key={tutor.id} tutor={tutor} />
+                ))
+              ) : (
+                <p className="col-span-full text-gray-500 text-center">
+                  No tutors found.
+                </p>
+              )}
             </div>
           </div>
 
@@ -258,20 +487,13 @@ function StudentDashboardPage() {
             </h2>
 
             <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide">
-              {tutors.map((tutor) => (
-                <TutorSmallCard
-                  key={tutor.id}
-                  image={tutor.image}
-                  name={tutor.name}
-                  subject={tutor.subject}
-                  experience={tutor.experience}
-                />
+              {recommendedTutorsList.map((tutor) => (
+                <TutorSmallCard tutor={tutor} />
               ))}
             </div>
           </div>
 
-
-          <div className="bg-white rounded-md shadow p-6 mb-6">
+          {/* <div className="bg-white rounded-md shadow p-6 mb-6">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">
               Popular Tutors
             </h2>
@@ -287,31 +509,58 @@ function StudentDashboardPage() {
                 />
               ))}
             </div>
-          </div>
+          </div> */}
 
-          {/* Notifications */}
-          <div className="bg-white rounded-md shadow p-6">
+          {/* Notifications Preview */}
+          <div className="bg-white rounded-md shadow p-4 sm:p-6">
             <h2 className="text-lg sm:text-xl font-semibold mb-4 flex items-center gap-2">
-              <Bell size={20} /> Notifications
+              Notifications
             </h2>
-            <ul className="space-y-3">
-              <li className="p-3 bg-gray-50 rounded-lg shadow-sm">
-                <Bell size={18} className="text-green-600" /> New tutor available:{" "}
-                <span className="font-medium">Mr. Sharma</span>
-              </li>
-              <li className="p-3 bg-gray-50 rounded-lg shadow-sm">
-                ✅ Your enquiry was sent successfully.
-              </li>
-              <li className="p-3 bg-gray-50 rounded-lg shadow-sm">
-                ⭐ You added <span className="font-medium">Ms. Priya</span> to
-                favourites.
-              </li>
-              <li className="p-3 bg-gray-50 rounded-lg shadow-sm">
-                📅 Demo class scheduled for tomorrow at 6 PM.
-              </li>
-            </ul>
+            {notifications.length === 0 ? (
+              <div className="text-center py-6 text-gray-500">
+                No notifications found.
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {notifications.map((note) => (
+                  <div
+                    key={note.id}
+                    className="p-3 bg-green-100 rounded-md shadow-sm flex items-center gap-3"
+                  >
+                    <Bell size={18} className="text-green-600" />
+
+                    {/* Message + Time */}
+                    <div className="flex-1">
+                      <p className="text-gray-800 text-xs md:text-sm">
+                        {note.message}
+                      </p>
+                      <span className="text-xs text-gray-500">
+                        {timeAgo(note.created_at)}
+                      </span>
+                    </div>
+
+                    {/* Close Button */}
+                    <button
+                      onClick={() => handleDelete(note.id)}
+                      className="p-1 rounded-full hover:bg-red-200 transition"
+                    >
+                      <X size={18} className="text-red-600" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
+
+        {toastOpen && (
+          <ToastMessage
+            message={isMailVerified}
+            isOpen={toastOpen}
+            onClose={() => setToastOpen(false)}
+            type="warning"
+          />
+        )}
       </main>
     </div>
   );

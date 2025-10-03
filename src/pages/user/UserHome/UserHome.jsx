@@ -406,15 +406,17 @@ function UserHome() {
     return () => clearTimeout(timer);
   }, []);
 
+
+
   useEffect(() => {
     const fetchTutors = async () => {
       try {
         const res = await axios.get("/api/tutors_list/");
         console.log(res.data, "tutors");
 
-        // ✅ Only keep approved tutors
+        // ✅ Only keep approved tutors and addd to home true
         const approvedTutors = res.data.filter(
-          (tutor) => tutor.is_approved === true
+          (tutor) => tutor.is_approved === true && tutor.add_to_home === true
         );
 
         setTutors(approvedTutors);
@@ -597,7 +599,7 @@ function UserHome() {
               <div className="space-y-8">
                 {/* Heading */}
                 <div className="space-y-6">
-                  <div className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-xs md:text-sm font-semibold uppercase tracking-wide border border-white/30">
+                  <div className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-md text-xs md:text-sm font-semibold uppercase tracking-wide border border-white/30">
                     <span className="w-2 h-2 bg-white rounded-full mr-2"></span>
                     Our Advantages
                   </div>
@@ -638,7 +640,7 @@ function UserHome() {
                 <div className="relative">
                   {/* Main Image Container */}
                   <div className="relative w-full max-w-md lg:max-w-lg">
-                    <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+                    <div className="relative rounded-md overflow-hidden shadow-2xl">
                       {/* Image */}
                       <img
                         src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
@@ -667,7 +669,7 @@ function UserHome() {
               {features.map((feature, index) => (
                 <div
                   key={index}
-                  className="group relative p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 hover:border-white/40 transition-all duration-500 hover:scale-105 hover:shadow-2xl"
+                  className="group relative p-6 rounded-md bg-white/10 backdrop-blur-sm border border-white/20 hover:border-white/40 transition-all duration-500 hover:scale-105 hover:shadow-2xl"
                 >
                   {/* Icon Container */}
                   <div className="mb-4 p-3 bg-gradient-to-br from-white/20 to-white/10 rounded-xl w-fit group-hover:scale-110 transition-transform duration-300">

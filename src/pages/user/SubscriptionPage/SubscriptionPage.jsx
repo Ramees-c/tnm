@@ -54,12 +54,13 @@ function SubscriptionPage() {
     }
   }, [userDetails, planDetails]);
 
-
   useEffect(() => {
-    if (isMailVerified) {
+    if (userDetails?.mail_verified === false) {
       setToastOpen(true);
+    } else {
+      setToastOpen(false);
     }
-  }, [isMailVerified]);
+  }, [userDetails]);
 
   const handleSelect = async (plan) => {
     if (userDetails?.mail_verified === false) {
@@ -221,16 +222,16 @@ Expiry: ${verifyData.expiry_date.split(" ")[0]}`
           <div className="flex items-center gap-3 mb-3">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-lg shadow bg-white hover:bg-gray-100 transition"
+              className="lg:hidden"
             >
-              <Menu size={24} />
+              <Menu size={27} />
             </button>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
               Choose Your Subscription
-            </h1>
+            </h1> 
           </div>
 
-          <p className="mb-8 text-gray-600">
+          <p className="mb-8 text-sm md:text-base text-gray-600">
             Select the plan that best fits your teaching journey.
           </p>
 
@@ -261,13 +262,13 @@ Expiry: ${verifyData.expiry_date.split(" ")[0]}`
         />
 
         {toastOpen && (
-        <ToastMessage
-          message={isMailVerified}
-          isOpen={toastOpen}
-          onClose={() => setToastOpen(false)}
-          type="warning"  
-        />
-      )}
+          <ToastMessage
+            message={isMailVerified}
+            isOpen={toastOpen}
+            onClose={() => setToastOpen(false)}
+            type="warning"
+          />
+        )}
       </main>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Bell, Menu } from "lucide-react";
+import { Bell, Menu, X } from "lucide-react";
 import DashboardSidebar from "../../../components/studentAndTutor/DashboardSidebar/DashboardSidebar";
 import axios from "axios";
 import { useAuth } from "../../../Context/userAuthContext";
@@ -12,7 +12,7 @@ function NotificationPage({ role = "tutor" }) {
   const [error, setError] = useState("");
   const [toastOpen, setToastOpen] = useState(false);
 
-  const { token, isMailVerified } = useAuth();
+  const { token, isMailVerified, refreshUserDetails, userDetails } = useAuth();
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -26,7 +26,6 @@ function NotificationPage({ role = "tutor" }) {
       } catch (err) {
         console.error("Failed to load notifications", err);
         setError("Unable to fetch notifications.");
-      } finally {
       }
     };
 
@@ -34,10 +33,28 @@ function NotificationPage({ role = "tutor" }) {
   }, [token]);
 
   useEffect(() => {
-    if (isMailVerified) {
+    if (userDetails?.mail_verified === false) {
       setToastOpen(true);
+    } else {
+      setToastOpen(false);
     }
-  }, [isMailVerified]);
+  }, [userDetails]);
+
+  // Delete notification API
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`/api/notify-delete/${id}/`, {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      });
+      // Update UI immediately
+      setNotifications((prev) => prev.filter((note) => note.id !== id));
+      await refreshUserDetails();
+    } catch (err) {
+      console.error("Failed to delete notification", err);
+    }
+  };
 
   function timeAgo(dateString) {
     const [day, month, yearAndTime] = dateString.split("-");
@@ -57,7 +74,7 @@ function NotificationPage({ role = "tutor" }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen">
       {/* Sidebar */}
       <div className="w-0 lg:w-64 xl:w-72">
         <DashboardSidebar
@@ -82,9 +99,9 @@ function NotificationPage({ role = "tutor" }) {
           <div className="flex items-center gap-3 mb-6">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-lg shadow bg-white hover:bg-gray-100 transition"
+              className="lg:hidden"
             >
-              <Menu size={24} />
+              <Menu size={27} />
             </button>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 flex items-center gap-2">
               Notifications
@@ -92,25 +109,43 @@ function NotificationPage({ role = "tutor" }) {
           </div>
 
           {/* Content */}
-
           <div className="space-y-4">
-            {notifications.map((note) => (
-              <div
-                key={note.id}
-                className="p-3 bg-green-100 rounded-md shadow-sm flex items-center gap-3"
-              >
-                <Bell size={18} className="text-green-600" />
-
-                {/* Message + Time */}
-                <div className="flex-1">
-                  <p className="text-gray-800">{note.message}</p>
-                  <span className="text-xs text-gray-500">
-                    {" "}
-                    {timeAgo(note.created_at)}
-                  </span>
-                </div>
+            {notifications.length === 0 ? (
+              <div className="text-center py-10 text-gray-500 flex flex-col items-center gap-2">
+                <Bell size={32} className="text-gray-400" />
+                <p className="text-sm sm:text-base">
+                  No notifications available
+                </p>
               </div>
-            ))}
+            ) : (
+              notifications.map((note) => (
+                <div
+                  key={note.id}
+                  className="p-3 bg-green-100 rounded-md shadow-sm flex items-center gap-3 justify-between"
+                >
+                  {/* Left Side */}
+                  <div className="flex items-center gap-3 flex-1">
+                    <Bell size={18} className="text-green-600" />
+                    <div>
+                      <p className="text-gray-800 text-sm md:text-md">
+                        {note.message}
+                      </p>
+                      <span className="text-xs text-gray-500">
+                        {timeAgo(note.created_at)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Close Button */}
+                  <button
+                    onClick={() => handleDelete(note.id)}
+                    className="p-1 rounded-full hover:bg-red-200 transition"
+                  >
+                    <X size={18} className="text-red-600" />
+                  </button>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </main>

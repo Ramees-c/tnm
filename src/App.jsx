@@ -25,6 +25,7 @@ import TutorDocumentPage from "./pages/user/TutorDocumentPage/TutorDocumentPage"
 import TutorEditPage from "./pages/user/TutorEditPage/TutorEditPage";
 import ProtectedRoute from "./components/common/ProtectedRoute/ProtectedRoute";
 import AssignedTutorsPage from "./pages/user/AssignedTutorsPage/AssignedTutorsPage";
+import StudentDashboardAllTutorsPage from "./pages/user/StudentDashboardAllTutorsPage/StudentDashboardAllTutorsPage";
 
 function App() {
   const location = useLocation();
@@ -45,9 +46,11 @@ function App() {
     "/tutorSubscription",
     "/assignedStudentsPage",
     "/tutornotification",
+    "/studentnotificaton",
     "/tutorDocument",
     "/tutorEditProfile",
-    "/assignedTutorsPage"
+    "/assignedTutorsPage",
+    "/studentDashbordAllTutors",
   ];
 
   // ✅ also hides for nested routes (e.g., /tutorDashboard/settings)
@@ -101,7 +104,7 @@ function App() {
         <Route
           path="/assignedStudentsPage"
           element={
-            <ProtectedRoute allowedRole="tutor">
+            <ProtectedRoute allowedRole="tutor" requirePayment={true}>
               <AssignedStudentsPage />
             </ProtectedRoute>
           }
@@ -111,6 +114,15 @@ function App() {
           element={
             <ProtectedRoute allowedRole="tutor">
               <NotificationPage role="tutor" />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/studentnotificaton"
+          element={
+            <ProtectedRoute allowedRole="student">
+              <NotificationPage role="student" />
             </ProtectedRoute>
           }
         />
@@ -131,13 +143,21 @@ function App() {
           }
         />
 
-         <Route
+        <Route
           path="/assignedTutorsPage"
           element={
             <ProtectedRoute allowedRole="student">
               <AssignedTutorsPage />
             </ProtectedRoute>
-        
+          }
+        />
+
+        <Route
+          path="/studentDashbordAllTutors"
+          element={
+            <ProtectedRoute allowedRole="student">
+              <StudentDashboardAllTutorsPage />
+            </ProtectedRoute>
           }
         />
       </Routes>

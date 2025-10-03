@@ -375,14 +375,14 @@ function TutorRegisterForm() {
 
   // ✅ Highlight typed text
   // ✅ Highlight typed text inside suggestion
-  const highlightMatch = (text, query) => {
-    if (!query) return text;
-    const regex = new RegExp(`(${query})`, "gi");
-    return text.replace(
-      regex,
-      (match) => `<span class="text-green-400 font-bold">${match}</span>` // highlight color
-    );
-  };
+    const highlightMatch = (text, query) => {
+      if (!query) return text;
+      const regex = new RegExp(`(${query})`, "gi");
+      return text.replace(
+        regex,
+        (match) => `<span class="text-green-400 font-bold">${match}</span>` // highlight color
+      );
+    };
 
   const handleSubmit = async (e) => {
     e.preventDefault();

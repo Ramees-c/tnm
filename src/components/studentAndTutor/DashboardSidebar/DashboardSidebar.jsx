@@ -42,10 +42,26 @@ const tutorLinks = [
 ];
 
 const studentLinks = [
-  { to: "/studentDashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
-  { to: "/assignedTutorsPage", label: "Assigned Tutors", icon: <Users size={20} /> },
-  { to: "", label: "Tutors", icon: <Users size={20} /> },
-  { to: "", label: "Notifications", icon: <MessageSquare size={20} /> },
+  {
+    to: "/studentDashboard",
+    label: "Dashboard",
+    icon: <LayoutDashboard size={20} />,
+  },
+  {
+    to: "/assignedTutorsPage",
+    label: "Assigned Tutors",
+    icon: <Users size={20} />,
+  },
+  {
+    to: "/studentDashbordAllTutors",
+    label: "Tutors",
+    icon: <Users size={20} />,
+  },
+  {
+    to: "/studentnotificaton",
+    label: "Notifications",
+    icon: <MessageSquare size={20} />,
+  },
 ];
 
 function DashboardSidebar({ role = "student", open, setOpen }) {
@@ -136,7 +152,7 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
                     : `${MEDIA_URL}${userDetails?.profile_image}`
                 }
                 alt="Profile"
-                className="w-16 h-16 lg:w-24 lg:h-24 rounded-full border-4 border-white shadow-md object-cover"
+                className="w-24 h-24 lg:w-24 lg:h-24 rounded-full border-4 border-white shadow-md object-cover bg-white"
               />
               {/* Edit Button */}
               <button
@@ -149,10 +165,10 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
             </div>
 
             <div className="mt-3 text-center">
-              <h2 className="text-md xl:text-xl font-semibold break-words max-w-full">
+              <h2 className="text-lg xl:text-xl font-semibold break-words max-w-full">
                 {userDetails?.full_name}
               </h2>
-              <p className="text-sm md:text-lg text-white/70">
+              <p className="text-sm md:text-lg text-white/70 mb-2">
                 {userDetails?.role === "tutor" ? "Tutor" : "Student"}
               </p>
             </div>
@@ -160,33 +176,47 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
 
           {/* Links */}
           <nav className="px-4 py-6 space-y-2">
-            {links.map(({ to, label, icon },i) => {
+            {links.map(({ to, label, icon }, i) => {
               const isActive = location.pathname === to;
-              const isNotification = label === "Notifications"; 
-    const notificationCount = userDetails?.notification_count || 0; 
+              const isNotification = label === "Notifications";
+              const notificationCount = userDetails?.notification_count || 0;
+
+              // 🔹 Check if "Assigned Students" should be disabled
+              const isDisabled =
+                role === "tutor" &&
+                label === "Assigned Students" &&
+                userDetails?.payment_history === null;
+
               return (
                 <Link
-        key={i}
-        to={to}
-        className={`flex items-center justify-between gap-3 px-4 py-3 rounded-md transition-all text-xs lg:text-sm xl:text-md ${
-          isActive
-            ? "bg-white text-green-700 font-semibold shadow-md"
-            : "hover:bg-white/20"
-        }`}
-        onClick={() => isMobile && setOpen(false)}
-      >
-        <div className="flex items-center gap-3">
-          {icon}
-          <span>{label}</span>
-        </div>
+                  key={i}
+                  to={isDisabled ? "#" : to} // disable navigation
+                  className={`flex items-center justify-between gap-3 px-4 py-3 rounded-md transition-all text-sm lg:text-base
+          ${
+            isActive
+              ? "bg-white text-green-700 font-semibold shadow-md"
+              : "hover:bg-white/20"
+          }
+          ${
+            isDisabled
+              ? "opacity-50 cursor-not-allowed pointer-events-none"
+              : ""
+          }
+        `}
+                  onClick={() => isMobile && setOpen(false)}
+                >
+                  <div className="flex items-center gap-3">
+                    {icon}
+                    <span>{label}</span>
+                  </div>
 
-        {/* 🔔 Notification Badge */}
-        {isNotification && notificationCount > 0 && (
-          <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-            {notificationCount}
-          </span>
-        )}
-      </Link>
+                  {/* 🔔 Notification Badge */}
+                  {isNotification && notificationCount > 0 && (
+                    <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                      {notificationCount}
+                    </span>
+                  )}
+                </Link>
               );
             })}
           </nav>

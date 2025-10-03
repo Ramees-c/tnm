@@ -11,7 +11,7 @@ function Hero() {
   return (
     // Header section start
     <div
-      className="relative w-full overflow-hidden flex items-center bg-cover bg-center"
+      className="relative w-full flex items-center bg-cover bg-center"
       style={{ backgroundImage: `url(${herobg})` }}
     >
       <div className="container">
@@ -30,7 +30,7 @@ function Hero() {
                 </span>
               </h4>
 
-              <h2 className="text-3xl md:text-3xl xl:text-6xl 2xl:text-7xl font-bold mb-6 text-white leading-tight">
+              <h2 className="text-3xl md:text-3xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold mb-6 text-white leading-tight">
                 Learn <span className="text-secondary">Smarter</span>,<br />
                 Achieve <span className="text-accent">Knowledge</span>
               </h2>

@@ -25,7 +25,7 @@ const VisionMission = () => {
 
         <div className="flex flex-col lg:flex-row gap-10">
           {/* Vision Card */}
-          <div className="flex-1 bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <div className="flex-1 bg-white rounded-md p-8 shadow-md hover:shadow-xl transition-shadow duration-300">
             <div className="flex items-center mb-6">
               <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-blue-100 flex items-center justify-center mr-4">
                 <FaEye className="text-3xl text-blue-600" />
@@ -60,7 +60,7 @@ const VisionMission = () => {
           </div>
 
           {/* Mission Card */}
-          <div className="flex-1 bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <div className="flex-1 bg-white rounded-md p-8 shadow-md hover:shadow-xl transition-shadow duration-300">
             <div className="flex items-center mb-6">
               <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-purple-100 flex items-center justify-center mr-4">
                 <FaBullseye className="text-3xl text-purple-600" />

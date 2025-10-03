@@ -43,7 +43,7 @@ function ProfileEditPopup({ isOpen, onClose }) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
-      setErrors("")
+      setErrors("");
       fetchUserDetails();
     } else {
       document.body.style.overflow = "auto";
@@ -188,14 +188,14 @@ function ProfileEditPopup({ isOpen, onClose }) {
     } catch (err) {
       console.error(
         err.response?.data?.non_field_errors?.[0] ||
-        "Failed to send OTP. Try again.",
+          "Failed to send OTP. Try again."
       );
-       setErrors((prev) => ({
-      ...prev,
-      email:
-        err.response?.data?.non_field_errors?.[0] ||
-        "Failed to send OTP. Try again.",
-    }));
+      setErrors((prev) => ({
+        ...prev,
+        email:
+          err.response?.data?.non_field_errors?.[0] ||
+          "Failed to send OTP. Try again.",
+      }));
     }
   };
 
@@ -224,15 +224,13 @@ function ProfileEditPopup({ isOpen, onClose }) {
         "Failed to request phone OTP ❌",
         err.response?.data.non_field_errors
       );
-        setErrors((prev) => ({
-      ...prev,
-      mobile_number:
-        err.response?.data?.non_field_errors?.[0] ||
-        "Failed to send OTP. Try again.",
-    }));
+      setErrors((prev) => ({
+        ...prev,
+        mobile_number:
+          err.response?.data?.non_field_errors?.[0] ||
+          "Failed to send OTP. Try again.",
+      }));
     }
-
-   
   };
 
   const handleOtpVerify = async (otp) => {
@@ -250,6 +248,7 @@ function ProfileEditPopup({ isOpen, onClose }) {
 
       console.log(`${contactType} verified ✅`, res.data);
 
+
       // Update formData based on type
       if (contactType === "email") {
         setFormData((prev) => ({
@@ -263,6 +262,7 @@ function ProfileEditPopup({ isOpen, onClose }) {
         }));
       }
 
+      await refreshUserDetails();      
       setShowOtpPopup(false);
       setOtpError("");
     } catch (err) {
@@ -532,12 +532,12 @@ function ProfileEditPopup({ isOpen, onClose }) {
                     )}
 
                   {(errors.mobile_number ||
-  (formData.mobile_number && formData.is_phone_verified === false)) && (
-  <p className="mt-1 text-xs text-red-600">
-    {errors.mobile_number ||
-      "Phone number is not verified"}
-  </p>
-)}
+                    (formData.mobile_number &&
+                      formData.is_phone_verified === false)) && (
+                    <p className="mt-1 text-xs text-red-600">
+                      {errors.mobile_number || "Phone number is not verified"}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

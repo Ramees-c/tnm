@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
   });
   const [userDetails, setUserDetails] = useState({});
   const [loading, setLoading] = useState(true);
-  const [isMailVerified, setIsMailVerified] = useState("");
+  const [isMailVerified, setIsMailVerified] = useState(false);
 
   const refreshUserDetails = async () => {
     if (!token) return;

@@ -105,9 +105,9 @@ const PlatformOverview = () => {
             <button
               key={index}
               onClick={() => setActiveTab(index)}
-              className={`px-8 py-4 mx-2 mb-4 rounded-xl text-sm md:text-md md:text-lg font-medium transition-all duration-300 relative overflow-hidden group ${
+              className={`px-8 py-4 mx-2 mb-4 rounded-md text-sm md:text-md md:text-lg font-medium transition-all duration-300 relative overflow-hidden group ${
                 activeTab === index
-                  ? "text-white shadow-xl"
+                  ? "text-white shadow-md"
                   : "bg-white text-gray-700 hover:text-white shadow-md hover:shadow-lg"
               }`}
             >
@@ -124,7 +124,7 @@ const PlatformOverview = () => {
         </div>
 
         {/* Tab Content */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-16 max-w-5xl mx-auto border border-gray-100 transform transition-all duration-300 hover:shadow-2xl">
+        <div className="bg-white rounded-md shadow-md p-8 mb-16 max-w-5xl mx-auto transform transition-all duration-300 hover:shadow-2xl">
           <p className="text-lg text-center text-gray-700 mb-6">
             {tabs[activeTab].content}
           </p>
@@ -146,12 +146,12 @@ const PlatformOverview = () => {
           {features.map((feature, index) => (
             <div
               key={index}
-              className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 relative overflow-hidden group"
+              className="bg-white rounded-md p-8 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 relative overflow-hidden group"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-gray-50 to-white rounded-bl-full"></div>
 
               <div
-                className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 ${feature.color} group-hover:scale-110 transition-transform duration-300`}
+                className={`w-16 h-16 rounded-md flex items-center justify-center mb-6 ${feature.color} group-hover:scale-110 transition-transform duration-300`}
               >
                 {feature.icon}
               </div>

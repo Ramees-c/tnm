@@ -1,17 +1,36 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import DashboardSidebar from "../../../components/studentAndTutor/DashboardSidebar/DashboardSidebar";
+import TutorSmallCard from "../../../components/studentAndTutor/TutorSmallCard/TutorSmallCard";
+import axios from "axios";
 import { useAuth } from "../../../Context/userAuthContext";
-import AssignedTutorCard from "../../../components/studentAndTutor/AssignedTutorCard/AssignedTutorCard";
 import ToastMessage from "../../../components/studentAndTutor/ToastMessage/ToastMessage";
 
-function AssignedTutorsPage() {
-  const { userDetails, isMailVerified } = useAuth();
+function StudentDashboardAllTutorsPage() {
+  const { isMailVerified, userDetails } = useAuth();
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [assignedTutors] = useState(
-    (userDetails?.tutors || []).filter((tutor) => !tutor.is_rejected)
-  );
+  const [tutors, setTutors] = useState([]);
   const [toastOpen, setToastOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchTutors = async () => {
+      try {
+        const res = await axios.get("/api/tutors_list/");
+
+        // ✅ Only keep approved tutors
+        const approvedTutors = res.data.filter(
+          (tutor) => tutor.is_approved === true
+        );
+
+        setTutors(approvedTutors);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchTutors();
+  }, []);
 
   useEffect(() => {
     if (userDetails?.mail_verified === false) {
@@ -29,7 +48,6 @@ function AssignedTutorsPage() {
           role="student"
           open={sidebarOpen}
           setOpen={setSidebarOpen}
-          onClose={() => setSidebarOpen(false)}
         />
       </div>
 
@@ -44,7 +62,7 @@ function AssignedTutorsPage() {
       {/* Main Content */}
       <main className="flex-1 w-full p-4 sm:p-6 transition-all duration-300">
         <div className="max-w-6xl mx-auto">
-          {/* ✅ Mobile Menu Button before Title */}
+          {/* Header */}
           <div className="flex items-center gap-3 mb-6">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -52,26 +70,17 @@ function AssignedTutorsPage() {
             >
               <Menu size={27} />
             </button>
-
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 flex items-center gap-2">
-              Assigned Tutors
+              All Tutors
             </h1>
           </div>
 
-          {/* Tutors List */}
-          {assignedTutors.length > 0 ? (
-            <div className="space-y-4">
-              {assignedTutors.map((tutor, i) => (
-                <AssignedTutorCard key={tutor.id} {...tutor} />
-              ))}
-            </div>
-          ) : (
-            <div className="flex items-center justify-center py-16">
-              <p className="text-gray-500 text-lg font-medium">
-                No tutors assigned
-              </p>
-            </div>
-          )}
+          {/* Tutors Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-2">
+            {tutors.map((tutor) => (
+              <TutorSmallCard key={tutor.id} tutor={tutor} />
+            ))}
+          </div>
         </div>
 
         {toastOpen && (
@@ -87,4 +96,4 @@ function AssignedTutorsPage() {
   );
 }
 
-export default AssignedTutorsPage;
+export default StudentDashboardAllTutorsPage;

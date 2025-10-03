@@ -22,8 +22,9 @@ function TutorDashboardPage() {
   const [notifications, setNotifications] = useState([]);
   const [toastOpen, setToastOpen] = useState(false);
 
-  const { userDetails, token, isMailVerified } = useAuth();
+  const { userDetails, token, isMailVerified, refreshUserDetails } = useAuth();
 
+  
 
   useEffect(() => {
     if (userDetails?.role === "tutor") {
@@ -51,11 +52,13 @@ function TutorDashboardPage() {
     fetchNotifications();
   }, [token]);
 
-   useEffect(() => {
-    if (isMailVerified) {
+  useEffect(() => {
+    if (userDetails?.mail_verified === false) {
       setToastOpen(true);
+    } else {
+      setToastOpen(false);
     }
-  }, [isMailVerified]);
+  }, [userDetails]);
 
   // ✅ Remove subject
   const handleRemoveSubject = (index) => {
@@ -102,6 +105,22 @@ function TutorDashboardPage() {
     if (minutes > 0) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
     return "Just now";
   }
+
+  // Delete notification API
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`/api/notify-delete/${id}/`, {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      });
+      // Update UI immediately
+      setNotifications((prev) => prev.filter((note) => note.id !== id));
+      await refreshUserDetails();
+    } catch (err) {
+      console.error("Failed to delete notification", err);
+    }
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -295,36 +314,50 @@ function TutorDashboardPage() {
             <h2 className="text-lg sm:text-xl font-semibold mb-4 flex items-center gap-2">
               Notifications
             </h2>
-            <div className="space-y-4">
-              {notifications.map((note) => (
-                <div
-                  key={note.id}
-                  className="p-3 bg-green-100 rounded-md shadow-sm flex items-center gap-3"
-                >
-                  <Bell size={18} className="text-green-600" />
 
-                  {/* Message + Time */}
-                  <div className="flex-1">
-                    <p className="text-gray-800">{note.message}</p>
-                    <span className="text-xs text-gray-500">
-                      {" "}
-                      {timeAgo(note.created_at)}
-                    </span>
+            {notifications.length === 0 ? (
+              <div className="text-center py-6 text-gray-500">
+                No notifications found.
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {notifications.map((note) => (
+                  <div
+                    key={note.id}
+                    className="p-3 bg-green-100 rounded-md shadow-sm flex items-center gap-3"
+                  >
+                    <Bell size={18} className="text-green-600" />
+
+                    {/* Message + Time */}
+                    <div className="flex-1">
+                      <p className="text-gray-800 text-xs md:text-sm">{note.message}</p>
+                      <span className="text-xs text-gray-500">
+                        {timeAgo(note.created_at)}
+                      </span>
+                    </div>
+
+                    {/* Close Button */}
+                    <button
+                      onClick={() => handleDelete(note.id)}
+                      className="p-1 rounded-full hover:bg-red-200 transition"
+                    >
+                      <X size={18} className="text-red-600" />
+                    </button>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
         {toastOpen && (
-        <ToastMessage
-          message={isMailVerified}
-          isOpen={toastOpen}
-          onClose={() => setToastOpen(false)}
-          type="warning"  
-        />
-      )}
+          <ToastMessage
+            message={isMailVerified}
+            isOpen={toastOpen}
+            onClose={() => setToastOpen(false)}
+            type="warning"
+          />
+        )}
       </main>
     </div>
   );

@@ -12,10 +12,12 @@ function AssignedStudentsPage() {
   const [toastOpen, setToastOpen] = useState(false);
 
   useEffect(() => {
-    if (isMailVerified) {
+    if (userDetails?.mail_verified === false) {
       setToastOpen(true);
+    } else {
+      setToastOpen(false);
     }
-  }, [isMailVerified]);
+  }, [userDetails]);
 
   return (
     <div className="flex min-h-screen">

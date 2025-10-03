@@ -122,7 +122,7 @@ function LoginForm({ onCreateAccount, onForgotPassword }) {
 };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center">
       <div className="w-full max-w-md bg-white rounded-md shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl">
         {/* Header */}
         <div className="bg-gradient-to-r from-green-500 to-green-600 py-6 px-8 text-center">
@@ -138,7 +138,7 @@ function LoginForm({ onCreateAccount, onForgotPassword }) {
         </div>
 
         {/* Form */}
-        <div className="p-6 sm:p-8">
+        <div className="p-4 md:p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email or Phone */}
             <div>
