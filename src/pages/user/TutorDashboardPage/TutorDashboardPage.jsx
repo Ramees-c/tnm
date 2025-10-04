@@ -24,8 +24,6 @@ function TutorDashboardPage() {
 
   const { userDetails, token, isMailVerified, refreshUserDetails } = useAuth();
 
-  
-
   useEffect(() => {
     if (userDetails?.role === "tutor") {
       setLoggedTutorDetails(userDetails);
@@ -119,6 +117,29 @@ function TutorDashboardPage() {
       await refreshUserDetails();
     } catch (err) {
       console.error("Failed to delete notification", err);
+    }
+  };
+
+  // Add this function inside TutorDashboardPage
+  const handleToggleActive = async () => {
+    try {
+      const newStatus = !active;
+
+      const res = await axios.post(
+        "/api/tutor_active_inactive/",
+        { active_inactive: newStatus },
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
+
+      setActive(res.data.active_inactive); 
+      console.log("updated");
+      
+    } catch (err) {
+      console.error("Failed to update active status", err);
     }
   };
 
@@ -257,7 +278,7 @@ function TutorDashboardPage() {
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link to="/tutorSubscription">
-                  <button className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-green-700 transition text-sm md:text-md">
+                  <button className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-md shadow hover:bg-green-700 transition text-sm md:text-md">
                     <ArrowUpCircle size={18} /> Upgrade
                   </button>
                 </Link>
@@ -273,8 +294,8 @@ function TutorDashboardPage() {
           <div className="bg-white rounded-md shadow p-4 sm:p-6 mb-6 flex justify-between items-center">
             <h2 className="text-lg sm:text-xl font-semibold">Profile Status</h2>
             <button
-              onClick={() => setActive(!active)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg shadow bg-gray-100 hover:bg-gray-200"
+              onClick={handleToggleActive}
+              className="flex items-center gap-2 px-4 py-2 rounded-md shadow bg-gray-100 hover:bg-gray-200"
             >
               {active ? (
                 <>
@@ -330,7 +351,9 @@ function TutorDashboardPage() {
 
                     {/* Message + Time */}
                     <div className="flex-1">
-                      <p className="text-gray-800 text-xs md:text-sm">{note.message}</p>
+                      <p className="text-gray-800 text-xs md:text-sm">
+                        {note.message}
+                      </p>
                       <span className="text-xs text-gray-500">
                         {timeAgo(note.created_at)}
                       </span>

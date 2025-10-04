@@ -136,7 +136,7 @@ function HeroSearchForm() {
           {filteredSubjects.map((sub) => (
             <li
               key={sub.id}
-              className="px-3 py-2 hover:bg-green-50 cursor-pointer"
+              className="px-3 py-2 hover:bg-green-50 cursor-pointer text-xs md:text-sm"
               dangerouslySetInnerHTML={{
                 __html: highlightMatch(sub.label, subjectInput),
               }}

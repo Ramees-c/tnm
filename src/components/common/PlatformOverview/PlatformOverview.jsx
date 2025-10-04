@@ -171,7 +171,7 @@ const PlatformOverview = () => {
         </div>
 
         {/* CTA Section */}
-        <div className="bg-gradient-to-br from-green-500 via-green-600 to-green-700 rounded-2xl shadow-md p-10 text-center text-white relative overflow-hidden">
+        <div className="bg-gradient-to-br from-green-500 via-green-600 to-green-700 rounded-md shadow-md p-10 text-center text-white relative overflow-hidden">
           <div className="absolute -top-20 -right-20 w-40 h-40 bg-white/10 rounded-full"></div>
           <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-white/10 rounded-full"></div>
 
@@ -182,10 +182,10 @@ const PlatformOverview = () => {
             Join thousands of students achieving their goals with our platform.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4 relative z-10">
-            <button className="bg-white text-gray-800 font-semibold py-4 px-8 rounded-full flex items-center justify-center hover:bg-gray-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+            <button className="bg-white text-gray-800 font-semibold py-4 px-8 rounded-md flex items-center justify-center hover:bg-gray-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
               Find a Tutor <FiArrowRight className="ml-2" />
             </button>
-            <button className="bg-transparent border-2 border-white text-white font-semibold py-4 px-8 rounded-full hover:bg-white hover:text-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+            <button className="bg-transparent border-2 border-white text-white font-semibold py-4 px-8 rounded-md hover:bg-white hover:text-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
               Become a Tutor
             </button>
           </div>

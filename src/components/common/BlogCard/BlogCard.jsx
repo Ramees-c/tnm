@@ -9,7 +9,7 @@ function BlogCard({ post }) {
   return (
     <div data-aos="fade-up">
       <div onClick={handleClick}>
-        <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+        <div className="bg-white rounded-md shadow-md overflow-hidden hover:shadow-lg transition">
           {/* Image */}
           <Link to={`/blogSingle/${post.id}`}>
           <img

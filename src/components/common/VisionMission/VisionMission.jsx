@@ -102,7 +102,7 @@ const VisionMission = () => {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Value 1 */}
-            <div className="bg-white rounded-xl p-6 text-center shadow-md hover:shadow-lg transition-shadow duration-300">
+            <div className="bg-white rounded-md p-6 text-center shadow-md hover:shadow-lg transition-shadow duration-300">
               <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
                 <FaHeart className="text-2xl text-amber-600" />
               </div>
@@ -116,7 +116,7 @@ const VisionMission = () => {
             </div>
 
             {/* Value 2 */}
-            <div className="bg-white rounded-xl p-6 text-center shadow-md hover:shadow-lg transition-shadow duration-300">
+            <div className="bg-white rounded-md p-6 text-center shadow-md hover:shadow-lg transition-shadow duration-300">
               <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
                 <FaLightbulb className="text-2xl text-green-600" />
               </div>
@@ -130,7 +130,7 @@ const VisionMission = () => {
             </div>
 
             {/* Value 3 */}
-            <div className="bg-white rounded-xl p-6 text-center shadow-md hover:shadow-lg transition-shadow duration-300">
+            <div className="bg-white rounded-md p-6 text-center shadow-md hover:shadow-lg transition-shadow duration-300">
               <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
                 <FaUsers className="text-2xl text-blue-600" />
               </div>

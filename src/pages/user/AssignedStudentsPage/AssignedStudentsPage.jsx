@@ -46,9 +46,9 @@ function AssignedStudentsPage() {
           <div className="flex items-center gap-3 mb-6">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-lg shadow bg-white hover:bg-gray-100 transition"
+              className="lg:hidden"
             >
-              <Menu size={24} />
+              <Menu size={27} />
             </button>
 
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 flex items-center gap-2">

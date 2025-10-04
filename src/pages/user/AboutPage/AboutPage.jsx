@@ -15,13 +15,13 @@ function AboutPage() {
       />
       <div className="container">
         <section className="w-full pt-16" data-aos="fade-up">
-          <div className="mx-auto grid grid-cols-1 xl:grid-cols-2 gap-10 items-center  lg:px-12">
+          <div className="mx-auto grid grid-cols-1 xl:grid-cols-2 gap-10 items-center lg:px-12">
             {/* Left Image */}
             <div className="flex justify-center xl:justify-center">
               <img
                 src={aboutImg}
                 alt="Students"
-                className="w-full max-w-[500px] lg:max-w-[600px] rounded-2xl shadow-xl object-cover transform transition duration-500"
+                className="w-full max-w-[500px] lg:max-w-[600px] rounded-md shadow-xl object-cover transform transition duration-500"
               />
             </div>
 

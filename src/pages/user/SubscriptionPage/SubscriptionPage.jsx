@@ -220,18 +220,15 @@ Expiry: ${verifyData.expiry_date.split(" ")[0]}`
       <main className="flex-1 w-full p-4 sm:p-6 transition-all duration-300">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-3 mb-3">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden"
-            >
+            <button onClick={() => setSidebarOpen(true)} className="lg:hidden">
               <Menu size={27} />
             </button>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
               Choose Your Subscription
-            </h1> 
+            </h1>
           </div>
 
-          <p className="mb-8 text-sm md:text-base text-gray-600">
+          <p className="mb-8 text-xs md:text-sm text-gray-600">
             Select the plan that best fits your teaching journey.
           </p>
 
