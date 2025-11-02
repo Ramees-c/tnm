@@ -75,17 +75,17 @@ function SubscriptionCard({
 
   return (
     <div
-      className={`flex flex-col rounded-md shadow-lg p-6 border-2 ${
-        isChosen && "border-green-600"
+      className={`flex flex-col rounded-md shadow-sm p-6 border ${
+        isChosen && "border-2 border-green-600"
       } relative`}
     >
       {/* Title */}
-      <h3 className="text-xl font-bold text-gray-800 mb-2">{title}</h3>
+      <h3 className="text-xl lg:text-2xl font-bold text-green-700 mb-2">{title}</h3>
 
       {/* Price */}
-      <p className="text-3xl font-extrabold text-gray-900 mb-4">
+      <p className="text-3xl lg:text-4xl font-extrabold text-gray-900 mb-4">
         ₹{price}{" "}
-        <span className="text-base font-medium text-gray-600">/{duration}</span>
+        <span className="text-xl lg:text-2xl font-semobold">/ {duration}</span>
       </p>
 
       {/* Features */}
@@ -97,7 +97,7 @@ function SubscriptionCard({
           }`}
         >
           {features.map((feature, index) => (
-            <li key={index} className="flex items-center gap-2 text-gray-700">
+            <li key={index} className="flex items-center gap-2 text-gray-700 text-sm sm:text-base">
               <CheckCircle2 size={18} className="text-green-600" />
               <span>{feature}</span>
             </li>

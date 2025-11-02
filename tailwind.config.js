@@ -21,7 +21,7 @@ export default {
         float: "float 6s ease-in-out infinite",
         "bounce-slow": "bounce 3s infinite",
         "fade-in": "fadeIn 1s ease-out",
-        'spin-slow': 'spin 3s linear infinite',
+        "spin-slow": "spin 3s linear infinite",
       },
       keyframes: {
         float: {
@@ -35,5 +35,5 @@ export default {
       },
     },
   },
-  plugins: [flowbite.plugin()],
+  plugins: [flowbite.plugin(), require("@tailwindcss/typography")],
 };

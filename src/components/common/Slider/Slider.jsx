@@ -3,11 +3,12 @@ import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 const Slider = ({
   children,
-  slidesToShow = 3,
+  slidesToShow,
   infinite = true,
   autoSlide = true,
   autoSlideInterval = 5000,
   slideBtnHide,
+  forceSingleSlideBelow1024 = false,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchPosition, setTouchPosition] = useState(null);
@@ -17,136 +18,109 @@ const Slider = ({
   const intervalRef = useRef(null);
   const totalItems = Children.count(children);
 
-  // Handle responsive slides count
+  // ✅ Responsive width tracking
   useEffect(() => {
     const handleResize = () => {
       if (sliderRef.current) {
         setSliderWidth(sliderRef.current.offsetWidth);
       }
     };
-
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Auto-slide functionality
+  // ✅ Get slides to show based on viewport
+  const getSlidesToShow = () => {
+    if (sliderWidth < 640) return 1;
+    if (sliderWidth < 1024) return forceSingleSlideBelow1024 ? 1 : 2;
+    return slidesToShow || 4;
+  };
+
+  const visibleSlides = getSlidesToShow();
+  const totalSlides = totalItems;
+
+  // ✅ Go to a specific slide safely
+  const goToSlide = (index) => {
+    let newIndex = index;
+    if (infinite) {
+      if (index < 0) newIndex = totalSlides - visibleSlides;
+      else if (index >= totalSlides - visibleSlides + 1) newIndex = 0;
+    } else {
+      newIndex = Math.max(0, Math.min(index, totalSlides - visibleSlides));
+    }
+    setCurrentIndex(newIndex);
+  };
+
+  // ✅ Slide controls
+  const nextSlide = () => goToSlide(currentIndex + 1);
+  const prevSlide = () => goToSlide(currentIndex - 1);
+
+  // ✅ Auto-slide setup
   useEffect(() => {
     if (!autoSlide || isHovered) {
       clearInterval(intervalRef.current);
       return;
     }
-
-    intervalRef.current = setInterval(() => {
-      nextSlide();
-    }, autoSlideInterval);
-
+    intervalRef.current = setInterval(nextSlide, autoSlideInterval);
     return () => clearInterval(intervalRef.current);
-  }, [autoSlide, autoSlideInterval, currentIndex, isHovered]);
+  }, [autoSlide, autoSlideInterval, isHovered, currentIndex]);
 
-  // Auto-center slides after resize
-  useEffect(() => {
-    goToSlide(currentIndex);
-  }, [sliderWidth]);
+  // ✅ Handle hover
+  const handleMouseEnter = () => setIsHovered(true);
+  const handleMouseLeave = () => setIsHovered(false);
 
-  // Calculate responsive slides to show
-  const getSlidesToShow = () => {
-    if (sliderWidth < 820) return 1;
-    if (sliderWidth < 1024) return 2;
-    return slidesToShow;
-  };
-
-  const visibleSlides = getSlidesToShow();
-  const totalSlides = Math.ceil(totalItems / visibleSlides);
-
-  const goToSlide = (index) => {
-    let newIndex = index;
-    if (infinite) {
-      if (index < 0) {
-        newIndex = totalSlides - 1;
-      } else if (index >= totalSlides) {
-        newIndex = 0;
-      }
-    } else {
-      newIndex = Math.max(0, Math.min(index, totalSlides - 1));
-    }
-    setCurrentIndex(newIndex);
-  };
-
-  const nextSlide = () => {
-    goToSlide(currentIndex + 1);
-  };
-
-  const prevSlide = () => {
-    goToSlide(currentIndex - 1);
-  };
-
-  // Pause auto-slide on hover
-  const handleMouseEnter = () => {
+  // ✅ Touch swipe handlers
+  const handleTouchStart = (e) => {
+    setTouchPosition(e.touches[0].clientX);
     setIsHovered(true);
   };
 
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-  };
-
-  // Touch event handlers for mobile swipe
-  const handleTouchStart = (e) => {
-    const touchDown = e.touches[0].clientX;
-    setTouchPosition(touchDown);
-    setIsHovered(true); // Pause auto-slide during interaction
-  };
-
   const handleTouchMove = (e) => {
-    const touchDown = touchPosition;
-
-    if (touchDown === null) {
-      return;
-    }
-
+    if (touchPosition === null) return;
     const currentTouch = e.touches[0].clientX;
-    const diff = touchDown - currentTouch;
+    const diff = touchPosition - currentTouch;
 
-    if (diff > 5) {
-      nextSlide();
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) nextSlide();
+      else prevSlide();
+      setTouchPosition(null);
     }
-
-    if (diff < -5) {
-      prevSlide();
-    }
-
-    setTouchPosition(null);
   };
 
   const handleTouchEnd = () => {
-    setIsHovered(false); // Resume auto-slide after interaction
+    setTouchPosition(null);
+    setIsHovered(false);
   };
 
-  // Clone children to add slider-specific props
-  const renderSlides = () => {
-    return Children.map(children, (child, index) => {
-      return cloneElement(child, {
+  // ✅ Clone child slides to control width
+  const renderSlides = () =>
+    Children.map(children, (child, index) =>
+      cloneElement(child, {
         style: {
           minWidth: `${100 / visibleSlides}%`,
           maxWidth: `${100 / visibleSlides}%`,
         },
         key: index,
-      });
-    });
-  };
+      })
+    );
+
+  // ✅ Compute transform width based on visible slides
+  const slideWidthPercent = 100 / visibleSlides;
+  const offset = currentIndex * slideWidthPercent;
 
   return (
     <div
-      className="relative w-full overflow-hidden"
+      className="relative w-full overflow-hidden group"
       ref={sliderRef}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Slides Container */}
+      {/* Slides */}
       <div
-         className="flex transition-transform duration-300 ease-out"
+        className="flex transition-transform duration-300 ease-out"
         style={{
-          transform: `translateX(-${currentIndex * (100 / visibleSlides)}%)`,
+          transform: `translateX(-${offset}%)`,
         }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -155,23 +129,24 @@ const Slider = ({
         {renderSlides()}
       </div>
 
-      {/* Navigation Arrows */}
-      {totalSlides > 1 && (
+      {/* Arrows */}
+      {totalSlides > visibleSlides && (
         <>
           <button
             onClick={prevSlide}
-            className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-primary hover:bg-secondary p-2 rounded-full shadow-lg transition-all duration-200 focus:outline-none ${
-              slideBtnHide ? "hidden" : "hidden lg:block"
-            }`}
+            className={`${forceSingleSlideBelow1024 === true ? 'hidden' : 'hidden lg:block'} absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-primary/60 hover:bg-secondary p-2 rounded-full shadow-lg transition-all duration-300 focus:outline-none ${
+              slideBtnHide ? "hidden" : "opacity-0 group-hover:opacity-100"
+            } ${isHovered ? "opacity-100" : "opacity-0"}`}
             aria-label="Previous slide"
           >
             <FiChevronLeft className="w-5 h-5 text-white" />
           </button>
+
           <button
             onClick={nextSlide}
-            className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-primary hover:bg-secondary p-2 rounded-full shadow-lg transition-all duration-200 focus:outline-none ${
-              slideBtnHide ? "hidden" : "hidden lg:block"
-            }`}
+            className={` ${forceSingleSlideBelow1024 === true ? 'hidden' : 'hidden lg:block'}  absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-primary/60 hover:bg-secondary p-2 rounded-full shadow-lg transition-all duration-300 focus:outline-none ${
+              slideBtnHide ? "hidden" : "opacity-0 group-hover:opacity-100"
+            } ${isHovered ? "opacity-100" : "opacity-0"}`}
             aria-label="Next slide"
           >
             <FiChevronRight className="w-5 h-5 text-white" />
@@ -180,22 +155,24 @@ const Slider = ({
       )}
 
       {/* Pagination Dots */}
-      {totalSlides > 1 && (
+      {totalSlides > visibleSlides && (
         <div className="flex justify-center mt-6 space-x-2">
-          {Array.from({ length: totalSlides }).map((_, index) => (
-            <button
-              key={index}
-              onClick={() => {
-                goToSlide(index);
-                setIsHovered(true); // Pause auto-slide on manual navigation
-                setTimeout(() => setIsHovered(false), autoSlideInterval * 2); // Resume after double the interval
-              }}
-              className={`w-2.5 h-2.5 rounded-full transition-all duration-200 ${
-                index === currentIndex ? "bg-primary w-4" : "bg-gray-300"
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
+          {Array.from({ length: totalSlides - visibleSlides + 1 }).map(
+            (_, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  goToSlide(index);
+                  setIsHovered(true);
+                  setTimeout(() => setIsHovered(false), autoSlideInterval * 2);
+                }}
+                className={`w-2.5 h-2.5 rounded-full transition-all duration-200 ${
+                  index === currentIndex ? "bg-primary w-4" : "bg-gray-300"
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            )
+          )}
         </div>
       )}
     </div>

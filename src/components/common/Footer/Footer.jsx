@@ -11,6 +11,7 @@ import DesignedLogo from "../../../assets/images/copyright-logo.png";
 
 import Footerlogo from "../../../assets/images/logo/tnmlogo.png";
 import DefaultButton from "../DefaultButton/DefaultButton";
+import { FaInstagram } from "react-icons/fa";
 
 function Footer() {
   const handleClick = () => {
@@ -30,12 +31,12 @@ function Footer() {
             />
           </div>
           <p className="text-sm mb-6">
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-            Dignissimos repudiandae voluptatibus quia ullam magnam voluptatum.
+            Connecting students with expert tutors across subjects, making
+            learning simple, flexible, and effective for every learner.
           </p>
           <div className="flex gap-3">
             <a
-              href="#"
+              href="https://www.facebook.com/profile.php?id=61578906604625&mibextid=ZbWKwL"
               className="bg-primary text-white p-2 rounded-full hover:bg-secondary transition"
             >
               <FaFacebookF />
@@ -47,13 +48,13 @@ function Footer() {
               <FaXTwitter />
             </a>
             <a
-              href="#"
+              href="https://www.instagram.com/tnm_network?igsh=Nmk0dWNobjZwenA3"
               className="bg-primary text-white p-2 rounded-full hover:bg-secondary transition"
             >
-              <FaYoutube />
+              <FaInstagram />
             </a>
             <a
-              href="#"
+              href="https://www.linkedin.com/in/tnm-network-tutor-near-me-3b2287376?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
               className="bg-primary text-white p-2 rounded-full hover:bg-secondary transition"
             >
               <FaLinkedinIn />
@@ -93,6 +94,15 @@ function Footer() {
             </li>
             <li>
               <Link
+                to="/allCategories"
+                className="hover:text-primary hover:font-bold"
+                onClick={handleClick}
+              >
+                All Subjects
+              </Link>
+            </li>
+            <li>
+              <Link
                 to="/testimonial"
                 className="hover:text-primary hover:font-bold"
                 onClick={handleClick}
@@ -116,21 +126,39 @@ function Footer() {
           <h3 className="font-bold mb-4 text-lg">Resources</h3>
           <ul className="space-y-2 text-md">
             <li>
-              <Link to="/faq" className="hover:text-primary hover:font-bold"  onClick={handleClick}>
+              <Link
+                to="/faq"
+                className="hover:text-primary hover:font-bold"
+                onClick={handleClick}
+              >
                 FAQ
               </Link>
             </li>
             <li>
-              <Link to="/terms" className="hover:text-primary hover:font-bold"  onClick={handleClick}>
+              <Link
+                to="/terms"
+                className="hover:text-primary hover:font-bold"
+                onClick={handleClick}
+              >
                 Terms & Conditions
               </Link>
             </li>
             <li>
               <Link
                 to="/refundPolicy"
-                className="hover:text-primary hover:font-bold"  onClick={handleClick}
+                className="hover:text-primary hover:font-bold"
+                onClick={handleClick}
               >
                 Refund Policy
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/privacyPolicy"
+                className="hover:text-primary hover:font-bold"
+                onClick={handleClick}
+              >
+                Privacy Policy
               </Link>
             </li>
           </ul>
@@ -148,7 +176,7 @@ function Footer() {
               placeholder="Your Email"
               className="flex-1 p-2 rounded-md border border-gray-300 focus:outline-none text-black mb-3"
             />
-            <DefaultButton buttonText="Submit" buttonSmall={true} />
+            <DefaultButton buttonText="Submit" buttonMedium={true} />
           </form>
         </div>
       </div>

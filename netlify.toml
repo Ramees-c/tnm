@@ -1,7 +1,7 @@
 # 🔄 API Proxy
 [[redirects]]
   from = "/api/*"
-  to = "http://tnm-test-api.dhanwis.com/api/:splat"
+  to = "https://api-tnm.tutor-nearme.com/api/:splat"
   status = 200
   force = true
 
@@ -10,3 +10,5 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+ 

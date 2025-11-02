@@ -17,6 +17,8 @@ import TutorSmallCard from "../../../components/studentAndTutor/TutorSmallCard/T
 import { useAuth } from "../../../Context/userAuthContext";
 import axios from "axios";
 import ToastMessage from "../../../components/studentAndTutor/ToastMessage/ToastMessage";
+import API_BASE from "../../../API/API";
+import HorizontalTutorList from "../../../components/studentAndTutor/HorizontalTutorList/HorizontalTutorList";
 
 const tutors = [
   {
@@ -173,73 +175,104 @@ function StudentDashboardPage() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [tutors, setTutors] = useState([]);
+  const [FavouriteTutors, setFavouriteTutors] = useState([]);
   const [filteredTutors, setFilteredTutors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [refreshFavourites, setRefreshFavourites] = useState(false);
+  const [refreshNotifications, setRefreshNotifications] = useState(false);
 
-  const recommendedTutorsList = [
-    {
-      id: 1,
-      full_name: "Ananya Sharma",
-      email: "ananya.sharma@example.com",
-      mobile_number: "+91 9876543210",
-      gender: "Female",
-      city: "Bengaluru",
-      state: "Karnataka",
-      qualification: "M.Sc. Mathematics",
-      categories: ["Mathematics", "Physics"],
-      profile_image: "https://randomuser.me/api/portraits/women/44.jpg",
-      is_approved: true,
-      mail_verified: true,
-    },
-    {
-      id: 2,
-      full_name: "Rahul Verma",
-      email: "rahul.verma@example.com",
-      mobile_number: "+91 9123456789",
-      gender: "Male",
-      city: "Mumbai",
-      state: "Maharashtra",
-      qualification: "B.Tech Computer Science",
-      categories: ["Programming", "Data Structures", "Web Development"],
-      profile_image: "https://randomuser.me/api/portraits/men/32.jpg",
-      is_approved: true,
-      mail_verified: false,
-    },
-    {
-      id: 3,
-      full_name: "Priya Nair",
-      email: "priya.nair@example.com",
-      mobile_number: "+91 9988776655",
-      gender: "Female",
-      city: "Kochi",
-      state: "Kerala",
-      qualification: "Ph.D. English Literature",
-      categories: ["English", "Creative Writing"],
-      profile_image: "https://randomuser.me/api/portraits/women/68.jpg",
-      is_approved: false,
-      mail_verified: true,
-    },
-  ];
+  // const recommendedTutorsList = [
+  //   {
+  //     id: 1,
+  //     full_name: "Ananya Sharma",
+  //     email: "ananya.sharma@example.com",
+  //     mobile_number: "+91 9876543210",
+  //     gender: "Female",
+  //     city: "Bengaluru",
+  //     state: "Karnataka",
+  //     qualification: "M.Sc. Mathematics",
+  //     categories: ["Mathematics", "Physics"],
+  //     profile_image: "https://randomuser.me/api/portraits/women/44.jpg",
+  //     is_approved: true,
+  //     mail_verified: true,
+  //   },
+  //   {
+  //     id: 2,
+  //     full_name: "Rahul Verma",
+  //     email: "rahul.verma@example.com",
+  //     mobile_number: "+91 9123456789",
+  //     gender: "Male",
+  //     city: "Mumbai",
+  //     state: "Maharashtra",
+  //     qualification: "B.Tech Computer Science",
+  //     categories: ["Programming", "Data Structures", "Web Development"],
+  //     profile_image: "https://randomuser.me/api/portraits/men/32.jpg",
+  //     is_approved: true,
+  //     mail_verified: false,
+  //   },
+  //   {
+  //     id: 3,
+  //     full_name: "Priya Nair",
+  //     email: "priya.nair@example.com",
+  //     mobile_number: "+91 9988776655",
+  //     gender: "Female",
+  //     city: "Kochi",
+  //     state: "Kerala",
+  //     qualification: "Ph.D. English Literature",
+  //     categories: ["English", "Creative Writing"],
+  //     profile_image: "https://randomuser.me/api/portraits/women/68.jpg",
+  //     is_approved: false,
+  //     mail_verified: true,
+  //   },
+  // ];
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/latest_notify/`, {
+        headers: { Authorization: `Token ${token}` },
+      });
+
+      // Update only if data changed (optional)
+      setNotifications((prev) => {
+        const prevIds = prev
+          .map((n) => n.id)
+          .sort()
+          .join(",");
+        const newIds = res.data
+          .map((n) => n.id)
+          .sort()
+          .join(",");
+        return prevIds === newIds ? prev : res.data;
+      });
+    } catch (err) {
+      console.error("Failed to load notifications", err);
+    }
+  };
+
+  console.log(userDetails.categories);
 
   useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const res = await axios.get("/api/notify/", {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        });
+    if (!token) return;
 
-        // take only latest 5
-        setNotifications(res.data.slice(0, 5));
-      } catch (err) {
-        console.error("Failed to load notifications", err);
-      }
-    };
+    fetchNotifications(); // fetch immediately
 
-    fetchNotifications();
-  }, [token]);
+    const interval = setInterval(fetchNotifications, 10000); // optional polling
+    return () => clearInterval(interval);
+  }, [token, refreshNotifications]);
+
+  const getFavouriteTutors = async () => {
+    const res = await axios.get(`${API_BASE}/student/favorite-tutors/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    });
+    setFavouriteTutors(res.data);
+  };
+
+  useEffect(() => {
+    getFavouriteTutors();
+  }, [token, refreshFavourites]);
 
   useEffect(() => {
     if (userDetails?.mail_verified === false) {
@@ -249,24 +282,23 @@ function StudentDashboardPage() {
     }
   }, [userDetails]);
 
-  // useEffect(() => {
-  //   const fetchRecommentedStudents = async () => {
-  //     try {
-  //       const res = await axios.get("/api/recommendations/", {
-  //         headers: {
-  //           Authorization: `Token ${token}`,
-  //         },
-  //       });
+  const fetchRecommentedStudents = async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/recommendations/`, {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      });
 
-  //       console.log(res.data.recommendations, "sfjkd");
-  //       setRecommentedTutors(res.data.recommendations, "sfjkd")
-  //     } catch (err) {
-  //       console.error("Failed to load recommented tutors", err);
-  //     }
-  //   };
+      setRecommentedTutors(res.data.recommendations);
+    } catch (err) {
+      console.error("Failed to load recommented tutors", err);
+    }
+  };
 
-  //   fetchRecommentedStudents();
-  // }, [token]);
+  useEffect(() => {
+    fetchRecommentedStudents();
+  }, [token]);
 
   // ✅ Fetch all approved tutors on mount
   // Filter tutors based on multiple fields
@@ -283,7 +315,7 @@ function StudentDashboardPage() {
 
       try {
         const res = await axios.get(
-          `/api/tutors/search/?q=${searchQuery.trim()}`,
+          `${API_BASE}/tutors/search/?q=${searchQuery.trim()}`,
           {
             headers: {
               Authorization: `Token ${token}`,
@@ -319,11 +351,12 @@ function StudentDashboardPage() {
     setHasSearched(true);
 
     try {
-      const res = await axios.get(`/api/tutors/search/?q=${query}`, {
+      const res = await axios.get(`${API_BASE}/tutors/search/?q=${query}`, {
         headers: {
           Authorization: `Token ${token}`,
         },
       });
+
       setFilteredTutors(res.data);
     } catch (err) {
       console.error("Search failed", err);
@@ -353,7 +386,7 @@ function StudentDashboardPage() {
   // Delete notification API
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/api/notify-delete/${id}/`, {
+      await axios.delete(`${API_BASE}/notify-delete/${id}/`, {
         headers: {
           Authorization: `Token ${token}`,
         },
@@ -393,54 +426,73 @@ function StudentDashboardPage() {
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="p-4 bg-green-100 rounded-md shadow text-center">
-              <p className="text-lg font-semibold text-green-700">
-                {userDetails?.tutors?.length || 0}
-              </p>
-              <p className="text-sm text-gray-600">Assigned Tutors</p>
-            </div>
-            <div className="p-4 bg-purple-100 rounded-md shadow text-center">
-              <p className="text-lg font-semibold text-purple-700">
-                {userDetails?.categories?.length || 0}
-              </p>
-              <p className="text-sm text-gray-600">Selected Subjects</p>
-            </div>
-            <div className="p-4 bg-blue-100 rounded-md shadow text-center">
-              <p className="text-lg font-semibold text-blue-700">7</p>
-              <p className="text-sm text-gray-600">Recommended Tutors</p>
-            </div>
-            <div className="p-4 bg-yellow-100 rounded-md shadow text-center">
-              <p className="text-lg font-semibold text-yellow-700">4</p>
-              <p className="text-sm text-gray-600">Favourite Tutors</p>
+          <div className="bg-white rounded-md shadow-sm p-2 sm:p-6 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="p-4 bg-green-200 rounded-md shadow-sm text-center">
+                <p className="text-lg font-bold text-green-700">
+                  {userDetails?.tutors?.length || 0}
+                </p>
+                <p className="text-sm font-medium text-gray-800">
+                  Assigned Tutors
+                </p>
+              </div>
+              <div className="p-4 bg-purple-200 rounded-md shadow-sm text-center">
+                <p className="text-lg font-bold text-purple-700">
+                  {userDetails?.categories?.length || 0}
+                </p>
+                <p className="text-sm font-medium text-gray-800">
+                  Selected Subjects
+                </p>
+              </div>
+              <div className="p-4 bg-yellow-200 rounded-md shadow-sm text-center">
+                <p className="text-lg font-bold text-yellow-700">
+                  {FavouriteTutors?.length || 0}
+                </p>
+                <p className="text-sm font-medium text-gray-800">
+                  Favourite Tutors
+                </p>
+              </div>
             </div>
           </div>
 
           {/* ✅ Selected Subjects Section */}
-          <div className="bg-white rounded-md shadow p-4 sm:p-6 mb-6">
-            <h2 className="text-lg sm:text-xl font-semibold mb-3">
+          <div className="bg-white rounded-md shadow-sm p-4 sm:p-6 mb-6">
+            <h2 className="text-lg sm:text-2xl font-bold mb-4 text-gray-800">
               Selected Subjects
             </h2>
 
             {userDetails?.categories?.length > 0 ? (
-              <div className="flex flex-wrap gap-3 rounded-md p-3 bg-gray-50">
-                {userDetails.categories.map((category, idx) => (
-                  <span
-                    key={idx}
-                    className="flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1 rounded-md text-sm md:text-md font-medium shadow-sm"
-                  >
-                    {category}
-                  </span>
-                ))}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {userDetails.categories.map((category, idx) => {
+                  const parts = category.split(" in ");
+                  const mainCategory = parts[0]; // Big text
+                  const subCategory = parts[1] || ""; // Only the first "in" after main
+
+                  return (
+                    <div
+                      key={idx}
+                      className="bg-green-50 border border-green-200 rounded-md p-2 flex flex-col hover:shadow-sm transition-shadow duration-300"
+                    >
+                      <span className="text-sm sm:text-base font-semibold text-green-700">
+                        {mainCategory}
+                      </span>
+                      {subCategory && (
+                        <span className="text-xs sm:text-sm text-green-900 mt-1">
+                          {subCategory}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             ) : (
-              <p className="text-gray-500 text-sm italic">
+              <p className="text-gray-400 text-sm italic">
                 No subjects selected yet.
               </p>
             )}
           </div>
 
-          <div className="bg-white rounded-md shadow p-6 mb-6">
+          <div className="bg-white rounded-md shadow-sm p-2 sm:p-6 mb-6">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">
               Find Tutors
             </h2>
@@ -462,11 +514,11 @@ function StudentDashboardPage() {
             </form>
 
             {/* Tutors Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
               {loading ? (
                 <p className="col-span-full text-center">Loading...</p>
               ) : !hasSearched ? (
-                <p className="col-span-full text-center text-gray-500">
+                <p className="col-span-full text-center text-gray-500 text-xs md:text-sm">
                   Search result
                 </p>
               ) : filteredTutors.length > 0 ? (
@@ -481,38 +533,36 @@ function StudentDashboardPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-md shadow p-6 mb-6">
+          <div className="bg-white rounded-md shadow-sm p-2 sm:p-6 mb-6">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">
               Recommended Tutors
             </h2>
 
-            <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide">
-              {recommendedTutorsList.map((tutor) => (
-                <TutorSmallCard tutor={tutor} />
-              ))}
-            </div>
+            <HorizontalTutorList
+              tutors={recommentedTutors}
+              setRefreshFavourites={setRefreshFavourites}
+            />
           </div>
 
-          {/* <div className="bg-white rounded-md shadow p-6 mb-6">
+          <div className="bg-white rounded-md shadow-sm p-2 sm:p-6 mb-6">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">
-              Popular Tutors
+              Favourite Tutors
             </h2>
 
-            <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide">
-              {tutors.map((tutor) => (
-                <TutorSmallCard
-                  key={tutor.id}
-                  image={tutor.image}
-                  name={tutor.name}
-                  subject={tutor.subject}
-                  experience={tutor.experience}
-                />
-              ))}
-            </div>
-          </div> */}
+            {FavouriteTutors && FavouriteTutors.length > 0 ? (
+              <HorizontalTutorList
+                tutors={FavouriteTutors}
+                setRefreshFavourites={setRefreshFavourites}
+              />
+            ) : (
+              <div className="text-gray-500 text-xs sm:text-sm text-center py-6">
+                You haven’t added any favourite tutors yet.
+              </div>
+            )}
+          </div>
 
           {/* Notifications Preview */}
-          <div className="bg-white rounded-md shadow p-4 sm:p-6">
+          <div className="bg-white rounded-md shadow-sm p-2 sm:p-6">
             <h2 className="text-lg sm:text-xl font-semibold mb-4 flex items-center gap-2">
               Notifications
             </h2>

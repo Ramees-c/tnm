@@ -6,7 +6,7 @@ import DocumentCard from "../../../components/studentAndTutor/DocumentCard/Docum
 import axios from "axios";
 import { useAuth } from "../../../Context/userAuthContext";
 import ConfirmMessagePopup from "../../../components/common/ConfirmMessagePopup/ConfirmMessagePopup";
-import { MEDIA_URL } from "../../../API/API";
+import API_BASE, { MEDIA_URL } from "../../../API/API";
 import ToastMessage from "../../../components/studentAndTutor/ToastMessage/ToastMessage";
 
 function TutorDocumentPage({ role = "tutor" }) {
@@ -79,7 +79,7 @@ function TutorDocumentPage({ role = "tutor" }) {
     formData.append("files", selectedFile);
 
     try {
-      const res = await axios.post("/api/tutor/documents/upload/", formData, {
+      const res = await axios.post(`${API_BASE}/tutor/documents/upload/`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Token ${token}`,
@@ -133,7 +133,7 @@ function TutorDocumentPage({ role = "tutor" }) {
   const confirmDelete = async () => {
     if (!fileToDelete) return;
     try {
-      await axios.delete(`/api/tutor/documents/${fileToDelete.id}/delete/`, {
+      await axios.delete(`${API_BASE}/tutor/documents/${fileToDelete.id}/delete/`, {
         headers: { Authorization: `Token ${token}` },
       });
 
@@ -211,14 +211,14 @@ function TutorDocumentPage({ role = "tutor" }) {
             >
               <Menu size={27} />
             </button>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+            <h1 className="text-xl sm:text-3xl font-bold text-gray-800">
               Tutor Documents
             </h1>
           </div>
 
           {/* Upload Section */}
-          <div className="bg-white rounded-md shadow p-4 sm:p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+          <div className="bg-white rounded-md shadow-sm p-4 sm:p-6">
+            <h2 className="text-sm sm:text-lg font-semibold text-gray-800 mb-4">
               Upload Document
             </h2>
             <DocumentUpload
@@ -227,9 +227,9 @@ function TutorDocumentPage({ role = "tutor" }) {
             />
 
             {selectedFile && (
-              <div className="mt-4 w-full md:w-80 bg-white rounded-md shadow-lg border border-gray-200 overflow-hidden relative mx-auto">
+              <div className="mt-4 w-full md:w-80 bg-white rounded-md shadow-sm border border-gray-200 overflow-hidden relative mx-auto">
                 {/* Header */}
-                <div className="px-4 py-2 bg-gray-100 flex flex-col gap-1 border-b border-gray-200">
+                <div className="px-4 py-2 bg-gray-100 flex flex-col gap-1 border-b border-gray-200 text-sm sm:text-lg">
                   <p className="text-gray-800 font-medium truncate">
                     {selectedFile.name}
                   </p>
@@ -241,7 +241,7 @@ function TutorDocumentPage({ role = "tutor" }) {
                 {/* Close */}
                 <button
                   onClick={() => setSelectedFile(null)}
-                  className="absolute top-3 right-3 bg-red-500 text-white w-8 h-8 flex items-center justify-center rounded-full shadow hover:bg-red-600 transition"
+                  className="absolute top-3 right-3 bg-red-500 text-white text-xs sm:text-sm h-5 w-5 sm:w-8 sm:h-8 flex items-center justify-center rounded-full shadow-sm hover:bg-red-600 transition"
                 >
                   ✕
                 </button>
@@ -255,9 +255,9 @@ function TutorDocumentPage({ role = "tutor" }) {
                 <div className="p-4 flex justify-end">
                   <button
                     onClick={handleUpload}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md shadow hover:bg-green-700 transition text-sm"
+                    className="flex items-center gap-2 px-2 py-2 sm:px-4 sm:py-2 bg-green-600 text-white rounded-md shadow-sm hover:bg-green-700 transition text-xs sm:text-sm"
                   >
-                    <Upload size={16} /> Upload
+                    <Upload size={15} /> Upload
                   </button>
                 </div>
               </div>
@@ -265,8 +265,8 @@ function TutorDocumentPage({ role = "tutor" }) {
           </div>
 
           {/* Uploaded Documents */}
-          <div className="bg-white rounded-xl shadow p-4 sm:p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+          <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+            <h2 className="text-sm sm:text-lg font-semibold text-gray-800 mb-4">
               Uploaded Documents
             </h2>
             {uploadedDocuments.length > 0 ? (

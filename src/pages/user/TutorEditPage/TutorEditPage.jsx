@@ -258,7 +258,6 @@ function TutorEditPage() {
                     type={showPasswords.current ? "text" : "password"}
                     name="currentPassword"
                     placeholder="Current Password"
-                    value={formData.currentPassword || ""}
                     onChange={handleChange}
                     className="w-full py-2 px-3 sm:px-4 border border-gray-300 rounded-md placeholder-gray-400 outline-none focus:ring-0 focus:border-green-500 text-sm sm:text-base"
                   />

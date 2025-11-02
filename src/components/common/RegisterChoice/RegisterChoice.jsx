@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import teacherImg from "../../../assets/images/logo/tnmlogo.png";
-import studentImg from "../../../assets/images/logo/tnmlogo.png";
+import teacherImg from "../../../assets/images/icons/tutor.png";
+import studentImg from "../../../assets/images/icons/student.png";
 import ChoiceCard from "../../../pages/user/ChoiceCard/ChoiceCard";
 import { HiAcademicCap, HiBookOpen } from "react-icons/hi";
 
@@ -49,7 +49,7 @@ function RegisterChoice({ onTutorClick, onStudentClick, onCreateAccount }) {
               image={studentImg}
               title="I am looking to Learn"
               description="Discover expert tutors, personalized lessons, and achieve your learning goals"
-              buttonText="POST YOUR REQUIREMENT"
+              buttonText="CREATE YOUR PROFILE"
               buttonColor="bg-green-500 hover:bg-green-600"
               cardColor="from-green-50 to-teal-50"
               icon={<HiBookOpen className="w-8 h-8 text-green-600 mb-3" />}
@@ -70,9 +70,18 @@ function RegisterChoice({ onTutorClick, onStudentClick, onCreateAccount }) {
             </span>
           </p>
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-500">
-            <span className="flex items-center">✅ 5000+ Expert Tutors</span>
-            <span className="flex items-center">✅ 100+ Subjects</span>
-            <span className="flex items-center">✅ Secure Payments</span>
+            <span className="flex items-center gap-2 text-gray-600 font-medium">
+              ✅ Highly Qualified Tutors
+            </span>
+            <span className="flex items-center gap-2 text-gray-600 font-medium">
+              ✅ Wide Range of Subjects
+            </span>
+            <span className="flex items-center gap-2 text-gray-600 font-medium">
+              ✅ Safe & Secure Payments
+            </span>
+            <span className="flex items-center gap-2 text-gray-600 font-medium">
+              ✅ Personalized Learning Plans
+            </span>
           </div>
         </div>
       </section>

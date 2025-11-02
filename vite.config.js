@@ -6,10 +6,11 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://tnm-test-api.dhanwis.com", // your backend
+        target: "https://api-tnm.tutor-nearme.com",
         changeOrigin: true,
         secure: false,
       },
     },
+    historyApiFallback: true, 
   },
 });

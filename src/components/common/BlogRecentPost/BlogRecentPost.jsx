@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import API_BASE from "../../../API/API";
 
 function BlogRecentPost() {
   const [posts, setPosts] = useState([]);
@@ -8,7 +9,7 @@ function BlogRecentPost() {
 
   useEffect(() => {
     axios
-      .get("/api/blogs/")
+      .get(`${API_BASE}/blogs/`)
       .then((res) => {
         // assuming API returns an array of blog objects
         // take the latest 5
@@ -23,7 +24,7 @@ function BlogRecentPost() {
 
   if (loading) {
     return (
-      <div className="bg-white p-4 shadow-md rounded-lg">
+      <div className="bg-white p-4 shadow-md rounded-md">
         <h3 className="font-bold mb-3">Recent Post</h3>
         <p className="text-sm text-gray-500">Loading...</p>
       </div>
@@ -31,7 +32,7 @@ function BlogRecentPost() {
   }
 
   return (
-    <div className="bg-white p-4 shadow-md rounded-lg">
+    <div className="bg-white p-2 shadow-md rounded-md">
       <h3 className="font-bold mb-3">Recent Post</h3>
       <ul className="space-y-4">
         {posts.map((post) => (

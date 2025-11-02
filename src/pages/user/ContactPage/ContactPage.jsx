@@ -14,6 +14,11 @@ import {
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import PageHeader from "../../../components/common/PageHeader/PageHeader";
+import { FaX } from "react-icons/fa6";
+import API_BASE from "../../../API/API";
+
+
+import pageBanner from "../../../assets/images/page_banner/contact.png"
 
 function ContactPage() {
   const [formData, setFormData] = useState({
@@ -77,43 +82,77 @@ function ContactPage() {
     if (errors.phone) setErrors({ ...errors, phone: "" });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    if (validateForm()) {
-      console.log("Form submitted:", formData);
-      setFormData({ name: "", email: "", phone: "", message: "" });
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
+    if (!validateForm()) {
+      setIsSubmitting(false);
+      return;
     }
 
-    setIsSubmitting(false);
+    try {
+      const payload = {
+        ...formData,
+        phone: formData.phone.startsWith("+")
+          ? formData.phone
+          : `+${formData.phone}`,
+      };
+
+      const response = await fetch(`${API_BASE}/contact/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      let data = {};
+      try {
+        data = await response.json();
+      } catch (err) {
+        // If response is empty or non-JSON
+        data = {};
+      }
+
+      if (response.ok) {
+        // Success
+        setFormData({ name: "", email: "", phone: "", message: "" });
+        setErrors({});
+        setShowSuccess(true);
+
+        // Hide after 3 seconds
+        setTimeout(() => setShowSuccess(false), 3000);
+      } else {
+        // Backend validation errors
+        if (data) {
+          const backendErrors = {};
+          for (let key in data) {
+            backendErrors[key] = Array.isArray(data[key])
+              ? data[key].join(" ")
+              : data[key];
+          }
+          setErrors(backendErrors);
+        } else {
+          alert("Something went wrong. Please try again later.");
+        }
+      }
+    } catch (err) {
+      console.error("Error submitting form:", err);
+      alert("Failed to send message. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="w-full min-h-screen">
       <PageHeader
         title="Contact Us"
-        headerBg="https://images.unsplash.com/photo-1423784346385-c1d4dac9893a?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTAwfHxjb250YWN0fGVufDB8fDB8fHww"
+        headerBg={pageBanner}
       />
-      
 
       <div className="container mx-auto px-4 py-12">
-        {/* <div className="bg-gradient-to-br from-green-500 via-green-600 to-green-700 rounded-lg p-10 text-center text-white relative overflow-hidden">
-        <div className="absolute -top-20 -right-20 w-40 h-40 bg-white/10 rounded-full"></div>
-          <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-white/10 rounded-full"></div>
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
-            Get in Touch
-          </h1>
-          <p className="text-sm md:text-lg opacity-90 mx-auto">
-            We'd love to hear from you. Let's start a conversation.
-          </p>
-        </div>
-      </div> */}
         {showSuccess && (
-          <div className="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-lg flex items-center" data-aos="fade-up">
+          <div className="fixed top-4 right-4 z-50 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-md shadow-lg flex items-center">
             <svg
               className="w-6 h-6 mr-2"
               fill="none"
@@ -131,10 +170,13 @@ function ContactPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8" data-aos="fade-up">
+        <div
+          className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+          data-aos="fade-up"
+        >
           {/* Info */}
-          <div className="bg-white rounded-xl shadow-lg p-8 space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800 border-b pb-4">
+          <div className="bg-white rounded-md shadow-lg p-5 sm:p-8 space-y-6">
+            <h2 className="text-2xl sm:text-2xl md:text-3xl font-bold text-gray-800 border-b pb-4">
               Contact Information
             </h2>
             <div className="flex items-start space-x-4">
@@ -143,8 +185,22 @@ function ContactPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800">Phone</h3>
-                <p className="text-gray-600">+1 (234) 567-8901</p>
-                <p className="text-gray-600">+1 (234) 567-8902</p>
+                <p className="text-sm sm:text-base">
+                  <a
+                    href="tel:+916282228560"
+                    className="text-gray-600 hover:text-green-600"
+                  >
+                    +91 6282 2285 60
+                  </a>
+                </p>
+                <p className="text-sm sm:text-base">
+                  <a
+                    href="tel:+918590228560"
+                    className="text-gray-600 hover:text-green-600"
+                  >
+                    +91 8590 2285 60
+                  </a>
+                </p>
               </div>
             </div>
             <div className="flex items-start space-x-4">
@@ -153,10 +209,12 @@ function ContactPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800">Address</h3>
-                <p className="text-gray-600">
-                  625 5th Street, The Grand Avenue
+                <p className="text-gray-600 text-sm sm:text-base">
+                  Sreerosh Green Acres
                   <br />
-                  2nd Block, New York City
+                  Mathukoth, Varam
+                  <br />
+                  Kannur, 670594
                 </p>
               </div>
             </div>
@@ -166,8 +224,22 @@ function ContactPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800">Email</h3>
-                <p className="text-gray-600">info@site.com</p>
-                <p className="text-gray-600">support@site.com</p>
+                <p className="text-sm sm:text-base">
+                  <a
+                    href="mailto:info@tutor-nearme.com"
+                    className="text-gray-600 hover:text-green-600"
+                  >
+                    info@tutor-nearme.com
+                  </a>
+                </p>
+                <p className="text-sm sm:text-base">
+                  <a
+                    href="mailto:admin@tutor-nearme.com"
+                    className="text-gray-600 hover:text-green-600"
+                  >
+                    admin@tutor-nearme.com
+                  </a>
+                </p>
               </div>
             </div>
             <div className="flex items-start space-x-4">
@@ -176,8 +248,9 @@ function ContactPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800">Business Hours</h3>
-                <p className="text-gray-600">Mon-Fri: 9AM - 5PM</p>
-                <p className="text-gray-600">Sat: 10AM - 3PM</p>
+                <p className="text-gray-600 text-sm sm:text-base">
+                  Available 24/7
+                </p>
               </div>
             </div>
 
@@ -185,27 +258,41 @@ function ContactPage() {
             <div className="pt-6 border-t">
               <h3 className="font-semibold text-gray-800 mb-4">Follow Us</h3>
               <div className="flex space-x-3">
-                {[FaFacebook, FaTwitter, FaLinkedin, FaInstagram].map(
-                  (Icon, idx) => (
-                    <a
-                      key={idx}
-                      href="#"
-                      className="bg-green-100 text-green-600 p-3 rounded-full hover:bg-green-600 hover:text-white transition"
-                    >
-                      <Icon />
-                    </a>
-                  )
-                )}
+                {[
+                  {
+                    icon: FaFacebook,
+                    url: "https://www.facebook.com/profile.php?id=61578906604625&mibextid=ZbWKwL",
+                  },
+                  { icon: FaX, url: "#" },
+                  {
+                    icon: FaLinkedin,
+                    url: "https://www.linkedin.com/in/tnm-network-tutor-near-me-3b2287376?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
+                  },
+                  {
+                    icon: FaInstagram,
+                    url: "https://www.instagram.com/tnm_network?igsh=Nmk0dWNobjZwenA3",
+                  },
+                ].map(({ icon: Icon, url }, idx) => (
+                  <a
+                    key={idx}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-green-100 text-green-600 p-3 rounded-full hover:bg-green-600 hover:text-white transition"
+                  >
+                    <Icon />
+                  </a>
+                ))}
               </div>
             </div>
           </div>
 
           {/* Form */}
-          <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          <div className="lg:col-span-2 bg-white rounded-md shadow-lg p-3 sm:p-8">
+            <h2 className="text-2xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-2">
               Send us a message
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 mb-6 text-xs sm:text-base">
               Fill out the form below and we'll get back to you as soon as
               possible.
             </p>
@@ -222,7 +309,7 @@ function ContactPage() {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border ${
+                    className={`w-full px-4 py-3 border text-xs sm:text-base rounded-md ${
                       errors.name ? "border-red-500" : "border-gray-300"
                     } rounded-lg outline-none border focus:ring-0 focus:border-primary`}
                     placeholder="Your name"
@@ -240,10 +327,10 @@ function ContactPage() {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border ${
+                    className={`w-full px-4 py-3 border text-xs sm:text-base rounded-md ${
                       errors.email ? "border-red-500" : "border-gray-300"
                     } rounded-lg outline-none border focus:ring-0 focus:border-primary`}
-                    placeholder="your.email@example.com"
+                    placeholder="Enter your email"
                   />
                   {errors.email && (
                     <p className="mt-1 text-sm text-red-600">{errors.email}</p>
@@ -257,14 +344,16 @@ function ContactPage() {
                   Phone *
                 </label>
                 <PhoneInput
-                  country={"in"} // Default India
-                  enableSearch={true} // Optional: allow search
+                  country={"in"}
+                  enableSearch={true}
                   value={formData.phone}
                   onChange={handlePhoneChange}
+                  countryCodeEditable={false}
+                  disableCountryCode={false}
                   inputProps={{
                     name: "phone",
                     required: true,
-                    className: `w-full px-12 py-3 border ${
+                    className: `w-full px-12 py-3 border text-xs sm:text-base rounded-md ${
                       errors.phone ? "border-red-500" : "border-gray-300"
                     } rounded-lg outline-none border focus:ring-0 focus:border-primary`,
                     placeholder: "Your Contact Number",
@@ -278,17 +367,17 @@ function ContactPage() {
               {/* Message */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Tell us about your project *
+                  Message *
                 </label>
                 <textarea
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
                   rows="5"
-                  className={`w-full px-4 py-3 border ${
+                  className={`w-full px-4 py-3 border text-xs sm:text-base rounded-md ${
                     errors.message ? "border-red-500" : "border-gray-300"
                   } rounded-lg outline-none border focus:ring-0 focus:border-primary`}
-                  placeholder="Describe your project..."
+                  placeholder="Type your message here..."
                 />
                 {errors.message && (
                   <p className="mt-1 text-sm text-red-600">{errors.message}</p>
@@ -298,7 +387,7 @@ function ContactPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                className="w-full bg-gradient-to-r text-sm sm:text-base from-green-500 to-green-600 text-white font-semibold py-3 px-6 rounded-md hover:shadow-lg hover:-translate-y-0.5 transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
               >
                 <span>{isSubmitting ? "Sending..." : "Send Message"}</span>
                 <FaPaperPlane className="text-sm" />
@@ -309,10 +398,10 @@ function ContactPage() {
 
         {/* Map */}
         <div className="mt-12" data-aos="fade-up">
-          <div className="rounded-xl shadow-lg overflow-hidden">
+          <div className="rounded-md shadow-lg overflow-hidden">
             <iframe
               title="map"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3021.891414872599!2d-74.0059416845949!3d40.712775779330!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25a3168f9a1f5%3A0x67bbf2bb89b34d1c!2sNew%20York%2C%20USA!5e0!3m2!1sen!2sin!4v1688200000000!5m2!1sen!2sin"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3904.1444572854025!2d75.42630067510531!3d11.895027788330074!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba43c98dda4185b%3A0x747ca4b01a657490!2sSreerosh%20Green%20Acres!5e0!3m2!1sen!2sin!4v1760527283104!5m2!1sen!2sin"
               width="100%"
               height="400"
               loading="lazy"

@@ -16,11 +16,11 @@ function ToastMessage({ message, isOpen, onClose, type = "info" }) {
   return (
     <div>
       {/* ✅ Only show toast if it's open AND popup is NOT open */}
-      {isOpen && !showEdit && (
-        <div className="fixed top-5 right-5 z-[9999]">
+      {isOpen && (
+        <div className="fixed top-5 right-5 z-40">
           <div
             onClick={() => setShowEdit(true)}
-            className={`px-2 py-1 lg:px-4 lg:py-3 rounded-md shadow-lg text-white w-[180px] lg:w-[300px] ${colors[type]} transition-transform transform flex justify-between items-center cursor-pointer`}
+            className={`px-2 py-1 lg:px-4 lg:py-3 rounded-md shadow-lg text-white w-[180px] md:w-[300px] ${colors[type]} transition-transform transform flex justify-between items-center cursor-pointer`}
           >
             <span className="text-xs md:text-sm">{message}</span>
           </div>

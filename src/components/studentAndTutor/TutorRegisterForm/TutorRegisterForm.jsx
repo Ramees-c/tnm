@@ -9,6 +9,7 @@ import OtpModal from "../../common/OtpModal/OtpModal";
 
 import { useNavigate } from "react-router-dom";
 import ConfirmMessagePopup from "../../common/ConfirmMessagePopup/ConfirmMessagePopup";
+import API_BASE from "../../../API/API";
 
 const initialFormData = {
   full_name: "",
@@ -27,6 +28,8 @@ const initialFormData = {
   available_days: [],
   profile_image: null,
   categories: [],
+  landmark: "",
+  near_by_town: "",
 };
 
 function TutorRegisterForm() {
@@ -53,6 +56,11 @@ function TutorRegisterForm() {
 
   const [showMessagePopup, setShowMessagePopup] = useState(false);
 
+  const [pincodeSuggestions, setPincodeSuggestions] = useState([]);
+  const [showPincodeSuggestions, setShowPincodeSuggestions] = useState(false);
+  const [pincodeTimeout, setPincodeTimeout] = useState(null);
+  const [isPincodeLoading, setIsPincodeLoading] = useState(false);
+
   const errorRefs = {
     full_name: useRef(null),
     email: useRef(null),
@@ -70,6 +78,8 @@ function TutorRegisterForm() {
     subjects: useRef(null),
     description: useRef(null),
     availableDays: useRef(null),
+    landmark: useRef(null),
+    near_by_town: useRef(null),
   };
 
   const subjectRef = useRef(null);
@@ -99,6 +109,21 @@ function TutorRegisterForm() {
     function handleClickOutside(event) {
       if (subjectRef.current && !subjectRef.current.contains(event.target)) {
         setShowSuggestions(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        errorRefs.pincode.current &&
+        !errorRefs.pincode.current.contains(event.target)
+      ) {
+        setShowPincodeSuggestions(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -173,6 +198,39 @@ function TutorRegisterForm() {
     setErrors((prev) => ({ ...prev, phoneNumber: "" }));
   };
 
+  const handlePincodeChange = async (e) => {
+    const value = e.target.value;
+    setFormData((prev) => ({ ...prev, pincode: value }));
+
+    setErrors((prev) => ({ ...prev, pincode: "" }));
+
+    if (value.length < 3) {
+      setPincodeSuggestions([]);
+      setShowPincodeSuggestions(false);
+      return;
+    }
+
+    setIsPincodeLoading(true); // ✅ start loading
+
+    try {
+      const res = await axios.get(`${API_BASE}/pincode_search/?q=${value}`);
+      setPincodeSuggestions(res.data || []);
+      setShowPincodeSuggestions(true);
+    } catch (err) {
+      console.error("Pincode search error:", err);
+      setPincodeSuggestions([]);
+      setShowPincodeSuggestions(false);
+    } finally {
+      setIsPincodeLoading(false); // ✅ stop loading
+    }
+  };
+
+  const handleSelectPincode = (pin) => {
+    // Update formData with selected pincode
+    setFormData((prev) => ({ ...prev, pincode: pin.pincode }));
+    setShowPincodeSuggestions(false); // close dropdown
+  };
+
   const validateForm = () => {
     let newErrors = {};
 
@@ -224,9 +282,43 @@ function TutorRegisterForm() {
       newErrors.availableDays = "Please select at least one available day";
     }
     if (!formData.description) newErrors.description = "Bio is required";
+    if (!formData.landmark) newErrors.landmark = "Landmark is required";
+    if (!formData.near_by_town)
+      newErrors.near_by_town = "Near by town is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const validatePassword = (password) => {
+    if (!password) return "Password is required";
+    if (password.length < 8)
+      return "Password must be at least 8 characters long";
+    if (!/[0-9]/.test(password)) return "Must include at least one number";
+    if (!/[!@#$%^&*]/.test(password))
+      return "Must include at least one special character (!@#$%^&*)";
+    return "";
+  };
+
+  const handlePasswordBlur = () => {
+    const errorMsg = validatePassword(formData.password);
+    setErrors((prev) => ({ ...prev, password: errorMsg }));
+  };
+
+  const handleConfirmPasswordBlur = () => {
+    if (!confirmPassword) {
+      setErrors((prev) => ({
+        ...prev,
+        confirmPassword: "Please confirm your password",
+      }));
+    } else if (confirmPassword !== formData.password) {
+      setErrors((prev) => ({
+        ...prev,
+        confirmPassword: "Passwords do not match",
+      }));
+    } else {
+      setErrors((prev) => ({ ...prev, confirmPassword: "" }));
+    }
   };
 
   // ✅ Recursive function to flatten categories and all nested subcategories
@@ -310,7 +402,7 @@ function TutorRegisterForm() {
     setErrors((prev) => ({ ...prev, subjects: "" }));
 
     try {
-      const res = await axios.get("/api/category-list/");
+      const res = await axios.get(`${API_BASE}/category-list/`);
       if (res.data && Array.isArray(res.data)) {
         const allSubcategories = flattenCategories(res.data);
         const query = value.toLowerCase();
@@ -375,14 +467,25 @@ function TutorRegisterForm() {
 
   // ✅ Highlight typed text
   // ✅ Highlight typed text inside suggestion
-    const highlightMatch = (text, query) => {
-      if (!query) return text;
-      const regex = new RegExp(`(${query})`, "gi");
-      return text.replace(
-        regex,
-        (match) => `<span class="text-green-400 font-bold">${match}</span>` // highlight color
-      );
-    };
+  const highlightMatch = (text, query) => {
+    if (!query) return text;
+    const regex = new RegExp(`(${query})`, "gi");
+    return text.replace(
+      regex,
+      (match) => `<span class="text-green-400 font-bold">${match}</span>` // highlight color
+    );
+  };
+
+  const highlightPincodeMatch = (text, query) => {
+    if (!query) return text;
+    // Escape regex special characters from query
+    const escapedQuery = query.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+    const regex = new RegExp(`(${escapedQuery})`, "gi");
+    return text.replace(
+      regex,
+      (match) => `<span class="text-green-500 font-bold">${match}</span>`
+    );
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -407,7 +510,7 @@ function TutorRegisterForm() {
       const phoneWithCode = `+${countryCode}${mobile_number}`;
 
       // Call send OTP
-      const response = await axios.post("/api/send-otp/", {
+      const response = await axios.post(`${API_BASE}/send-otp/`, {
         email,
         mobile_number: phoneWithCode,
       });
@@ -456,7 +559,7 @@ function TutorRegisterForm() {
   // 🔹 Resend OTP API
   const sendOtp = async () => {
     try {
-      await axios.post("/api/send-otp/", {
+      await axios.post(`${API_BASE}/send-otp/`, {
         email: formData.email,
         mobile_number: `+${formData.countryCode}${formData.mobile_number}`,
       });
@@ -490,7 +593,7 @@ function TutorRegisterForm() {
       fd.append("otp", enteredOtp);
 
       // Call register API
-      const res = await axios.post("/api/register/tutor/", fd, {
+      const res = await axios.post(`${API_BASE}/register/tutor/`, fd, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -691,7 +794,7 @@ function TutorRegisterForm() {
                       onChange={handlePhoneChange}
                       placeholder="Phone Number *"
                       ref={errorRefs.phoneNumber}
-                      className={`w-full py-2 px-4 border ${
+                      className={`w-full py-2 px-4 text-xs sm:text-sm border ${
                         errors.phoneNumber
                           ? "border-red-500"
                           : "border-gray-300"
@@ -737,6 +840,7 @@ function TutorRegisterForm() {
                   placeholder="Password *"
                   value={formData.password}
                   onChange={handleChange}
+                  onBlur={handlePasswordBlur}
                   hasError={errors.password}
                   innerRef={errorRefs.password}
                 />
@@ -762,8 +866,9 @@ function TutorRegisterForm() {
                     setConfirmPassword(e.target.value);
                     setErrors((prev) => ({ ...prev, confirmPassword: "" })); // ✅ clear error while typing
                   }}
+                  onBlur={handleConfirmPasswordBlur}
                   ref={errorRefs.confirmPassword}
-                  className={`w-full py-2 px-4 pr-10 border ${
+                  className={`w-full py-2 px-4 pr-10 border text-xs sm:text-sm ${
                     errors.confirmPassword
                       ? "border-red-500"
                       : "border-gray-300"
@@ -817,17 +922,86 @@ function TutorRegisterForm() {
                   <p className="text-red-500 text-xs mt-1">{errors.state}</p>
                 )}
               </div>
-              <div ref={errorRefs.pincode}>
-                <FormInput
+              <div className="relative" ref={errorRefs.pincode}>
+                <input
+                  type="text"
                   name="pincode"
                   placeholder="Pincode *"
                   value={formData.pincode}
-                  onChange={handleChange}
-                  hasError={errors.pincode}
-                  innerRef={errorRefs.pincode}
+                  onChange={handlePincodeChange}
+                  className={`w-full py-2 px-4 border ${
+                    errors.pincode ? "border-red-500" : "border-gray-300 text-xs sm:text-sm"
+                  } rounded-md placeholder-gray-400 outline-none focus:ring-0 focus:border-primary`}
+                  autoComplete="off"
                 />
                 {errors.pincode && (
                   <p className="text-red-500 text-xs mt-1">{errors.pincode}</p>
+                )}
+
+                {/* Dropdown suggestions */}
+                {showPincodeSuggestions && (
+                  <ul className="absolute w-full border rounded-md bg-white shadow-md mt-2 max-h-60 overflow-y-auto z-10">
+                    {isPincodeLoading ? (
+                      <li className="px-4 py-2 text-gray-500 text-sm italic">
+                        Loading...
+                      </li>
+                    ) : pincodeSuggestions.length > 0 ? (
+                      pincodeSuggestions.map((pin) => (
+                        <li
+                          key={pin.id}
+                          onMouseDown={(e) => {
+                            e.preventDefault(); // prevent input blur
+                            handleSelectPincode(pin);
+                          }}
+                          className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm"
+                          dangerouslySetInnerHTML={{
+                            __html: `${highlightPincodeMatch(
+                              pin.pincode,
+                              formData.pincode
+                            )} - ${highlightPincodeMatch(
+                              pin.office_name,
+                              formData.pincode
+                            )}`,
+                          }}
+                        />
+                      ))
+                    ) : (
+                      <li className="px-4 py-2 text-gray-400 text-sm italic">
+                        No pincodes found
+                      </li>
+                    )}
+                  </ul>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div ref={errorRefs.landmark}>
+                <FormInput
+                  name="landmark"
+                  placeholder="Landmark *"
+                  value={formData.landmark}
+                  onChange={handleChange}
+                  hasError={errors.landmark}
+                  innerRef={errorRefs.landmark}
+                />
+                {errors.landmark && (
+                  <p className="text-red-500 text-xs mt-1">{errors.landmark}</p>
+                )}
+              </div>
+              <div ref={errorRefs.near_by_town}>
+                <FormInput
+                  name="near_by_town"
+                  placeholder="Near by town *"
+                  value={formData.near_by_town}
+                  onChange={handleChange}
+                  hasError={errors.near_by_town}
+                  innerRef={errorRefs.near_by_town}
+                />
+                {errors.near_by_town && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.near_by_town}
+                  </p>
                 )}
               </div>
             </div>
@@ -912,8 +1086,8 @@ function TutorRegisterForm() {
                   onChange={handleSubjectChange}
                   onFocus={handleSubjectChange}
                   ref={errorRefs.subjects}
-                  className={`w-full py-2 px-4 border ${
-                    errors.subjects ? "border-red-500" : "border-gray-300"
+                  className={`w-full py-2 px-4 border text-xs sm:text-sm ${
+                    errors.subjects ? "border-red-500" : "border-gray-300 text-xs sm:text-sm"
                   } rounded-md placeholder-gray-400 outline-none focus:ring-0 focus:border-primary`}
                   autoComplete="off"
                   autoCorrect="off"
@@ -1039,7 +1213,7 @@ function TutorRegisterForm() {
                 onChange={handleChange}
                 ref={errorRefs.description}
                 rows="4"
-                className={`w-full px-4 py-3 border ${
+                className={`w-full px-4 py-3 text-xs sm:text-sm border ${
                   errors.description ? "border-red-500" : "border-gray-300"
                 } rounded-md outline-none focus:ring-0 focus:border-primary transition`}
               />
@@ -1104,7 +1278,7 @@ function TutorRegisterForm() {
             message="Please wait, admin approval is required before accessing the dashboard."
             onClose={() => {
               setShowMessagePopup(false);
-              navigate("/"); 
+              navigate("/");
             }}
           />
         )}

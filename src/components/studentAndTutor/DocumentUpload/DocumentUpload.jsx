@@ -26,9 +26,9 @@ function DocumentUpload({ onUpload, uploadError }) {
 
   return (
     <div className="flex flex-col items-center w-full">
-      <label className="flex flex-col items-center px-6 py-4 bg-gray-100 text-gray-600 rounded-md shadow cursor-pointer hover:bg-gray-200 transition">
-        <Upload size={24} className="mb-2 text-green-600" />
-        <span className="text-sm font-medium">Select PDF or DOC</span>
+      <label className="flex flex-col items-center px-6 py-4 bg-gray-100 text-gray-600 rounded-md shadow-sm cursor-pointer hover:bg-gray-200 transition">
+        <Upload size={20} className="mb-2 text-green-600" />
+        <span className="text-xs sm:text-sm font-medium">Select PDF or DOC</span>
         <input
           type="file"
           accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"

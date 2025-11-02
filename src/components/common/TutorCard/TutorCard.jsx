@@ -1,22 +1,70 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FaChalkboardTeacher, FaBookOpen } from "react-icons/fa";
 import DefaultButton from "../DefaultButton/DefaultButton";
+import { useAuth } from "../../../Context/userAuthContext";
+import { useNavigate } from "react-router-dom";
 
 function TutorCard({ tutor }) {
+  const navigate = useNavigate();
+  const { userDetails } = useAuth();
+
   const [isHovered, setIsHovered] = useState(false);
   const [showAllCategories, setShowAllCategories] = useState(false);
-  const [showFullBio, setShowFullBio] = useState(false); // 👈 new state
+  const [showMoreBtn, setShowMoreBtn] = useState(false);
+  const [visibleCategoriesCount, setVisibleCategoriesCount] = useState(
+    tutor.categories.length
+  );
+
+  const containerRef = useRef(null);
+
+  // ✅ Check if categories overflow the first row
+  useEffect(() => {
+    const checkOverflow = () => {
+      const container = containerRef.current;
+      if (!container) return;
+
+      const firstRowTop = container.children[0]?.offsetTop || 0;
+      let count = 0;
+
+      for (let i = 0; i < container.children.length; i++) {
+        if (container.children[i].offsetTop === firstRowTop) {
+          count++;
+        }
+      }
+
+      setVisibleCategoriesCount(count);
+      setShowMoreBtn(count < tutor.categories.length);
+    };
+
+    checkOverflow();
+
+    const resizeObserver = new ResizeObserver(checkOverflow);
+    resizeObserver.observe(containerRef.current);
+
+    return () => resizeObserver.disconnect();
+  }, [tutor.categories]);
+
+  const handleClick = () => {
+    if (userDetails?.role === "student") {
+      navigate("/studentDashbordAllTutors");
+    } else {
+      navigate("/register", {
+        state: { redirect: "/studentDashbordAllTutors" },
+      });
+    }
+  };
 
   return (
     <div
-      className={`relative bg-white rounded-md shadow-lg overflow-hidden transition-all duration-300 
-      w-[340px] md:w-[390px] lg:w-[390px] xl:w-[350px] 2xl:w-[400px] min-h-[590px] 
+      className={`relative rounded-md shadow-lg overflow-hidden transition-all duration-300 
+      w-[340px] md:w-[300px] lg:w-[350px] xl:w-[290px] 2xl:w-[340px] flex flex-col 
+      ${userDetails?.role !== "tutor" ? "min-h-[420px]" : "min-h-[400px]"} 
       ${isHovered ? "shadow-xl -translate-y-1" : "shadow-md"}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Tutor Image */}
-      <div className="relative overflow-hidden h-[250px]">
+      <div className="relative overflow-hidden h-[200px] ">
         <img
           src={tutor.profile_image}
           alt={tutor.full_name}
@@ -25,100 +73,91 @@ function TutorCard({ tutor }) {
       </div>
 
       {/* Tutor Info */}
-      <div className="p-5 flex flex-col justify-between bg-white flex-grow transition-all duration-300">
-        <div className="flex flex-col justify-between bg-white">
-          <div>
-            <div className="flex justify-between items-start mb-1">
-              <div>
-                <h3 className="text-xl font-bold text-gray-800">
-                  {tutor.full_name}
-                </h3>
-                <p className="text-gray-600 text-sm">{tutor.qualification}</p>
-              </div>
-            </div>
-
-            {/* Bio */}
+      <div className="p-3 flex flex-col justify-between flex-1 bg-white transition-all duration-300">
+        <div>
+          <div className="flex justify-between items-start mb-3">
             <div>
-              <p
-                className={`text-gray-600 text-sm ${
-                  showFullBio ? "" : "overflow-hidden h-10"
-                }`}
-                style={
-                  showFullBio
-                    ? {}
-                    : {
-                        display: "-webkit-box",
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: "vertical",
-                      }
-                }
-              >
-                {tutor.description}
-              </p>
-              {tutor.description.length > 120 && (
-                <button
-                  onClick={() => setShowFullBio(!showFullBio)}
-                  className="text-xs text-primary underline mt-1 focus:outline-none"
-                >
-                  {showFullBio ? "Show less" : "Read more"}
-                </button>
-              )}
+              <h3 className="text-xl font-bold text-gray-800">
+                {tutor.full_name}
+              </h3>
+              <p className="text-gray-600 text-sm">{tutor.qualification}</p>
+            </div>
+          </div>
+
+          {/* Categories */}
+          <div className="mb-2 mt-2">
+            <div
+              ref={containerRef}
+              className={`flex flex-wrap gap-2 overflow-hidden transition-all duration-500 ${
+                showAllCategories ? "max-h-[1000px]" : "max-h-14"
+              }`}
+            >
+              {tutor.categories.map((category, index) => {
+                const parts = category.split(" in ");
+                const mainCategory = parts[0];
+                const subCategory = parts[1] || "";
+
+                if (!showAllCategories && index >= visibleCategoriesCount)
+                  return null;
+
+                return (
+                  <div
+                    key={index}
+                    className="bg-gray-100 rounded-md p-1 flex flex-col hover:shadow-md transition-all duration-300 border border-gray-200"
+                  >
+                    <span className="text-xs sm:text-xs font-semibold text-gray-800">
+                      {mainCategory}
+                    </span>
+                    {subCategory && (
+                      <span className="text-[11px] sm:text-xs text-gray-600 mt-1">
+                        {subCategory}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
-            {/* Categories */}
-            <div className="flex flex-wrap gap-2 mb-2 mt-2">
-              {(showAllCategories
-                ? tutor.categories
-                : tutor.categories.slice(0, 1)
-              ).map((subject, index) => (
-                <span
-                  key={index}
-                  className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
-                >
-                  {subject}
-                </span>
-              ))}
-
-              {tutor.categories.length > 1 && (
+            {/* More / Less Button */}
+            {showMoreBtn && (
+              <div className="mt-2">
                 <button
                   onClick={() => setShowAllCategories(!showAllCategories)}
-                  className="text-xs text-primary underline focus:outline-none"
+                  className="text-xs sm:text-xs text-primary underline focus:outline-none"
                 >
                   {showAllCategories
                     ? "Show less"
-                    : `+${tutor.categories.length - 1} more`}
+                    : `+${
+                        tutor.categories.length - visibleCategoriesCount
+                      } more`}
                 </button>
-              )}
-            </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer always sticks to bottom */}
+        <div className="mt-auto pt-1 border-t border-gray-100 flex justify-between items-end">
+          <div
+            className={`${
+              userDetails?.role === "tutor"
+                ? "flex w-full justify-between items-center"
+                : ""
+            }`}
+          >
+            <span className="text-gray-500 text-sm block">Starting from</span>
+            <p className="text-xl font-bold text-primary">
+              ₹{tutor.hourly_rate}/hr
+            </p>
           </div>
 
-          {/* Footer */}
-          <div>
-            <div className="flex items-center justify-between border-t border-gray-100 pt-2">
-              <div className="flex items-center text-gray-600">
-                <FaChalkboardTeacher className="mr-2" />
-                <span className="text-sm">
-                  {tutor.assigned_students.length} students
-                </span>
-              </div>
-              <div className="flex items-center text-gray-600">
-                <FaBookOpen className="mr-2" />
-                <span className="text-sm">
-                  {tutor.categories.length} courses
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-3 flex justify-between items-center pb-3">
-              <div>
-                <span className="text-gray-500 text-sm">Starting from</span>
-                <p className="text-xl font-bold text-primary">
-                  ₹{tutor.hourly_rate}/hr
-                </p>
-              </div>
-              <DefaultButton buttonText="Register Now" buttonSmall={true} />
-            </div>
-          </div>
+          {userDetails?.role !== "tutor" && (
+            <DefaultButton
+              onClick={handleClick}
+              buttonText="Register Now"
+              buttonMedium={true}
+            />
+          )}
         </div>
       </div>
     </div>

@@ -5,11 +5,13 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import logo from "../../../assets/images/logo/tnmlogo.png";
 import axios from "axios";
 import { useAuth } from "../../../Context/userAuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import API_BASE from "../../../API/API";
 
 function LoginForm({ onCreateAccount, onForgotPassword }) {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [formData, setFormData] = useState({
     identifier: "",
     password: "",
@@ -57,82 +59,80 @@ function LoginForm({ onCreateAccount, onForgotPassword }) {
   // ✅ Submit
   // ✅ Submit
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  if (!validate()) return;
+    e.preventDefault();
+    if (!validate()) return;
 
-  setIsLoading(true);
-  setServerError("");
+    setIsLoading(true);
+    setServerError("");
 
-  try {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    let payload = {
-      password: formData.password,
-    };
-
-    if (emailRegex.test(formData.identifier)) {
-      payload.email = formData.identifier;
-    } else {
-      payload.mobile_number = formData.identifier;
-    }
-
-    const response = await axios.post("/api/login/", payload);
-    console.log("✅ Login success:", response.data);
-
-    // 🚨 Block admin login
-    if (response.data.role === "admin") {
-      setServerError("Admins are not allowed to login from here.");
-      setIsLoading(false);
-      return;
-    }
-
-    // ✅ Save auth first
-    if (response.data.token) {
-      login(response.data); 
-    } else {
-      setServerError("No token received. Please try again.");
-      setIsLoading(false);
-      return;
-    }
-
-    // ✅ Redirect after login is saved
-    if (response.data.role === "student") {
-      navigate("/studentDashboard", { replace: true });
-    } else if (response.data.role === "tutor") {
-      if (response?.data?.is_approved) {
-        navigate("/tutorDashboard", { replace: true });
-        console.log("Tutor approved, redirecting to dashboard.");
+    try {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      let payload = { password: formData.password };
+      if (emailRegex.test(formData.identifier)) {
+        payload.email = formData.identifier;
       } else {
-        setServerError(
-          "Your account is not approved yet. Please wait for admin approval."
-        );
+        payload.mobile_number = formData.identifier;
       }
-    } else {
-      setServerError("Unknown role. Please contact support.");
+
+      const response = await axios.post(`${API_BASE}/login/`, payload);
+
+      if (response.data.role === "admin") {
+        setServerError("Admins are not allowed to login from here.");
+        setIsLoading(false);
+        return;
+      }
+
+      if (response.data.token) {
+        login(response.data); // save token
+      } else {
+        setServerError("No token received. Please try again.");
+        setIsLoading(false);
+        return;
+      }
+
+      // ✅ Redirect after login
+      const redirectPath = location.state?.redirect; // <--- important
+
+      if (redirectPath) {
+        navigate(redirectPath, { replace: true });
+      } else {
+        // normal dashboard
+        if (response.data.role === "student") {
+          navigate("/studentDashboard", { replace: true });
+        } else if (response.data.role === "tutor") {
+          if (response?.data?.is_approved) {
+            navigate("/tutorDashboard", { replace: true });
+          } else {
+            setServerError(
+              "Your account is not approved yet. Please wait for admin approval."
+            );
+          }
+        } else {
+          setServerError("Unknown role. Please contact support.");
+        }
+      }
+    } catch (error) {
+      setServerError(
+        error.response?.data?.non_field_errors ||
+          "Something went wrong. Please try again."
+      );
+    } finally {
+      setIsLoading(false);
     }
-  } catch (error) {
-    console.error("❌ Login error:", error);
-    setServerError(
-      error.response?.data?.non_field_errors ||
-        "Something went wrong. Please try again."
-    );
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="w-full max-w-md bg-white rounded-md shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl">
+      <div className="w-full max-w-lg bg-white rounded-md shadow-sm overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-green-500 to-green-600 py-6 px-8 text-center">
+        <div className="bg-gradient-to-r from-green-500 to-green-600 py-3 text-center">
           <div className="flex items-center justify-center mb-2">
             <div className="bg-white p-2 rounded-full mr-3">
-              <img src={logo} alt="Logo" className="w-8 h-8 object-contain" />
+              <img src={logo} alt="Logo" className="w-7 h-7 object-contain" />
             </div>
             <h1 className="text-2xl font-bold text-white">Login</h1>
           </div>
-          <p className="text-blue-100 mt-1 text-sm">
+          <p className="text-green-200 mt-1 text-sm">
             Sign in to continue your journey
           </p>
         </div>

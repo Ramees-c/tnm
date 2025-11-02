@@ -14,41 +14,61 @@ import { useAuth } from "../../../Context/userAuthContext";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import ToastMessage from "../../../components/studentAndTutor/ToastMessage/ToastMessage";
+import ConfirmMessagePopup from "../../../components/common/ConfirmMessagePopup/ConfirmMessagePopup";
+import API_BASE from "../../../API/API";
 
 function TutorDashboardPage() {
-  const [active, setActive] = useState(true);
+  const [active, setActive] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loggedTutorDetails, setLoggedTutorDetails] = useState({});
   const [notifications, setNotifications] = useState([]);
   const [toastOpen, setToastOpen] = useState(false);
+  const [confirmActiveModalOpen, setConfirmActiveModalOpen] = useState(false);
+  const [refreshNotifications, setRefreshNotifications] = useState(false);
 
   const { userDetails, token, isMailVerified, refreshUserDetails } = useAuth();
 
   useEffect(() => {
     if (userDetails?.role === "tutor") {
       setLoggedTutorDetails(userDetails);
+      // ✅ take active status from backend
+      if (typeof userDetails.active_inactive !== "undefined") {
+        setActive(userDetails.active_inactive);
+      }
     }
   }, [userDetails]);
 
+  const fetchNotifications = async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/latest_notify/`, {
+        headers: { Authorization: `Token ${token}` },
+      });
+
+      // Update only if data changed (optional)
+      setNotifications((prev) => {
+        const prevIds = prev
+          .map((n) => n.id)
+          .sort()
+          .join(",");
+        const newIds = res.data
+          .map((n) => n.id)
+          .sort()
+          .join(",");
+        return prevIds === newIds ? prev : res.data;
+      });
+    } catch (err) {
+      console.error("Failed to load notifications", err);
+    }
+  };
+
   useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const res = await axios.get("/api/notify/", {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        });
+    if (!token) return;
 
-        // take only latest 5
-        setNotifications(res.data.slice(0, 5));
-      } catch (err) {
-        console.error("Failed to load notifications", err);
-        setError("Unable to fetch notifications.");
-      }
-    };
+    fetchNotifications(); // fetch immediately
 
-    fetchNotifications();
-  }, [token]);
+    const interval = setInterval(fetchNotifications, 10000); // optional polling
+    return () => clearInterval(interval);
+  }, [token, refreshNotifications]);
 
   useEffect(() => {
     if (userDetails?.mail_verified === false) {
@@ -107,7 +127,7 @@ function TutorDashboardPage() {
   // Delete notification API
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/api/notify-delete/${id}/`, {
+      await axios.delete(`${API_BASE}/notify-delete/${id}/`, {
         headers: {
           Authorization: `Token ${token}`,
         },
@@ -124,20 +144,18 @@ function TutorDashboardPage() {
   const handleToggleActive = async () => {
     try {
       const newStatus = !active;
-
       const res = await axios.post(
-        "/api/tutor_active_inactive/",
+        `${API_BASE}/tutor_active_inactive/`,
         { active_inactive: newStatus },
-        {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        }
+        { headers: { Authorization: `Token ${token}` } }
       );
 
-      setActive(res.data.active_inactive); 
-      console.log("updated");
-      
+      // ✅ update state from backend response
+      setActive(res.data.active_inactive);
+      setConfirmActiveModalOpen(false);
+
+      // refresh user details in global context
+      await refreshUserDetails();
     } catch (err) {
       console.error("Failed to update active status", err);
     }
@@ -177,48 +195,67 @@ function TutorDashboardPage() {
           </div>
 
           {/* Overview Cards */}
-          <div className="bg-white rounded-md shadow p-4 sm:p-6 mb-6">
+          <div className="bg-white rounded-md shadow-sm p-2 sm:p-6 mb-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="p-4 bg-blue-100 rounded-lg shadow text-center">
-                <p className="text-lg font-semibold text-blue-700">
+              <div className="p-4 bg-blue-200 rounded-md shadow-sm text-center">
+                <p className="text-lg font-bold text-blue-700">
                   {loggedTutorDetails?.assigned_students?.length || 0}
                 </p>
-                <p className="text-sm text-gray-600">Assigned Students</p>
+                <p className="text-sm font-medium text-gray-800">
+                  Assigned Students
+                </p>
               </div>
-              <div className="p-4 bg-yellow-100 rounded-lg shadow text-center">
-                <p className="text-lg font-semibold text-yellow-700">
+              <div className="p-4 bg-yellow-200 rounded-md shadow-sm text-center">
+                <p className="text-lg font-bold text-yellow-700">
                   {loggedTutorDetails?.categories?.length || 0}
                 </p>
-                <p className="text-sm text-gray-600">Selected Subjects</p>
+                <p className="text-sm font-medium text-gray-800">
+                  Selected Subjects
+                </p>
               </div>
-              <div className="p-4 bg-green-100 rounded-lg shadow text-center">
-                <p className="text-lg font-semibold text-green-700">
+              <div className="p-4 bg-green-200 rounded-md shadow-sm text-center">
+                <p className="text-lg font-bold text-green-700">
                   {notifications.length || 0}
                 </p>
-                <p className="text-sm text-gray-600">Notifications</p>
+                <p className="text-sm font-medium text-gray-800">
+                  Notifications
+                </p>
               </div>
             </div>
           </div>
 
           {/* ✅ Selected Subjects Section */}
-          <div className="bg-white rounded-md shadow p-4 sm:p-6 mb-6">
-            <h2 className="text-lg sm:text-xl font-semibold mb-3">
+          <div className="bg-white rounded-md shadow-sm p-4 sm:p-6 mb-6">
+            <h2 className="text-lg sm:text-2xl font-bold mb-4 text-gray-800">
               Selected Subjects
             </h2>
 
-            {loggedTutorDetails?.categories?.length > 0 ? (
-              <div className="flex flex-col gap-5 rounded-md p-3 bg-gray-50">
-                {loggedTutorDetails?.categories?.map((subject) => (
-                  <span
-                    key={subject.id}
-                    className="flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1 rounded-md text-sm md:text-md font-medium shadow-sm"
-                  >
-                    {subject}
-                  </span>
-                ))}
+            {userDetails?.categories?.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {userDetails.categories.map((category, idx) => {
+                  const parts = category.split(" in ");
+                  const mainCategory = parts[0]; // Big text
+                  const subCategory = parts[1] || ""; // Only the first "in" after main
+
+                  return (
+                    <div
+                      key={idx}
+                      className="bg-green-50 border border-green-200 rounded-md p-2 flex flex-col hover:shadow-sm transition-shadow duration-300"
+                    >
+                      <span className="text-sm sm:text-base font-semibold text-green-700">
+                        {mainCategory}
+                      </span>
+                      {subCategory && (
+                        <span className="text-xs sm:text-sm text-green-900 mt-1">
+                          {subCategory}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             ) : (
-              <p className="text-gray-500 text-sm italic">
+              <p className="text-gray-400 text-sm italic">
                 No subjects selected yet.
               </p>
             )}
@@ -226,23 +263,23 @@ function TutorDashboardPage() {
 
           {/* Subscription Status */}
           {userDetails?.payment_history ? (
-            <div className="bg-white rounded-md shadow-md p-6 sm:p-8 mb-6 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border border-green-100">
+            <div className="bg-white rounded-md shadow-sm p-2 sm:p-8 mb-6 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border border-green-100">
               <div>
-                <h2 className="text-xl font-bold text-gray-800 mb-4">
+                <h2 className="text-lg sm:text-xl font-semibold mb-4">
                   Subscription
                 </h2>
-                <div className="grid xl:grid-cols-3 gap-8 text-gray-700">
-                  <p className="flex items-center gap-2">
+                <div className="grid xl:grid-cols-3 gap-3 xl:gap-8 text-gray-700 text-xs sm:text-sm">
+                  <p className="flex items-center gap-2 font-medium">
                     <CreditCard size={18} className="text-green-600" />
                     Plan:{" "}
-                    <span className="font-semibold text-green-700">
+                    <span className="font-bold text-green-700 text-xs sm:text-sm">
                       {userDetails.payment_history.plan_name}
                     </span>
                   </p>
-                  <p className="flex items-center gap-2">
+                  <p className="flex items-center font-medium gap-2">
                     <CreditCard size={18} className="text-blue-600" />
                     Price:{" "}
-                    <span className="font-medium text-sm md:text-md">
+                    <span className="font-medium text-xs sm:text-sm">
                       {userDetails.payment_history.actual_price} /{" "}
                       {getDurationInMonths(
                         userDetails.payment_history.created_at,
@@ -251,24 +288,24 @@ function TutorDashboardPage() {
                       months
                     </span>
                   </p>
-                  <p className="flex items-center gap-2">
+                  <p className="flex items-center font-medium gap-2">
                     <Calendar size={18} className="text-purple-600" />
                     Start Date:{" "}
-                    <span className="font-medium text-sm md:text-md">
+                    <span className="font-medium text-xs sm:text-sm">
                       {userDetails.payment_history.created_at?.split(" ")[0]}
                     </span>
                   </p>
-                  <p className="flex items-center gap-2">
+                  <p className="flex items-center font-medium gap-2">
                     <Calendar size={18} className="text-red-600" />
                     Expiry Date:{" "}
-                    <span className="font-medium text-red-500 text-sm md:text-md">
+                    <span className="font-medium text-red-500 text-xs sm:text-sm">
                       {userDetails.payment_history.expiry_date?.split(" ")[0]}
                     </span>
                   </p>
-                  <p className="flex items-center gap-2">
+                  <p className="flex items-center font-medium gap-2">
                     <CheckCircle size={18} className="text-green-600" />
                     Status:{" "}
-                    <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                    <span className="px-2 py-0.5 rounded-full text-xs sm:text-sm font-semibold bg-green-100 text-green-700">
                       Active
                     </span>
                   </p>
@@ -278,66 +315,86 @@ function TutorDashboardPage() {
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link to="/tutorSubscription">
-                  <button className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-md shadow hover:bg-green-700 transition text-sm md:text-md">
-                    <ArrowUpCircle size={18} /> Upgrade
+                  <button className="flex items-center gap-2 bg-green-600 text-white px-2 py-2 sm:px-5 sm:py-2.5 rounded-md shadow hover:bg-green-700 transition text-xs sm:text-sm">
+                    <ArrowUpCircle size={16} /> Upgrade
                   </button>
                 </Link>
               </div>
             </div>
           ) : (
-            <div className="bg-white rounded-md shadow-md p-6 sm:p-8 mb-6 text-center text-gray-600">
+            <div className="bg-white rounded-md shadow-sm p-6 sm:p-8 mb-6 text-center text-gray-600">
               No plan subscribed
             </div>
           )}
 
           {/* Active/Inactive Toggle */}
-          <div className="bg-white rounded-md shadow p-4 sm:p-6 mb-6 flex justify-between items-center">
+          <div className="bg-white rounded-md shadow-sm p-2 sm:p-6 mb-6 flex justify-between items-center">
             <h2 className="text-lg sm:text-xl font-semibold">Profile Status</h2>
-            <button
-              onClick={handleToggleActive}
-              className="flex items-center gap-2 px-4 py-2 rounded-md shadow bg-gray-100 hover:bg-gray-200"
-            >
-              {active ? (
-                <>
-                  <ToggleRight size={20} className="text-green-600" /> Active
-                </>
-              ) : (
-                <>
-                  <ToggleLeft size={20} className="text-red-600" /> Inactive
-                </>
-              )}
-            </button>
+
+            {active === null ? (
+              <span className="text-gray-500 text-xs sm:text-sm italic">
+                Loading...
+              </span>
+            ) : (
+              <button
+                onClick={() => setConfirmActiveModalOpen(true)}
+                className="flex items-center gap-2 py-1 px-3 sm:px-4 sm:py-2 rounded-md shadow-sm bg-gray-100 hover:bg-gray-200 text-xs sm:text-sm"
+              >
+                {active ? (
+                  <>
+                    <ToggleRight size={18} className="text-green-600" /> Active
+                  </>
+                ) : (
+                  <>
+                    <ToggleLeft size={20} className="text-red-600" /> Inactive
+                  </>
+                )}
+              </button>
+            )}
           </div>
 
+          {/* ✅ Confirm Popup */}
+          <ConfirmMessagePopup
+            isOpen={confirmActiveModalOpen}
+            type="confirm"
+            message={`Are you sure you want to mark your profile as ${
+              active ? "Inactive" : "Active"
+            }?`}
+            onYes={handleToggleActive}
+            onNo={() => setConfirmActiveModalOpen(false)}
+          />
+
           {/* Stats Section */}
-          <div className="bg-white rounded-md shadow p-4 sm:p-6 mb-6">
+          {/* <div className="bg-white rounded-md shadow-sm p-2 sm:p-6 mb-6">
             <h2 className="text-lg sm:text-xl font-semibold mb-4 flex items-center gap-2">
               <BarChart2 size={20} /> Stats
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <div className="p-4 bg-purple-100 rounded-lg shadow text-center">
-                <p className="text-lg font-semibold text-purple-700">150</p>
-                <p className="text-sm text-gray-600">Profile Visits</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="p-4 bg-purple-200 rounded-md shadow-sm text-center">
+                <p className="text-lg font-bold text-purple-700">150</p>
+                <p className="text-sm font-medium text-gray-800">
+                  Profile Visits
+                </p>
               </div>
-              <div className="p-4 bg-pink-100 rounded-lg shadow text-center">
-                <p className="text-lg font-semibold text-pink-700">20</p>
-                <p className="text-sm text-gray-600">Enquiries</p>
+              <div className="p-4 bg-pink-200 rounded-md text-center">
+                <p className="text-lg font-bold text-pink-700">20</p>
+                <p className="text-sm font-medium text-gray-800">Enquiries</p>
               </div>
-              <div className="p-4 bg-indigo-100 rounded-lg shadow text-center">
-                <p className="text-lg font-semibold text-indigo-700">5</p>
-                <p className="text-sm text-gray-600">Reviews</p>
+              <div className="p-4 bg-indigo-200 rounded-md text-center">
+                <p className="text-lg font-bold text-indigo-700">5</p>
+                <p className="text-sm font-medium text-gray-800">Reviews</p>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Notifications Preview */}
-          <div className="bg-white rounded-md shadow p-4 sm:p-6">
+          <div className="bg-white rounded-md shadow-sm p-2 sm:p-6">
             <h2 className="text-lg sm:text-xl font-semibold mb-4 flex items-center gap-2">
               Notifications
             </h2>
 
             {notifications.length === 0 ? (
-              <div className="text-center py-6 text-gray-500">
+              <div className="text-center py-6 text-gray-500 text-xs sm:text-sm">
                 No notifications found.
               </div>
             ) : (

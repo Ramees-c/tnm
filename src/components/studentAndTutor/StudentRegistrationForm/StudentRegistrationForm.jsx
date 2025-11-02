@@ -8,6 +8,7 @@ import axios from "axios";
 import OtpModal from "../../common/OtpModal/OtpModal";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../Context/userAuthContext";
+import API_BASE from "../../../API/API";
 
 const initialFormData = {
   full_name: "",
@@ -22,10 +23,11 @@ const initialFormData = {
   categories: [],
   profile_photo: null,
   gender: "",
+  landmark: "",
+  near_by_town: "",
 };
 
 function StudentRegistrationForm() {
-
   const { login } = useAuth();
 
   const navigate = useNavigate();
@@ -48,6 +50,11 @@ function StudentRegistrationForm() {
   const [selectedSubjects, setSelectedSubjects] = useState([]);
   const [pendingFormData, setPendingFormData] = useState(null);
 
+  const [pincodeSuggestions, setPincodeSuggestions] = useState([]);
+  const [showPincodeSuggestions, setShowPincodeSuggestions] = useState(false);
+  const [pincodeTimeout, setPincodeTimeout] = useState(null);
+  const [isPincodeLoading, setIsPincodeLoading] = useState(false);
+
   const errorRefs = {
     full_name: useRef(null),
     email: useRef(null),
@@ -61,6 +68,8 @@ function StudentRegistrationForm() {
     qualification: useRef(null),
     categories: useRef(null),
     gender: useRef(null),
+    landmark: useRef(null),
+    near_by_town: useRef(null),
   };
 
   const subjectRef = useRef(null);
@@ -89,6 +98,21 @@ function StudentRegistrationForm() {
     function handleClickOutside(event) {
       if (subjectRef.current && !subjectRef.current.contains(event.target)) {
         setShowSuggestions(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        errorRefs.pincode.current &&
+        !errorRefs.pincode.current.contains(event.target)
+      ) {
+        setShowPincodeSuggestions(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -133,6 +157,50 @@ function StudentRegistrationForm() {
     setErrors((prev) => ({ ...prev, countryCode: "" }));
   };
 
+  const handlePincodeChange = async (e) => {
+    const value = e.target.value;
+    setFormData((prev) => ({ ...prev, pincode: value }));
+
+    setErrors((prev) => ({ ...prev, pincode: "" }));
+
+    if (value.length < 3) {
+      setPincodeSuggestions([]);
+      setShowPincodeSuggestions(false);
+      return;
+    }
+
+    setIsPincodeLoading(true); // ✅ start loading
+
+    try {
+      const res = await axios.get(`${API_BASE}/pincode_search/?q=${value}`);
+      setPincodeSuggestions(res.data || []);
+      setShowPincodeSuggestions(true);
+    } catch (err) {
+      console.error("Pincode search error:", err);
+      setPincodeSuggestions([]);
+      setShowPincodeSuggestions(false);
+    } finally {
+      setIsPincodeLoading(false); // ✅ stop loading
+    }
+  };
+
+  const highlightPincodeMatch = (text, query) => {
+    if (!query) return text;
+    // Escape regex special characters from query
+    const escapedQuery = query.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+    const regex = new RegExp(`(${escapedQuery})`, "gi");
+    return text.replace(
+      regex,
+      (match) => `<span class="text-green-500 font-bold">${match}</span>`
+    );
+  };
+
+  const handleSelectPincode = (pin) => {
+    // Update formData with selected pincode
+    setFormData((prev) => ({ ...prev, pincode: pin.pincode }));
+    setShowPincodeSuggestions(false); // close dropdown
+  };
+
   const handlePhoneChange = (e) => {
     const onlyNums = e.target.value.replace(/\D/g, "");
     setFormData({ ...formData, mobile_number: onlyNums });
@@ -172,9 +240,43 @@ function StudentRegistrationForm() {
     if (!formData.categories || formData.categories.length === 0) {
       newErrors.categories = "Subjects are required"; // fixed
     }
+    if (!formData.landmark) newErrors.landmark = "Landmark is required";
+    if (!formData.near_by_town)
+      newErrors.near_by_town = "Near by town is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const validatePassword = (password) => {
+    if (!password) return "Password is required";
+    if (password.length < 8)
+      return "Password must be at least 8 characters long";
+    if (!/[0-9]/.test(password)) return "Must include at least one number";
+    if (!/[!@#$%^&*]/.test(password))
+      return "Must include at least one special character (!@#$%^&*)";
+    return "";
+  };
+
+  const handlePasswordBlur = () => {
+    const errorMsg = validatePassword(formData.password);
+    setErrors((prev) => ({ ...prev, password: errorMsg }));
+  };
+
+  const handleConfirmPasswordBlur = () => {
+    if (!confirmPassword) {
+      setErrors((prev) => ({
+        ...prev,
+        confirmPassword: "Please confirm your password",
+      }));
+    } else if (confirmPassword !== formData.password) {
+      setErrors((prev) => ({
+        ...prev,
+        confirmPassword: "Passwords do not match",
+      }));
+    } else {
+      setErrors((prev) => ({ ...prev, confirmPassword: "" }));
+    }
   };
 
   // ✅ Recursive function to flatten categories and all nested subcategories
@@ -258,7 +360,7 @@ function StudentRegistrationForm() {
     setErrors((prev) => ({ ...prev, categories: "" }));
 
     try {
-      const res = await axios.get("/api/category-list/");
+      const res = await axios.get(`${API_BASE}/category-list/`);
       if (res.data && Array.isArray(res.data)) {
         const allSubcategories = flattenCategories(res.data);
         const query = value.toLowerCase();
@@ -350,7 +452,7 @@ function StudentRegistrationForm() {
       const phoneWithCode = `+${countryCode}${mobile_number}`;
 
       // ✅ Call send OTP API
-      const response = await axios.post("/api/send-otp/", {
+      const response = await axios.post(`${API_BASE}/send-otp/`, {
         email,
         mobile_number: phoneWithCode,
       });
@@ -401,7 +503,7 @@ function StudentRegistrationForm() {
   // ✅ Resend OTP
   const sendOtp = async () => {
     try {
-      await axios.post("/api/send-otp/", {
+      await axios.post(`${API_BASE}/send-otp/`, {
         email: formData.email,
         mobile_number: `+${formData.countryCode}${formData.mobile_number}`,
       });
@@ -413,66 +515,68 @@ function StudentRegistrationForm() {
 
   // ✅ OTP Verify
   const handleOtpVerify = async (enteredOtp) => {
-  try {
-    if (!pendingFormData) throw new Error("No form data found.");
+    try {
+      if (!pendingFormData) throw new Error("No form data found.");
 
-    // Build FormData
-    const fd = new FormData();
-    Object.keys(pendingFormData).forEach((key) => {
-      const val = pendingFormData[key];
+      // Build FormData
+      const fd = new FormData();
+      Object.keys(pendingFormData).forEach((key) => {
+        const val = pendingFormData[key];
 
-      if (key === "categories" && Array.isArray(val)) {
-        val.forEach((id) => fd.append("categories", id));
-      } else if (key === "profile_photo") {
-        if (val instanceof File) fd.append("profile_photo", val);
-      } else {
-        if (val !== null && val !== undefined) fd.append(key, val);
+        if (key === "categories" && Array.isArray(val)) {
+          val.forEach((id) => fd.append("categories", id));
+        } else if (key === "profile_photo") {
+          if (val instanceof File) fd.append("profile_photo", val);
+        } else {
+          if (val !== null && val !== undefined) fd.append(key, val);
+        }
+      });
+
+      // Append OTP
+      fd.append("otp", enteredOtp);
+
+      // Call student registration API
+      const res = await axios.post(`${API_BASE}/register/student/`, fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (res.data?.token && res.data?.role === "student") {
+        setShowOtpPopup(false);
+        setOtpError("");
+
+        // ✅ Use context login instead of manual localStorage
+        login(res.data);
+
+        // Reset form...
+        setFormData(initialFormData);
+        setConfirmPassword("");
+        setSelectedSubjects([]);
+        setPreview(null);
+        setFilteredSubjects([]);
+        setErrors({});
+        setPendingFormData(null);
+
+        // Redirect
+        navigate("/studentDashboard", { replace: true });
       }
-    });
+    } catch (err) {
+      console.error(
+        "❌ Student Registration Error:",
+        err.response?.data || err.message
+      );
 
-    // Append OTP
-    fd.append("otp", enteredOtp);
+      const apiErrors = err.response?.data;
 
-    // Call student registration API
-    const res = await axios.post("/api/register/student/", fd, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+      if (apiErrors?.otp) {
+        setOtpError(
+          Array.isArray(apiErrors.otp) ? apiErrors.otp[0] : apiErrors.otp
+        );
+        return;
+      }
 
-    if (res.data?.token && res.data?.role === "student") {
-      setShowOtpPopup(false);
-      setOtpError("");
-
-      // ✅ Use context login instead of manual localStorage
-      login(res.data);
-
-      // Reset form...
-      setFormData(initialFormData);
-      setConfirmPassword("");
-      setSelectedSubjects([]);
-      setPreview(null);
-      setFilteredSubjects([]);
-      setErrors({});
-      setPendingFormData(null);
-
-      // Redirect
-      navigate("/studentDashboard", { replace: true });
+      setOtpError("❌ Invalid or expired OTP. Please try again.");
     }
-  } catch (err) {
-    console.error(
-      "❌ Student Registration Error:",
-      err.response?.data || err.message
-    );
-
-    const apiErrors = err.response?.data;
-
-    if (apiErrors?.otp) {
-      setOtpError(Array.isArray(apiErrors.otp) ? apiErrors.otp[0] : apiErrors.otp);
-      return;
-    }
-
-    setOtpError("❌ Invalid or expired OTP. Please try again.");
-  }
-};
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center py-8">
@@ -621,7 +725,7 @@ function StudentRegistrationForm() {
                     onChange={handlePhoneChange}
                     placeholder="Phone Number *"
                     ref={errorRefs.mobile_number} // ✅ fixed
-                    className={`w-full py-2 px-4 border ${
+                    className={`w-full py-2 px-4 border text-xs sm:text-sm ${
                       errors.mobile_number
                         ? "border-red-500"
                         : "border-gray-300"
@@ -668,6 +772,7 @@ function StudentRegistrationForm() {
                 placeholder="Password *"
                 value={formData.password}
                 onChange={handleChange}
+                onBlur={handlePasswordBlur}
                 hasError={errors.password}
                 innerRef={errorRefs.password}
               />
@@ -693,6 +798,7 @@ function StudentRegistrationForm() {
                   setConfirmPassword(e.target.value);
                   setErrors((prev) => ({ ...prev, confirmPassword: "" })); // ✅ clear error
                 }}
+                onBlur={handleConfirmPasswordBlur}
                 hasError={errors.confirmPassword}
                 innerRef={errorRefs.confirmPassword}
               />
@@ -743,8 +849,10 @@ function StudentRegistrationForm() {
                 onChange={handleSubjectChange}
                 onFocus={handleSubjectChange}
                 ref={errorRefs.categories}
-                className={`w-full py-2 px-4 border ${
-                  errors.categories ? "border-red-500" : "border-gray-300"
+                className={`w-full py-2 px-4 border text-xs sm:text-sm ${
+                  errors.categories
+                    ? "border-red-500"
+                    : "border-gray-300 text-xs sm:text-sm"
                 } rounded-md placeholder-gray-400 outline-none focus:ring-0 focus:border-primary`}
                 autoComplete="off"
                 autoCorrect="off"
@@ -826,17 +934,84 @@ function StudentRegistrationForm() {
                 <p className="text-red-500 text-xs mt-1">{errors.state}</p>
               )}
             </div>
-            <div ref={errorRefs.pincode}>
+            <div ref={errorRefs.pincode} className="relative">
               <FormInput
+                type="text"
                 name="pincode"
                 placeholder="Pincode *"
                 value={formData.pincode}
-                onChange={handleChange}
+                onChange={handlePincodeChange}
                 hasError={errors.pincode}
                 innerRef={errorRefs.pincode}
               />
               {errors.pincode && (
                 <p className="text-red-500 text-xs mt-1">{errors.pincode}</p>
+              )}
+
+              {/* Dropdown suggestions */}
+              {showPincodeSuggestions && (
+                <ul className="absolute w-full border rounded-md bg-white shadow-md mt-2 max-h-60 overflow-y-auto z-10">
+                  {isPincodeLoading ? (
+                    <li className="px-4 py-2 text-gray-500 text-sm italic">
+                      Loading...
+                    </li>
+                  ) : pincodeSuggestions.length > 0 ? (
+                    pincodeSuggestions.map((pin) => (
+                      <li
+                        key={pin.id}
+                        onMouseDown={(e) => {
+                          e.preventDefault(); // prevent input blur
+                          handleSelectPincode(pin);
+                        }}
+                        className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm"
+                        dangerouslySetInnerHTML={{
+                          __html: `${highlightPincodeMatch(
+                            pin.pincode,
+                            formData.pincode
+                          )} - ${highlightPincodeMatch(
+                            pin.office_name,
+                            formData.pincode
+                          )}`,
+                        }}
+                      />
+                    ))
+                  ) : (
+                    <li className="px-4 py-2 text-gray-400 text-sm italic">
+                      No pincodes found
+                    </li>
+                  )}
+                </ul>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div ref={errorRefs.landmark}>
+              <FormInput
+                name="landmark"
+                placeholder="Landmark *"
+                value={formData.landmark}
+                onChange={handleChange}
+                hasError={errors.landmark}
+                innerRef={errorRefs.landmark}
+              />
+              {errors.landmark && (
+                <p className="text-red-500 text-xs mt-1">{errors.landmark}</p>
+              )}
+            </div>
+            <div ref={errorRefs.near_by_town}>
+              <FormInput
+                name="near_by_town"
+                placeholder="Near by town *"
+                value={formData.near_by_town}
+                onChange={handleChange}
+                hasError={errors.near_by_town}
+                innerRef={errorRefs.near_by_town}
+              />
+              {errors.near_by_town && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.near_by_town}
+                </p>
               )}
             </div>
           </div>

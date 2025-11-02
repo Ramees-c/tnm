@@ -46,10 +46,7 @@ function AssignedTutorsPage() {
         <div className="max-w-6xl mx-auto">
           {/* ✅ Mobile Menu Button before Title */}
           <div className="flex items-center gap-3 mb-6">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden"
-            >
+            <button onClick={() => setSidebarOpen(true)} className="lg:hidden">
               <Menu size={27} />
             </button>
 
@@ -67,7 +64,7 @@ function AssignedTutorsPage() {
             </div>
           ) : (
             <div className="flex items-center justify-center py-16">
-              <p className="text-gray-500 text-lg font-medium">
+              <p className="text-gray-500 text-sm sm:text-lg font-medium">
                 No tutors assigned
               </p>
             </div>

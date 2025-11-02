@@ -1,25 +1,30 @@
-import { X, Upload, ImageIcon } from "lucide-react";
+import { X, Upload, ImageIcon, Loader2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import FormInput from "../FormInput/FormInput";
 import axios from "axios";
-import { MEDIA_URL } from "../../../API/API";
+import API_BASE, { MEDIA_URL } from "../../../API/API";
 import { useAuth } from "../../../Context/userAuthContext";
 import OtpModal from "../../common/OtpModal/OtpModal";
 import Loading from "../../common/Loading/Loading";
+import { useSuccessMessage } from "../../../Context/SuccessMessageProvider";
 
 function ProfileEditPopup({ isOpen, onClose }) {
   const { token, refreshUserDetails } = useAuth();
+  const { showSuccess } = useSuccessMessage();
 
   const [formData, setFormData] = useState({
     profile_image: null,
     countryCode: "91",
+    available_days: [],
   });
+
   const [errors, setErrors] = useState({});
   const [profileImage, setProfileImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const [showPasswords, setShowPasswords] = useState({
     current: false,
@@ -35,28 +40,88 @@ function ProfileEditPopup({ isOpen, onClose }) {
   const [pendingEmail, setPendingEmail] = useState("");
   const [imageKey, setImageKey] = useState(null);
 
+  const [pincodeSuggestions, setPincodeSuggestions] = useState([]);
+  const [showPincodeSuggestions, setShowPincodeSuggestions] = useState(false);
+  const [pincodeTimeout, setPincodeTimeout] = useState(null);
+  const [isPincodeLoading, setIsPincodeLoading] = useState(false);
+
+  const [subjectInput, setSubjectInput] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedSubjects, setSelectedSubjects] = useState([]);
+
+  const [filteredSubjects, setFilteredSubjects] = useState([]);
+
+  const [otpLoading, setOtpLoading] = useState(false);
+
   const fileInputRef = useRef(null);
+
+  const errorRefs = {
+    subjects: useRef(null),
+    pincode: useRef(null),
+  };
+
+  const subjectRef = useRef(null);
 
   // const imageKey = formData.role === "tutor" ? "profile_image" : "profile_photo";
 
   // 🔹 Fetch user details when popup opens
   useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    
+
     if (isOpen) {
-      document.body.style.overflow = "hidden";
+      setSubmitError('')
+      // Prevent background scroll
+      html.style.overflow = "hidden";
+      body.style.overflow = "hidden";
       setErrors("");
       fetchUserDetails();
     } else {
-      document.body.style.overflow = "auto";
+      // Restore scroll
+      html.style.overflow = "";
+      body.style.overflow = "";
     }
+
     return () => {
-      document.body.style.overflow = "auto";
+      html.style.overflow = "";
+      body.style.overflow = "";
     };
+
+    
   }, [isOpen]);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        errorRefs.pincode.current &&
+        !errorRefs.pincode.current.contains(event.target)
+      ) {
+        setShowPincodeSuggestions(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (subjectRef.current && !subjectRef.current.contains(event.target)) {
+        setShowSuggestions(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const fetchUserDetails = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`/api/profile/edit/`, {
+      const res = await axios.get(`${API_BASE}/profile/edit/`, {
         headers: { Authorization: `Token ${token}` },
       });
 
@@ -66,25 +131,52 @@ function ProfileEditPopup({ isOpen, onClose }) {
         ...data,
         is_mail_verified: data.is_mail_verified,
         email_verified_initial: data.is_mail_verified,
+        available_days: Array.isArray(data.available_days)
+          ? data.available_days.map((d) => d.trim())
+          : typeof data.available_days === "string"
+          ? data.available_days.split(",").map((d) => d.trim())
+          : [],
       });
 
       setOriginalPhone(data.mobile_number || "");
       setOriginalEmail(data.email || "");
 
-      // Determine image key immediately after fetching API
       const key = data.role === "tutor" ? "profile_image" : "profile_photo";
       setImageKey(key);
+      setProfileImage(data[key] ? `${data[key]}` : null);
 
-      // Set profile image immediately
-      setProfileImage(data[key] ? `${MEDIA_URL}${data[key]}` : null);
+      // ✅ Fetch all categories from API
+      const categoriesRes = await axios.get(`${API_BASE}/category-list/`);
+      const allCategories = categoriesRes.data
+        ? flattenCategories(categoriesRes.data)
+        : [];
+
+      // ✅ Map selected category IDs to category objects
+      if (data.categories && data.categories.length > 0) {
+        const preSelected = allCategories.filter((cat) => {
+          // Replace last "(...)" with " in ...", keep other parentheses
+          let normalizedLabel = cat.label
+            .replace(/\s*\(([^()]+)\)$/, " in $1")
+            .toLowerCase()
+            .trim();
+
+          return data.categories.some(
+            (selected) => selected.toLowerCase().trim() === normalizedLabel
+          );
+        });
+
+        setSelectedSubjects(preSelected); // keep full objects for chips
+        setFormData((prev) => ({
+          ...prev,
+          categories: [...data.categories], // original backend labels
+        }));
+      }
     } catch (error) {
       console.error("Failed to fetch user details ❌", error);
     } finally {
       setLoading(false);
     }
   };
-
-  // console.log(formData.profile_image);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -116,6 +208,48 @@ function ProfileEditPopup({ isOpen, onClose }) {
     }
 
     setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  const handlePincodeChange = async (e) => {
+    const value = e.target.value;
+    setFormData((prev) => ({ ...prev, pincode: value }));
+
+    if (value.length < 3) {
+      setPincodeSuggestions([]);
+      setShowPincodeSuggestions(false);
+      return;
+    }
+
+    setIsPincodeLoading(true); // ✅ start loading
+
+    try {
+      const res = await axios.get(`${API_BASE}/pincode_search/?q=${value}`);
+      setPincodeSuggestions(res.data || []);
+      setShowPincodeSuggestions(true);
+    } catch (err) {
+      console.error("Pincode search error:", err);
+      setPincodeSuggestions([]);
+      setShowPincodeSuggestions(false);
+    } finally {
+      setIsPincodeLoading(false); // ✅ stop loading
+    }
+  };
+
+  const handleSelectPincode = (pin) => {
+    // Update formData with selected pincode
+    setFormData((prev) => ({ ...prev, pincode: pin.pincode }));
+    setShowPincodeSuggestions(false); // close dropdown
+  };
+
+  const highlightPincodeMatch = (text, query) => {
+    if (!query) return text;
+    // Escape regex special characters from query
+    const escapedQuery = query.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+    const regex = new RegExp(`(${escapedQuery})`, "gi");
+    return text.replace(
+      regex,
+      (match) => `<span class="text-green-500 font-bold">${match}</span>`
+    );
   };
 
   const handleImageUpload = (e) => {
@@ -172,12 +306,162 @@ function ProfileEditPopup({ isOpen, onClose }) {
     }));
   };
 
+  // ✅ Recursive function to flatten categories and all nested subcategories
+  const flattenCategories = (
+    categories,
+    rootName = "",
+    chain = [],
+    rootId = null,
+    path = []
+  ) => {
+    let result = [];
+
+    categories.forEach((category) => {
+      const isTop = !rootName;
+      const currentRootName = rootName || category.name;
+
+      // 🔹 Preserve the very first rootId across recursion
+      const baseRootId = rootId ?? category.id;
+
+      // 🔹 Always build path starting from top-most root
+      const currentPath = isTop ? [category.id] : [...path, category.id];
+
+      const hasChildren =
+        category.subcategories && category.subcategories.length > 0;
+      const isLeaf = !hasChildren;
+
+      if (isTop) {
+        // ✅ Root-level item
+        result.push({
+          id: category.id,
+          name: category.name,
+          label: category.name,
+          parent: null,
+          pathIds: [category.id], // root path starts with itself
+          hasChildren,
+          isLeaf, // 🔹 add leaf flag
+        });
+      } else {
+        // ✅ Sub-level item with same "in ... (Root)" label format
+        const cleanChain = [...chain].filter((c) => c !== currentRootName);
+
+        const label =
+          cleanChain.length > 0
+            ? `${category.name} in ${cleanChain
+                .reverse()
+                .join(" in ")} (${currentRootName})`
+            : `${category.name} (${currentRootName})`;
+
+        result.push({
+          id: category.id,
+          name: category.name,
+          label,
+          parent: currentRootName,
+          pathIds: [baseRootId, ...currentPath.slice(1)],
+          hasChildren,
+          isLeaf, // 🔹 add leaf flag
+        });
+      }
+
+      // 🔹 Recurse deeper if subcategories exist
+      if (hasChildren) {
+        result = result.concat(
+          flattenCategories(
+            category.subcategories,
+            currentRootName,
+            [...chain, category.name],
+            baseRootId, // keep passing the very first root id
+            currentPath
+          )
+        );
+      }
+    });
+
+    return result;
+  };
+
+  // ✅ Subject input change
+  const handleSubjectChange = async (e) => {
+    const value = e.target.value;
+    setSubjectInput(value);
+    setErrors((prev) => ({ ...prev, subjects: "" }));
+
+    try {
+      const res = await axios.get(`${API_BASE}/category-list/`);
+      if (res.data && Array.isArray(res.data)) {
+        const allSubcategories = flattenCategories(res.data);
+        const query = value.toLowerCase();
+
+        // Show all leaf subjects if input is empty
+        const matches = allSubcategories.filter(
+          (sub) => sub.isLeaf && sub.label.toLowerCase().includes(query)
+        );
+
+        setFilteredSubjects(matches);
+        setShowSuggestions(true);
+      } else {
+        setFilteredSubjects([]);
+        setShowSuggestions(false);
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      setFilteredSubjects([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSelectSubject = (subject) => {
+    if (selectedSubjects.some((s) => s.id === subject.id)) {
+      setShowSuggestions(false);
+      return;
+    }
+
+    const updatedSubjects = [...selectedSubjects, subject];
+    setSelectedSubjects(updatedSubjects);
+
+    // ✅ Only leaf IDs, not full path
+    const leafIds = updatedSubjects.map((s) => s.id);
+
+    setFormData((prev) => ({
+      ...prev,
+      categories: leafIds,
+    }));
+
+    setSubjectInput("");
+    setErrors((prev) => ({ ...prev, subjects: "" }));
+    setShowSuggestions(false);
+    setFilteredSubjects([]);
+  };
+
+  const removeSubject = (id) => {
+    const updatedSubjects = selectedSubjects.filter((s) => s.id !== id);
+    setSelectedSubjects(updatedSubjects);
+
+    // ✅ Only leaf IDs
+    const leafIds = updatedSubjects.map((s) => s.id);
+
+    setFormData((prev) => ({
+      ...prev,
+      categories: leafIds,
+    }));
+  };
+
+  const highlightMatch = (text, query) => {
+    if (!query) return text;
+    const regex = new RegExp(`(${query})`, "gi");
+    return text.replace(
+      regex,
+      (match) => `<span class="text-green-400 font-bold">${match}</span>` // highlight color
+    );
+  };
+
   const requestEmailOtp = async () => {
     if (!formData.email) return;
 
     try {
+      setOtpLoading(true);
       const res = await axios.post(
-        "/api/profile/request-change-contact/",
+        `${API_BASE}/profile/request-change-contact/`,
         { email: formData.email }, // send email
         { headers: { Authorization: `Token ${token}` } }
       );
@@ -185,11 +469,13 @@ function ProfileEditPopup({ isOpen, onClose }) {
       console.log("OTP sent ✅", res.data);
       setPendingEmail(formData.email);
       setShowOtpPopup(true); // open OTP modal
+      setOtpLoading(false);
     } catch (err) {
       console.error(
         err.response?.data?.non_field_errors?.[0] ||
           "Failed to send OTP. Try again."
       );
+      setOtpLoading(false);
       setErrors((prev) => ({
         ...prev,
         email:
@@ -210,8 +496,9 @@ function ProfileEditPopup({ isOpen, onClose }) {
     const fullNumber = `+${countryCode}${mobileNumber}`;
 
     try {
+      setOtpLoading(true);
       const res = await axios.post(
-        "/api/profile/request-change-contact/",
+        `${API_BASE}/profile/request-change-contact/`,
         { mobile_number: fullNumber }, // send full number with country code
         { headers: { Authorization: `Token ${token}` } }
       );
@@ -219,11 +506,13 @@ function ProfileEditPopup({ isOpen, onClose }) {
       console.log("Phone OTP sent ✅", res.data);
       setPendingEmail(fullNumber); // save with country code to show in OTP modal
       setShowOtpPopup(true); // open OTP modal
+      setOtpLoading(false);
     } catch (err) {
       console.error(
         "Failed to request phone OTP ❌",
         err.response?.data.non_field_errors
       );
+      setOtpLoading(false);
       setErrors((prev) => ({
         ...prev,
         mobile_number:
@@ -238,7 +527,7 @@ function ProfileEditPopup({ isOpen, onClose }) {
       const contactType = /^\+?[0-9]+$/.test(pendingEmail) ? "mobile" : "email";
 
       const res = await axios.post(
-        "/api/profile/verify-change-contact/",
+        `${API_BASE}/profile/verify-change-contact/`,
         {
           otp,
           contact_type: contactType,
@@ -247,7 +536,6 @@ function ProfileEditPopup({ isOpen, onClose }) {
       );
 
       console.log(`${contactType} verified ✅`, res.data);
-
 
       // Update formData based on type
       if (contactType === "email") {
@@ -262,9 +550,10 @@ function ProfileEditPopup({ isOpen, onClose }) {
         }));
       }
 
-      await refreshUserDetails();      
+      await refreshUserDetails();
       setShowOtpPopup(false);
       setOtpError("");
+      showSuccess("verified successfully!");
     } catch (err) {
       console.error(
         "OTP verification failed ❌",
@@ -277,7 +566,8 @@ function ProfileEditPopup({ isOpen, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
-    setSubmitError(""); // clear old error
+    setSubmitError("");
+    setSubmitting(true);
 
     const { currentPassword, newPassword, confirmNewPassword } = formData;
     const allEmpty = !currentPassword && !newPassword && !confirmNewPassword;
@@ -314,12 +604,34 @@ function ProfileEditPopup({ isOpen, onClose }) {
 
     if (Object.keys(passwordErrors).length > 0) {
       setErrors((prev) => ({ ...prev, ...passwordErrors }));
+      setSubmitting(false);
       return;
     }
 
     try {
       const form = new FormData();
       form.append("full_name", formData.full_name || "");
+      form.append("gender", formData.gender || "");
+      form.append("city", formData.city || "");
+      form.append("state", formData.state || "");
+      form.append("pincode", formData.pincode || "");
+      form.append("qualification", formData.qualification || "");
+      form.append("hourly_rate", formData.hourly_rate || "");
+      form.append("experience_years", formData.experience_years || "");
+      form.append("description", formData.description || "");
+      form.append("landmark", formData.landmark || "");
+      form.append("near_by_town", formData.near_by_town || "");
+
+      if (selectedSubjects.length > 0) {
+        selectedSubjects.forEach((cat) => {
+          form.append("categories", cat.id);
+        });
+      }
+
+      form.append(
+        "available_days",
+        JSON.stringify(formData.available_days || [])
+      );
 
       if (formData[imageKey] instanceof File) {
         // ✅ send actual dynamic key
@@ -329,7 +641,7 @@ function ProfileEditPopup({ isOpen, onClose }) {
       }
       // else: don't append → keep current image
 
-      await axios.put(`/api/profile/update/`, form, {
+      await axios.put(`${API_BASE}/profile/update/`, form, {
         headers: {
           Authorization: `Token ${token}`,
           "Content-Type": "multipart/form-data",
@@ -343,7 +655,7 @@ function ProfileEditPopup({ isOpen, onClose }) {
         passwordForm.append("new_password", newPassword);
         passwordForm.append("confirm_new_password", confirmNewPassword);
 
-        await axios.put(`/api/change-password/`, passwordForm, {
+        await axios.put(`${API_BASE}/change-password/`, passwordForm, {
           headers: {
             Authorization: `Token ${token}`,
             "Content-Type": "multipart/form-data",
@@ -351,22 +663,58 @@ function ProfileEditPopup({ isOpen, onClose }) {
         });
       }
       await refreshUserDetails();
+      showSuccess("Profile updated successfully!");
       onClose();
     } catch (error) {
-      console.error("Profile or password update failed ❌", error);
-      setSubmitError(
-        error.response?.data?.error ||
-          "Failed to update profile or password. Please try again."
-      );
+      console.error("Profile update failed ❌", error);
+
+      let errorMessage = "Failed to update profile. Please try again.";
+
+      if (error.response?.data) {
+        const data = error.response.data;
+
+        // ✅ Pick the first field with an error
+        const firstField = Object.keys(data)[0];
+        const firstError =
+          Array.isArray(data[firstField]) && data[firstField].length > 0
+            ? data[firstField][0]
+            : data[firstField];
+
+        if (firstField && firstError) {
+          // ✅ Convert snake_case → "Full name"
+          const readableField = firstField
+            .replace(/_/g, " ")
+            .replace(/\b\w/g, (char) => char.toUpperCase());
+
+          errorMessage = `${readableField}: ${firstError}`;
+        }
+      }
+
+      setSubmitError(errorMessage);
+    } finally {
+      setSubmitting(false);
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-2 sm:px-4 py-4 sm:py-6">
       <div
-        className="bg-white w-full max-w-3xl rounded-md shadow-lg p-4 sm:p-6 relative lg:max-h-[90vh] 2xl:max-h-[100vh] overflow-y-auto scrollbar-hide"
+        className="
+  bg-white 
+  w-full 
+  max-w-[95%] sm:max-w-2xl lg:max-w-3xl 
+  rounded-md 
+  shadow-lg 
+  p-2 sm:p-6 md:p-8 
+  relative 
+  max-h-[90vh] 
+  overflow-y-auto 
+  scrollbar-hide 
+  transform scale-95 sm:scale-100 
+  transition-transform duration-300 ease-out
+"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -377,9 +725,9 @@ function ProfileEditPopup({ isOpen, onClose }) {
           <X className="w-5 h-5" />
         </button>
 
-        <h2 className="text-lg sm:text-xl font-bold text-gray-700 mb-4">
+        <h1 className="text-lg sm:text-xl font-bold text-gray-700 mb-4">
           Edit Profile
-        </h2>
+        </h1>
 
         {loading ? (
           <div className="flex items-center justify-center h-screen">
@@ -391,13 +739,13 @@ function ProfileEditPopup({ isOpen, onClose }) {
             <div className="flex flex-col items-center mb-6">
               <label
                 htmlFor="profilePhoto"
-                className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
+                className="relative w-20 h-20 sm:w-32 sm:h-32 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
               >
                 {profileImage ? (
                   <img
                     src={profileImage}
                     alt="Preview"
-                    className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover"
+                    className="w-20 h-20 sm:w-32 sm:h-32 rounded-full object-cover"
                   />
                 ) : (
                   <div className="flex flex-col items-center justify-center text-gray-500">
@@ -470,9 +818,14 @@ function ProfileEditPopup({ isOpen, onClose }) {
                     <button
                       type="button"
                       onClick={requestEmailOtp}
+                      disabled={otpLoading}
                       className="absolute right-2 top-1/3 -translate-y-1/2 bg-red-600 text-white text-xs px-3 py-1 rounded-md hover:bg-red-700 transition"
                     >
-                      Verify
+                      {otpLoading ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        "Verify"
+                      )}
                     </button>
                     <p className="mt-1 text-xs text-red-600">
                       {errors.email ? errors.email : "Email is not verified"}
@@ -496,9 +849,9 @@ function ProfileEditPopup({ isOpen, onClose }) {
                         countryCode: country.dialCode,
                       });
                     }}
-                    inputClass="!w-full !h-10 sm:!h-11 !text-gray-700 !rounded-md !outline-none !border !border-gray-300"
-                    buttonClass="!h-10 sm:!h-11 !rounded-md !border !border-gray-300 !bg-white"
-                    dropdownClass="!bg-white !text-gray-700 !rounded-md !border-gray-200 !shadow-md"
+                    inputClass="!w-full !h-8 sm:!h-9 !text-gray-700 !text-xs sm:!text-sm !rounded-md !outline-none !border !border-gray-300"
+                    buttonClass="!h-8 sm:!h-9 !rounded-md !border !border-gray-300 !bg-white"
+                    dropdownClass="!bg-white !text-gray-700 !rounded-md !border-gray-200 !shadow-md !text-xs sm:!text-sm"
                     enableSearch={true}
                     inputProps={{ name: "countryCode" }}
                   />
@@ -525,9 +878,14 @@ function ProfileEditPopup({ isOpen, onClose }) {
                       <button
                         type="button"
                         onClick={requestPhoneOtp}
-                        className="absolute right-3 top-1/3 -translate-y-1/2 text-xs px-3 py-1 rounded bg-red-600 hover:bg-red-700 transition text-white"
+                        disabled={otpLoading}
+                        className="absolute right-3 top-1/3 -translate-y-1/2 text-xs px-1 py-1 sm:px-3 sm:py-1 rounded bg-red-600 hover:bg-red-700 transition text-white"
                       >
-                        Verify
+                        {otpLoading ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          "Verify"
+                        )}
                       </button>
                     )}
 
@@ -540,14 +898,339 @@ function ProfileEditPopup({ isOpen, onClose }) {
                   )}
                 </div>
               </div>
+
+              <div>
+                <FormInput
+                  name="gender"
+                  placeholder="Select Gender"
+                  value={formData.gender || ""}
+                  onChange={handleChange}
+                  select
+                  options={[
+                    { label: "Select Gender *", value: "" },
+                    { label: "Male", value: "male" },
+                    { label: "Female", value: "female" },
+                    { label: "Other", value: "other" },
+                  ]}
+                />
+              </div>
             </div>
 
-            {/* Reset Password */}
-            <div className="pt-4 border-t border-gray-200">
-              <h3 className="text-md sm:text-lg font-semibold text-gray-700 mb-3">
-                Reset Password
+            {/* Location & Professional Information */}
+            <div className="space-y-4">
+              <h3 className="text-sm md:text-base font-semibold text-gray-700 border-b pb-2">
+                Location Information
               </h3>
 
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <FormInput
+                    name="city"
+                    placeholder="City *"
+                    value={formData.city || ""}
+                    onChange={handleChange}
+                    hasError={errors.city}
+                  />
+                </div>
+
+                <div>
+                  <FormInput
+                    name="state"
+                    placeholder="State *"
+                    value={formData.state || ""}
+                    onChange={handleChange}
+                    hasError={errors.state}
+                  />
+                </div>
+
+                <div className="relative" ref={errorRefs.pincode}>
+                  <input
+                    type="text"
+                    name="pincode"
+                    placeholder="Pincode *"
+                    value={formData.pincode}
+                    onChange={handlePincodeChange}
+                    className={`w-full py-2 px-4 border ${
+                      errors.pincode ? "border-red-500" : "border-gray-300"
+                    } rounded-md placeholder-gray-400 outline-none focus:ring-0 focus:border-primary text-xs sm:text-sm placeholder:text-xs sm:placehoder:text-sm`}
+                    autoComplete="off"
+                  />
+
+                  {/* Dropdown suggestions */}
+                  {showPincodeSuggestions && (
+                    <ul className="absolute w-full border rounded-md bg-white shadow-md mt-2 max-h-60 overflow-y-auto z-10">
+                      {isPincodeLoading ? (
+                        <li className="px-4 py-2 text-gray-500 text-xs sm:text-sm italic">
+                          Loading...
+                        </li>
+                      ) : pincodeSuggestions.length > 0 ? (
+                        pincodeSuggestions.map((pin) => (
+                          <li
+                            key={pin.id}
+                            onMouseDown={(e) => {
+                              e.preventDefault(); // prevent input blur
+                              handleSelectPincode(pin);
+                            }}
+                            className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-xs sm:text-sm"
+                            dangerouslySetInnerHTML={{
+                              __html: `${highlightPincodeMatch(
+                                pin.pincode,
+                                formData.pincode
+                              )} - ${highlightPincodeMatch(
+                                pin.office_name,
+                                formData.pincode
+                              )}`,
+                            }}
+                          />
+                        ))
+                      ) : (
+                        <li className="px-4 py-2 text-gray-400 text-xs sm:text-sm italic">
+                          No pincodes found
+                        </li>
+                      )}
+                    </ul>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <FormInput
+                    name="landmark"
+                    placeholder="landmark *"
+                    value={formData.landmark || ""}
+                    onChange={handleChange}
+                    hasError={errors.landmark}
+                  />
+                </div>
+
+                <div>
+                  <FormInput
+                    name="near_by_town"
+                    placeholder="Near by town *"
+                    value={formData.near_by_town || ""}
+                    onChange={handleChange}
+                    hasError={errors.near_by_town}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <h3 className="text-sm md:text-base font-semibold text-gray-700 border-b pb-2 mt-6">
+              {formData.role === "tutor"
+                ? "Professional Information"
+                : "Academic Information"}
+            </h3>
+
+            <div
+              className={`grid grid-cols-1 gap-4 ${
+                formData.role === "tutor" ? "md:grid-cols-2" : "md:grid-cols-1"
+              }`}
+            >
+              <div>
+                <FormInput
+                  name="qualification"
+                  placeholder="Highest Qualification *"
+                  value={formData.qualification}
+                  onChange={handleChange}
+                  hasError={errors.qualification}
+                />
+              </div>
+
+              {formData.role === "tutor" && (
+                <div>
+                  <FormInput
+                    name="experience_years"
+                    placeholder="Teaching Experience (years) *"
+                    value={formData.experience_years}
+                    onChange={(e) => {
+                      const onlyNums = e.target.value.replace(/[^0-9]/g, ""); // ✅ allow digits only
+                      setFormData((prev) => ({
+                        ...prev,
+                        experience_years: onlyNums,
+                      }));
+                      setErrors((prev) => ({ ...prev, experience: "" })); // clear error while typing
+                    }}
+                    hasError={errors.experience}
+                  />
+                </div>
+              )}
+            </div>
+
+            <div
+              className={`grid grid-cols-1 gap-4 ${
+                formData.role === "tutor" ? "md:grid-cols-2" : "md:grid-cols-1"
+              }`}
+            >
+              {formData.role === "tutor" && (
+                <div>
+                  <FormInput
+                    type="text"
+                    name="hourly_rate"
+                    placeholder="Hourly Rate (₹) *"
+                    value={formData.hourly_rate}
+                    onChange={(e) => {
+                      handleChange(e);
+                      setErrors((prev) => ({ ...prev, hourlyRate: "" }));
+                    }}
+                    hasError={errors.hourlyRate}
+                  />
+                </div>
+              )}
+
+              <div
+                ref={(el) => {
+                  errorRefs.subjects.current = el;
+                  subjectRef.current = el;
+                }}
+                className="relative"
+              >
+                {/* Input */}
+                <input
+                  type="text"
+                  name="categories"
+                  placeholder={`${
+                    formData.role === "tutor"
+                      ? "Subjects You Want to Teach*"
+                      : "Subjects You Want to Learn*"
+                  }`}
+                  value={subjectInput}
+                  onChange={handleSubjectChange}
+                  onFocus={handleSubjectChange}
+                  className={`w-full py-2 px-4 border ${
+                    errors.subjects ? "border-red-500" : "border-gray-300"
+                  } rounded-md placeholder-gray-400 placeholder:text-xs sm:placeholder:text-sm text-xs sm:text-sm outline-none focus:ring-0 focus:border-primary`}
+                  autoComplete="off"
+                  autoCorrect="off"
+                />
+
+                {/* ✅ Suggestions Dropdown */}
+                {showSuggestions && (
+                  <ul className="absolute w-full border rounded-md bg-white shadow-md mt-2 max-h-60 overflow-y-auto z-10">
+                    {filteredSubjects.length > 0 ? (
+                      filteredSubjects.map((sub) => (
+                        <li
+                          key={sub.id}
+                          onClick={() => handleSelectSubject(sub)}
+                          className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-xs sm:text-sm"
+                          dangerouslySetInnerHTML={{
+                            __html: highlightMatch(sub.label, subjectInput),
+                          }}
+                        />
+                      ))
+                    ) : (
+                      <li className="px-4 py-2 text-gray-400 text-xs sm:text-sm italic">
+                        No subjects found
+                      </li>
+                    )}
+                  </ul>
+                )}
+
+                {/* ✅ Selected Subjects Chips */}
+                {selectedSubjects.length > 0 && (
+                  <div className="flex flex-wrap gap-2 border rounded-md p-2 mt-2">
+                    {selectedSubjects.map((sub) => (
+                      <span
+                        key={sub.id}
+                        className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-md text-xs sm:text-sm"
+                      >
+                        {sub.label}
+                        <button
+                          type="button"
+                          onClick={() => removeSubject(sub.id)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {formData.role === "tutor" && (
+              <div>
+                <h3 className="text-sm md:text-lg font-semibold text-gray-700 border-b pb-2 mt-6">
+                  Available Days
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {[
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday",
+                    "Saturday",
+                    "Sunday",
+                  ].map((day) => {
+                    const isChecked = formData.available_days.includes(day);
+                    return (
+                      <label
+                        key={day}
+                        className={`flex text-xs sm:text-sm items-center space-x-2 border p-2 rounded-md cursor-pointer hover:bg-gray-50`}
+                      >
+                        <input
+                          type="checkbox"
+                          value={day}
+                          checked={isChecked}
+                          onChange={() => {
+                            setFormData((prev) => {
+                              const isSelected =
+                                prev.available_days.includes(day);
+                              const updatedDays = isSelected
+                                ? prev.available_days.filter((d) => d !== day)
+                                : [...prev.available_days, day];
+
+                              return { ...prev, available_days: updatedDays };
+                            });
+
+                            setErrors((prev) => ({
+                              ...prev,
+                              availableDays: "",
+                            }));
+                          }}
+                          className="h-4 w-4 text-green-600 outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 active:ring-0 active:ring-offset-0 appearance-none checked:bg-green-600 checked:border-green-600 text-xs sm:text-sm"
+                        />
+                        <span
+                          className={`${
+                            isChecked
+                              ? "text-black font-medium"
+                              : "text-gray-400"
+                          }`}
+                        >
+                          {day}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {formData.role === "tutor" && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Bio *
+                </label>
+                <textarea
+                  name="description"
+                  placeholder="Tell us about yourself, your teaching style, and experience..."
+                  value={formData.description}
+                  onChange={handleChange}
+                  rows="4"
+                  className={`w-full px-4 py-3 border text-xs sm:text-sm ${
+                    errors.description ? "border-red-500" : "border-gray-300"
+                  } rounded-md outline-none focus:ring-0 focus:border-primary transition`}
+                />
+              </div>
+            )}
+
+            {/* Reset Password */}
+            <h3 className="text-sm md:text-base font-semibold text-gray-700 border-b pb-2 mt-6">
+              Reset Password
+            </h3>
+            <div>
               <div className="space-y-4">
                 <div className="relative">
                   <FormInput
@@ -634,9 +1317,12 @@ function ProfileEditPopup({ isOpen, onClose }) {
 
             <button
               type="submit"
-              className="w-full py-2.5 sm:py-3 rounded-lg font-medium text-white bg-gradient-to-r from-green-500 to-green-600 shadow-md hover:shadow-lg transition text-sm sm:text-base"
+              disabled={submitting}
+              className={`w-full py-2.5 sm:py-3 rounded-lg font-medium text-white bg-gradient-to-r from-green-500 to-green-600 shadow-md hover:shadow-lg transition text-sm sm:text-base ${
+                submitting ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              Save Changes
+              {submitting ? "Saving..." : "Save Changes"}
             </button>
           </form>
         )}

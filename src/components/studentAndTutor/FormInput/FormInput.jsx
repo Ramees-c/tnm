@@ -11,6 +11,7 @@ function FormInput({
   select = false,
   className = "",
   hasError,
+  onBlur
 }) {
   const [open, setOpen] = useState(false);
 
@@ -26,7 +27,7 @@ function FormInput({
         {/* Selected value */}
         <div
           onClick={() => setOpen(!open)}
-          className={`w-full px-4 py-2 flex justify-between items-center border rounded-md cursor-pointer bg-white hover:border-primary transition ${ hasError ? "border-red-500" : "border-gray-300"} ` }
+          className={`w-full px-4 py-2 text-xs sm:text-sm flex justify-between items-center border rounded-md cursor-pointer bg-white hover:border-primary transition ${ hasError ? "border-red-500" : "border-gray-300"} ` }
         >
           <span className={value ? "text-gray-800" : "text-gray-400"}>
             {value
@@ -47,7 +48,7 @@ function FormInput({
               <li
                 key={i}
                 onClick={() => handleSelect(opt.value)}
-                className="px-4 py-2 cursor-pointer hover:bg-primary/10 text-gray-700"
+                className="px-4 py-2 cursor-pointer hover:bg-primary/10 text-gray-700 text-xs sm:text-sm"
               >
                 {opt.label}
               </li>
@@ -66,7 +67,8 @@ function FormInput({
       placeholder={placeholder}
       value={value}
       onChange={onChange}
-      className={`w-full px-4 py-2 rounded-md outline-none border placeholder-gray-400 focus:ring-0 focus:border-primary ${className} ${
+      onBlur={onBlur}
+      className={`w-full px-4 py-2 text-xs sm:text-sm placeholder:text-xs sm:placeholder:text-sm rounded-md outline-none border placeholder-gray-400 focus:ring-0 focus:border-primary ${className} ${
         hasError ? "border-red-500" : "border-gray-300"
       }`}
     />

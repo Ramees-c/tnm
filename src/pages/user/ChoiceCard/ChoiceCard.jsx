@@ -13,9 +13,9 @@ function ChoiceCard({
   };
   return (
     <div
-      className={`w-full max-w-md bg-gradient-to-b ${cardColor} rounded-md overflow-hidden shadow-xl transform transition-all duration-300 hover:scale-105 hover:shadow-xl border border-gray-100`}
+      className={`w-full max-w-md bg-gradient-to-b ${cardColor} rounded-md overflow-hidden shadow-sm`}
     >
-      <div className="p-8 flex flex-col items-center text-center">
+      <div className="p-6 flex flex-col items-center text-center">
         {/* Icon */}
         {icon}
 

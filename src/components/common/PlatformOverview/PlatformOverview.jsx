@@ -10,6 +10,7 @@ import {
   FiStar,
   FiCheckCircle,
 } from "react-icons/fi";
+import SubHeader from "../Subheader/SubHeader";
 
 const PlatformOverview = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -17,19 +18,17 @@ const PlatformOverview = () => {
   const features = [
     {
       icon: <FiUsers className="text-3xl" />,
-      title: "Expert Tutors",
+      title: "Skilled Tutors",
       description:
-        "Connect with certified professionals across diverse subjects and skill levels.",
-      stats: "5000+ Tutors",
+        "Learn from experienced professionals who guide you every step of the way.",
       color: "bg-blue-100 text-blue-600",
       gradient: "from-blue-500 to-blue-600",
     },
     {
       icon: <FiBookOpen className="text-3xl" />,
-      title: "Personalized Learning",
+      title: "Customized Learning",
       description:
-        "Customized lesson plans tailored to your learning style and goals.",
-      stats: "95% Success Rate",
+        "Tailored lesson plans that adapt to your goals and learning style.",
       color: "bg-purple-100 text-purple-600",
       gradient: "from-purple-500 to-purple-600",
     },
@@ -37,17 +36,15 @@ const PlatformOverview = () => {
       icon: <FiMonitor className="text-3xl" />,
       title: "Interactive Platform",
       description:
-        "Seamless virtual classroom with real-time collaboration tools.",
-      stats: "24/7 Access",
+        "Engage in dynamic lessons with real-time collaboration tools.",
       color: "bg-green-100 text-green-600",
       gradient: "from-green-500 to-green-600",
     },
     {
       icon: <FiAward className="text-3xl" />,
-      title: "Certified Programs",
+      title: "Accredited Learning",
       description:
-        "Earn recognized certifications to advance your career or academic journey.",
-      stats: "100+ Programs",
+        "Complete accredited programs that validate your skills and enhance your professional growth.",
       color: "bg-amber-100 text-amber-600",
       gradient: "from-amber-500 to-amber-600",
     },
@@ -57,55 +54,64 @@ const PlatformOverview = () => {
     {
       title: "For Students",
       content:
-        "Find the perfect tutor tailored to your learning needs, schedule, and budget.",
+        "Find the ideal tutor who fits your goals, schedule, and learning style.",
       benefits: [
-        "Personalized learning paths",
-        "Flexible scheduling",
-        "Progress tracking",
-        "Affordable pricing options",
+        "Customized learning plans",
+        "Convenient session timings",
+        "Continuous progress tracking",
+        "Affordable and transparent pricing",
       ],
     },
     {
       title: "For Tutors",
       content:
-        "Share your expertise with students worldwide and build your teaching career.",
+        "Share your knowledge with dedicated learners and grow your tutoring career.",
       benefits: [
-        "Global student reach",
-        "Flexible working hours",
-        "Competitive earnings",
-        "Teaching resources",
+        "Reach motivated students",
+        "Flexible teaching schedules",
+        "Fair and transparent earnings",
+        "Access to valuable teaching resources",
       ],
     },
   ];
 
   return (
-    <section className="py-16 relative overflow-hidden">
+    <section className=" relative overflow-hidden">
       <div className="px-4 relative z-10">
         {/* Section Header */}
-        <div className="text-center  mx-auto mb-16">
+        {/* <div className="text-center  mx-auto mb-16">
           <span className="inline-block px-4 py-1.5 text-xs font-semibold text-green-600 bg-green-100 rounded-full mb-4">
             Transforming Education
           </span>
-          <h2 className="text-2xl md:text-5xl font-bold text-gray-800 mb-6 leading-tight">
-            Learn from the Best{" "}
+          <h2 className="text-2xl md:text-5xl font-extrabold text-gray-800 mb-6 leading-tight">
+            Learn from Top
             <span className="text-transparent bg-clip-text bg-green-600">
-              Educators
-            </span>{" "}
-            Worldwide
+              {" "}
+              Educators{" "}
+            </span>
+            Around the World
           </h2>
+
           <p className="text-sm md:text-lg text-gray-600 leading-relaxed">
-            Our innovative platform connects passionate learners with expert
-            educators for personalized, effective learning experiences.
+            Our platform links motivated learners with skilled tutors for
+            personalized guidance and effective learning outcomes.
           </p>
-        </div>
+        </div> */}
+
+        <SubHeader
+          tagline="Transforming Education"
+          title="Learn from Top Learn from Top Educators Around the World"
+          description="Our platform links motivated learners with skilled tutors for
+            personalized guidance and effective learning outcomes."
+        />
 
         {/* Tabs */}
-        <div className="flex flex-wrap justify-center mb-12">
+        <div className="flex flex-wrap justify-center mb-7">
           {tabs.map((tab, index) => (
             <button
               key={index}
               onClick={() => setActiveTab(index)}
-              className={`px-8 py-4 mx-2 mb-4 rounded-md text-sm md:text-md md:text-lg font-medium transition-all duration-300 relative overflow-hidden group ${
+              className={`px-3 py-2 sm:px-5 sm:py-4 mx-2 mb-4 rounded-md text-xs md:text-sm font-medium transition-all duration-300 relative overflow-hidden group ${
                 activeTab === index
                   ? "text-white shadow-md"
                   : "bg-white text-gray-700 hover:text-white shadow-md hover:shadow-lg"
@@ -124,54 +130,51 @@ const PlatformOverview = () => {
         </div>
 
         {/* Tab Content */}
-        <div className="bg-white rounded-md shadow-md p-8 mb-16 max-w-5xl mx-auto transform transition-all duration-300 hover:shadow-2xl">
-          <p className="text-lg text-center text-gray-700 mb-6">
+        <div className="bg-white rounded-md shadow-md p-2 sm:p-4 mb-12 max-w-5xl mx-auto transform transition-all duration-300 hover:shadow-2xl">
+          <p className="text-base sm:text-lg font-semibold text-center text-gray-700 mb-6">
             {tabs[activeTab].content}
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-1 mt-6">
             {tabs[activeTab].benefits.map((benefit, idx) => (
               <div
                 key={idx}
-                className="flex items-center p-3 bg-gray-50 rounded-lg"
+                className="flex items-center p-2 bg-gray-50 rounded-lg"
               >
                 <FiCheckCircle className="text-green-500 mr-3 flex-shrink-0" />
-                <span className="text-gray-700">{benefit}</span>
+                <span className="text-gray-700 text-xs sm:text-base">
+                  {benefit}
+                </span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-2 sm:gap-5">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="bg-white rounded-md p-8 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 relative overflow-hidden group"
+              className="bg-white rounded-md p-2 sm:p-4 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 relative overflow-hidden group"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-gray-50 to-white rounded-bl-full"></div>
 
               <div
-                className={`w-16 h-16 rounded-md flex items-center justify-center mb-6 ${feature.color} group-hover:scale-110 transition-transform duration-300`}
+                className={`w-12 h-12 rounded-md flex items-center justify-center mb-6 ${feature.color} group-hover:scale-110 transition-transform duration-300`}
               >
                 {feature.icon}
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-3">
+              <h3 className="text-base sm:text-xl font-bold text-gray-800 mb-3">
                 {feature.title}
               </h3>
-              <p className="text-gray-600 mb-4 leading-relaxed">
+              <p className="text-gray-600 leading-relaxed text-xs sm:text-base">
                 {feature.description}
               </p>
-              <div className="flex items-center justify-between mt-6">
-                <span className="font-semibold text-gray-800">
-                  {feature.stats}
-                </span>
-              </div>
             </div>
           ))}
         </div>
 
         {/* CTA Section */}
-        <div className="bg-gradient-to-br from-green-500 via-green-600 to-green-700 rounded-md shadow-md p-10 text-center text-white relative overflow-hidden">
+        {/* <div className="bg-gradient-to-br from-green-500 via-green-600 to-green-700 rounded-md shadow-md p-10 text-center text-white relative overflow-hidden">
           <div className="absolute -top-20 -right-20 w-40 h-40 bg-white/10 rounded-full"></div>
           <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-white/10 rounded-full"></div>
 
@@ -189,7 +192,7 @@ const PlatformOverview = () => {
               Become a Tutor
             </button>
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   );

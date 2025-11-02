@@ -36,24 +36,43 @@ function LoginRegisterPage() {
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
-  return (
-    <div className="container">
-      {step === "choice" && (
-        <RegisterChoice
-          onTutorClick={() => setStep("tutor")}
-          onStudentClick={() => setStep("student")}
-          onCreateAccount={() => setStep("login")}
-        />
-      )}
+  const showBackground =
+    step === "login" || step === "choice" || step === "forgot";
 
-      {step === "tutor" && <TutorRegisterForm />}
-      {step === "student" && <StudentRegistrationForm />}
-      {step === "login" && (
-        <LoginForm onCreateAccount={() => setStep("choice")} onForgotPassword={() => setStep("forgot")} />
+  return (
+    <div
+     className={`relative min-h-screen ${
+        showBackground ? "bg-cover bg-center bg-no-repeat" : "bg-white"
+      }`}
+      style={{
+        backgroundImage: showBackground ? "url('/loginbg.png')" : "none",
+      }}
+    >
+      {/* Dark overlay for better contrast */}
+     {showBackground && (
+        <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
       )}
-      {step === "forgot" && (
-        <ForgotPasswordForm onBackToLogin={() => setStep("login")} />
-      )}
+      <div className="relative z-10 w-full">
+        {step === "choice" && (
+          <RegisterChoice
+            onTutorClick={() => setStep("tutor")}
+            onStudentClick={() => setStep("student")}
+            onCreateAccount={() => setStep("login")}
+          />
+        )}
+
+        {step === "tutor" && <TutorRegisterForm />}
+        {step === "student" && <StudentRegistrationForm />}
+        {step === "login" && (
+          <LoginForm
+            onCreateAccount={() => setStep("choice")}
+            onForgotPassword={() => setStep("forgot")}
+          />
+        )}
+        {step === "forgot" && (
+          <ForgotPasswordForm onBackToLogin={() => setStep("login")} />
+        )}
+      </div>
     </div>
   );
 }

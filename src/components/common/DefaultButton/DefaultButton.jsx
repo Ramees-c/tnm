@@ -1,18 +1,33 @@
 import React from "react";
 
-function DefaultButton({ buttonText, buttonSmall, buttonMedium, buttonFullwidth, onClick }) {
+function DefaultButton({
+  buttonText,
+  buttonSmall,
+  buttonMedium,
+  buttonFullwidth,
+  onClick,
+  disabled = false,
+}) {
   const buttonClass = buttonFullwidth
     ? "w-full px-4 py-2 lg:px-6 lg:py-3"
     : buttonSmall
-    ? "px-3 py-1"
+    ? "px-2 py-1 text-[10px]"
     : buttonMedium
     ? "px-4 py-2 lg:px-3 lg:py-2"
     : "px-3 py-2 lg:px-7 lg:py-3";
 
   return (
     <button
-      onClick={onClick}  // 👈 added here
-      className={`inline-block ${buttonClass} bg-gradient-to-r from-green-500 to-green-600 text-white rounded-md font-medium hover:shadow-lg hover:scale-105 transition-all duration-300 text-sm lg:text-md tracking-wide`}
+      onClick={onClick}
+      disabled={disabled}
+      className={`inline-block ${buttonClass} bg-gradient-to-r from-green-500 to-green-600 text-white rounded-md font-medium 
+        hover:shadow-lg hover:scale-105 transition-all duration-300 text-xs lg:text-base tracking-wide
+        ${
+          disabled
+            ? "opacity-50 cursor-not-allowed hover:shadow-none hover:scale-100"
+            : ""
+        }
+      `}
     >
       {buttonText}
     </button>

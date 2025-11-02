@@ -4,6 +4,7 @@ import axios from "axios";
 import BlogContent from "../../../components/common/BlogContent/BlogContent";
 import BlogSidebar from "../../../components/common/BlogSidebar/BlogSidebar";
 import Loading from "../../../components/common/Loading/Loading";
+import API_BASE from "../../../API/API";
 
 function BlogSingle() {
   const { id } = useParams();
@@ -14,7 +15,7 @@ function BlogSingle() {
   useEffect(() => {
     setLoading(true); // ensure loading state is true before fetching
     axios
-      .get(`/api/blogs/${id}/`)
+      .get(`${API_BASE}/blogs/${id}/`)
       .then((res) => {
         setPost(res.data);
         setError(null);
@@ -29,7 +30,7 @@ function BlogSingle() {
 
   if (loading)
     return (
-       <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center h-screen">
         <Loading />
       </div>
     );
@@ -41,7 +42,7 @@ function BlogSingle() {
     <section className="w-full py-12 bg-gray-50">
       <div className="mx-auto px-6 lg:px-12">
         {/* Title */}
-        <h1 className="text-xl md:text-2xl lg:text-4xl font-bold text-center text-gray-900 leading-snug mb-10">
+        <h1 className="text-base md:text-2xl lg:text-3xl font-bold text-center text-gray-900 leading-snug mb-10">
           {post.title}
         </h1>
 

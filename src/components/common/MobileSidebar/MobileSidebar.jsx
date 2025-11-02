@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { FiHome, FiUser, FiBook, FiStar, FiMail, FiX } from "react-icons/fi";
 import logo from "../../../assets/images/logo/tnmlogo.png";
+import { FaRegNewspaper } from "react-icons/fa";
 
 const MobileSidebar = ({ isOpen, onClose }) => {
   // Navigation items with React Icons
@@ -16,15 +17,21 @@ const MobileSidebar = ({ isOpen, onClose }) => {
       path: "/about",
       icon: <FiUser className="text-lg" />,
     },
+
     {
-      name: "Blogs",
-      path: "/blog",
+      name: "Subjects",
+      path: "/allCategories",
       icon: <FiBook className="text-lg" />,
     },
     {
       name: "Testimonials",
       path: "/testimonial",
       icon: <FiStar className="text-lg" />,
+    },
+    {
+      name: "Blogs",
+      path: "/blog",
+      icon: <FaRegNewspaper className="text-lg" />,
     },
     {
       name: "Contact",
@@ -56,14 +63,14 @@ const MobileSidebar = ({ isOpen, onClose }) => {
       {/* Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-60 lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-70 z-50"
           onClick={onClose}
         />
       )}
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-[100vh] w-72 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:hidden ${
+        className={`fixed top-0 left-0 h-[100vh] w-72 z-[30000] bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:hidden ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -100,22 +107,12 @@ const MobileSidebar = ({ isOpen, onClose }) => {
                   `flex items-center p-3 rounded-md transition-colors duration-200 group ${
                     isActive
                       ? "bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold"
-                      : "hover:bg-gradient-to-r from-green-500 to-green-600"
+                      : "hover:bg-gradient-to-r from-green-500 to-green-600 hover:text-white text-gray-700"
                   }`
                 }
               >
-                <span
-                  className={({ isActive }) =>
-                    `flex items-center gap-2 transition-colors ${
-                      isActive ? "text-white" : "text-primary hover:text-white"
-                    }`
-                  }
-                >
-                  {item.icon}
-                </span>
-                <span className="ml-3 font-medium group-hover:text-primary text-lg">
-                  {item.name}
-                </span>
+                <span className="flex items-center gap-2">{item.icon}</span>
+                <span className="ml-3 font-medium text-base">{item.name}</span>
               </NavLink>
             ))}
           </ul>

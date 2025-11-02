@@ -2,8 +2,13 @@ import React, { useState, useEffect } from "react";
 import { FiChevronDown, FiChevronRight, FiChevronUp } from "react-icons/fi";
 import DefaultButton from "../DefaultButton/DefaultButton";
 import axios from "axios";
+import API_BASE from "../../../API/API";
+
+import { useNavigate } from "react-router-dom";
 
 function FindTutorMenu() {
+  const navigate = useNavigate();
+
   const [menuData, setMenuData] = useState([]);
   const [activeTab, setActiveTab] = useState(null);
   const [hoveredLink, setHoveredLink] = useState(null);
@@ -12,7 +17,7 @@ function FindTutorMenu() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data } = await axios.get("/api/category-list/");
+        const { data } = await axios.get(`${API_BASE}/category-list/`);
         const mappedData = data.map((category) => {
           const columns = category.subcategories.map((subcat) => ({
             heading: subcat.name,
@@ -33,6 +38,12 @@ function FindTutorMenu() {
     setMobileOpenIndex(mobileOpenIndex === index ? null : index);
   };
 
+  const handleCategoryClick = (categoryName) => {
+    navigate(`/all-tutors?category=${encodeURIComponent(categoryName)}`, {
+      state: { hideHeroSearch: true },
+    });
+  };
+
   const shouldUseTwoColumns = (links) => links.length >= 8;
 
   return (
@@ -40,7 +51,7 @@ function FindTutorMenu() {
       {/* Desktop View */}
       <div className="hidden lg:block">
         {/* Tabs */}
-        <div className="flex flex-wrap rounded-t-lg overflow-hidden shadow-sm border border-gray-200">
+        <div className="flex flex-wrap rounded-t-md overflow-hidden">
           {menuData.map((item) => (
             <button
               key={item.title}
@@ -59,78 +70,67 @@ function FindTutorMenu() {
           ))}
         </div>
 
-        {/* Mega Menu */}
-        {/* Desktop Mega Menu */}
         {/* Desktop Mega Menu */}
         {activeTab?.columns && (
-          <div className="bg-white rounded-b-lg shadow-lg p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 border border-t-0 border-gray-200">
+          <div className="bg-white rounded-b-md shadow-sm p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 border border-t-0 border-gray-200">
             {activeTab.columns
-              .filter((col) => col.links && col.links.length > 0) // Only show columns with links
-              .slice(0, 9) // Take only the first 9 valid columns
+              .filter((col) => col.links && col.links.length > 0)
+              .slice(0, 9)
               .map((col, idx) => {
-                // Take only first 10 links
                 const linksToShow = col.links.slice(0, 10);
-
-                // Split into two columns with 5 items each
                 const firstColumn = linksToShow.slice(0, 5);
                 const secondColumn = linksToShow.slice(5, 10);
 
                 return (
                   <div key={idx}>
-                    <h3 className="text-sm font-semibold text-gray-800 mb-3">
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-800 mb-4 border-b border-gray-100 pb-1">
                       {col.heading}
                     </h3>
 
-                    <div className="flex gap-4">
+                    <div className="flex gap-4 flex-wrap sm:flex-nowrap">
                       {/* First Column */}
-                      <ul className="space-y-2">
+                      <ul className="space-y-2 w-full sm:w-1/2">
                         {firstColumn.map((link, i) => (
-                          <li
-                            key={i}
-                            onMouseEnter={() => setHoveredLink(link)}
-                            onMouseLeave={() => setHoveredLink(null)}
-                          >
-                            <a
-                              href="#"
-                              className={`flex items-center py-1.5 px-2 rounded-md transition-all text-sm whitespace-normal ${
+                          <li key={i}>
+                            <button
+                              onClick={() => handleCategoryClick(link)}
+                              onMouseEnter={() => setHoveredLink(link)}
+                              onMouseLeave={() => setHoveredLink(null)}
+                              className={`w-full text-left flex items-center gap-2 py-1 rounded-md transition-all duration-200 text-sm sm:text-sm ${
                                 hoveredLink === link
-                                  ? "bg-primary/10 text-primary font-medium pl-3"
-                                  : "text-gray-600 hover:text-gray-800"
+                                  ? "bg-green-50 text-green-600 font-medium shadow-inner"
+                                  : "text-gray-700 hover:bg-green-50 hover:text-green-600"
                               }`}
-                              title={link}
                             >
                               {hoveredLink === link && (
-                                <FiChevronRight className="mr-2 text-primary text-sm" />
+                                <FiChevronRight className="text-green-600" />
                               )}
                               <span>{link}</span>
-                            </a>
+                            </button>
                           </li>
                         ))}
                       </ul>
 
                       {/* Second Column */}
                       {secondColumn.length > 0 && (
-                        <ul className="space-y-2">
+                        <ul className="space-y-2 w-full sm:w-1/2">
                           {secondColumn.map((link, i) => (
-                            <li
-                              key={i}
-                              onMouseEnter={() => setHoveredLink(link)}
-                              onMouseLeave={() => setHoveredLink(null)}
-                            >
-                              <a
-                                href="#"
-                                className={`flex items-center py-1.5 px-2 rounded-md transition-all text-sm whitespace-normal ${
+                            <li key={i}>
+                              <button
+                                onClick={() => handleCategoryClick(link)}
+                                onMouseEnter={() => setHoveredLink(link)}
+                                onMouseLeave={() => setHoveredLink(null)}
+                                className={`w-full text-left flex items-center gap-2 py-1 rounded-md transition-all duration-200 text-sm sm:text-sm ${
                                   hoveredLink === link
-                                    ? "bg-primary/10 text-primary font-medium pl-3"
-                                    : "text-gray-600 hover:text-gray-800"
+                                    ? "bg-green-50 text-green-600 font-medium shadow-inner"
+                                    : "text-gray-700 hover:bg-green-50 hover:text-green-600"
                                 }`}
-                                title={link}
                               >
                                 {hoveredLink === link && (
-                                  <FiChevronRight className="mr-2 text-primary text-sm" />
+                                  <FiChevronRight className="text-green-600" />
                                 )}
                                 <span>{link}</span>
-                              </a>
+                              </button>
                             </li>
                           ))}
                         </ul>
@@ -144,11 +144,11 @@ function FindTutorMenu() {
       </div>
 
       {/* Mobile View */}
-      <div className="lg:hidden space-y-4">
+      <div className="lg:hidden space-y-1">
         {menuData.map((item, index) => (
           <div
             key={index}
-            className="border border-gray-200 rounded-lg overflow-hidden"
+            className="border border-gray-200 rounded-md overflow-hidden"
           >
             <button
               onClick={() => toggleMobileMenu(index)}
@@ -163,7 +163,7 @@ function FindTutorMenu() {
             </button>
 
             {mobileOpenIndex === index && item.columns && (
-              <div className="p-4 bg-white">
+              <div className="p-2 bg-white">
                 {item.columns.map((col, colIndex) => (
                   <div key={colIndex} className="mb-4 last:mb-0">
                     <h3 className="font-semibold text-gray-800 mb-2">
@@ -172,29 +172,18 @@ function FindTutorMenu() {
                     <ul className="space-y-2 pl-4">
                       {col.links.map((link, linkIndex) => (
                         <li key={linkIndex}>
-                          <a
-                            href="#"
+                          <button
+                            onClick={() => handleCategoryClick(link)}
                             className="flex items-center py-1.5 text-gray-600 hover:text-primary transition-colors"
                           >
                             <FiChevronRight className="mr-2 text-primary text-xs" />
                             <span className="truncate">{link}</span>
-                          </a>
+                          </button>
                         </li>
                       ))}
                     </ul>
                   </div>
                 ))}
-
-                <div className="mt-4 bg-primary/5 p-4 rounded-lg">
-                  <h3 className="font-bold text-gray-800 mb-2">
-                    Need help choosing?
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-2">
-                    Our education consultants can help you find the perfect
-                    tutor.
-                  </p>
-                  <DefaultButton buttonText="Get Free Consultation" />
-                </div>
               </div>
             )}
           </div>

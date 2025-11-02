@@ -1,7 +1,7 @@
 import React from "react";
 
 import shapeIcon from "../../../assets/images/91.png";
-import bannerImg from "../../../assets/images/1.png";
+import bannerImg from "../../../assets/images/2.png";
 
 import herobg from "../../../assets/images/hero.jpg";
 
@@ -25,19 +25,20 @@ function Hero() {
                   alt="Discover"
                   className="mr-3 w-10 hidden lg:block animate-bounce-slow"
                 />
-                <span className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-sm xl:text-md">
-                  Discover 20,000+ World-Class Courses
+                <span className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-xs xl:text-sm">
+                 Discover world-class courses for every learner
                 </span>
               </h4>
 
-              <h2 className="text-3xl md:text-3xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold mb-6 text-white leading-tight">
-                Learn <span className="text-secondary">Smarter</span>,<br />
-                Achieve <span className="text-accent">Knowledge</span>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold text-white leading-snug mb-6">
+                Learn Smarter
+                <br />
+                With Trusted <span className="text-secondary">Tutors</span>
               </h2>
 
-              <p className="text-white/90 mb-8 text-lg max-w-2xl mx-auto lg:mx-0 ">
-                Expand your knowledge and open doors to exciting careers with
-                our revolutionary online education platform.
+              <p className="text-white/90 mb-8 text-xs sm:text-lg max-w-2xl mx-auto lg:mx-0 ">
+                Grow your knowledge and discover new career paths with our
+                trusted learning platform.
               </p>
 
               <HeroSearchForm />
@@ -50,7 +51,7 @@ function Hero() {
               <img
                 src={bannerImg}
                 alt="Learning Illustration"
-                className="w-full h-auto object-contain"
+                className="w-full xl:h-[90vh] object-contain"
               />
             </div>
           </div>

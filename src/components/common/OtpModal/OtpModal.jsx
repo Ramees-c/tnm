@@ -142,8 +142,9 @@ function OtpModal({
               Enter verification code
             </h2>
             <p className="mt-1 text-xs md:text-md text-gray-500">
-              We sent a 6-digit code to{" "}
-              <span className="font-medium text-gray-700">{phoneOrEmail}</span>
+              {/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(phoneOrEmail)
+                ? "OTP sent to your email. It may take 1–2 minutes to arrive."
+                : `Sent a 6-digit code to ${phoneOrEmail}`}
             </p>
           </div>
           <button

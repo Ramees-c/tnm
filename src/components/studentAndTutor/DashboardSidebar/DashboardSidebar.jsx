@@ -15,7 +15,7 @@ import ConfirmMessagePopup from "../../common/ConfirmMessagePopup/ConfirmMessage
 import ProfileEditPopup from "../ProfileEditPopup/ProfileEditPopup";
 import { useAuth } from "../../../Context/userAuthContext";
 import axios from "axios";
-import { MEDIA_URL } from "../../../API/API";
+import API_BASE, { MEDIA_URL } from "../../../API/API";
 
 const tutorLinks = [
   {
@@ -31,6 +31,11 @@ const tutorLinks = [
   {
     to: "/assignedStudentsPage",
     label: "Assigned Students",
+    icon: <Users size={20} />,
+  },
+  {
+    to: "/tutorAllStudent",
+    label: "All Students",
     icon: <Users size={20} />,
   },
   { to: "/tutorDocument", label: "Documents", icon: <Edit3 size={20} /> },
@@ -68,13 +73,90 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  const [notifyCount, setNotifyCount] = useState(0);
   const location = useLocation();
 
-  const { user, handleLogout, userDetails } = useAuth(); // ✅ Get user + logout from context
+  const { user, handleLogout, userDetails, token } = useAuth();
 
   const links = role === "tutor" ? tutorLinks : studentLinks;
 
   const navigate = useNavigate();
+
+  // ✅ 1. Main notification count updater
+  useEffect(() => {
+    if (!token) return;
+
+    // Load instantly from sessionStorage (prevents blinking)
+    const savedCount = sessionStorage.getItem("notifyCount");
+    if (savedCount !== null) setNotifyCount(Number(savedCount));
+
+    let isMounted = true;
+    let timeoutId = null;
+
+    const fetchNotifyCount = async () => {
+      try {
+        const res = await axios.get(`${API_BASE}/notify_count/`, {
+          headers: { Authorization: `Token ${token}` },
+        });
+
+        if (isMounted) {
+          const newCount = res.data.notify_count;
+          setNotifyCount((prev) => {
+            if (prev !== newCount) {
+              sessionStorage.setItem("notifyCount", newCount);
+              return newCount;
+            }
+            return prev;
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch notification count", err);
+      }
+    };
+
+    // Fetch instantly
+    fetchNotifyCount();
+
+    // Poll every 20s instead of 30s (more responsive)
+    const interval = setInterval(fetchNotifyCount, 20000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [token, notifyCount]);
+
+  // ✅ 2. Reset when on notification page, and refresh quickly after leaving
+  useEffect(() => {
+    if (!token) return;
+
+    const isNotificationPage =
+      location.pathname === "/studentnotificaton" ||
+      location.pathname === "/tutornotification";
+
+    if (isNotificationPage) {
+      // Instantly clear count when visiting notifications
+      setNotifyCount(0);
+      sessionStorage.setItem("notifyCount", 0);
+    } else {
+      // Refresh a few seconds after leaving (to catch new ones faster)
+      const timeout = setTimeout(async () => {
+        try {
+          const res = await axios.get(`${API_BASE}/notify_count/`, {
+            headers: { Authorization: `Token ${token}` },
+          });
+          const newCount = res.data.notify_count;
+          setNotifyCount(newCount);
+          sessionStorage.setItem("notifyCount", newCount);
+        } catch (err) {
+          console.error("Failed to refresh notification count", err);
+        }
+      }, 3000); // refresh 3s after leaving notification page
+
+      return () => clearTimeout(timeout);
+    }
+  }, [location.pathname, token, notifyCount]);
 
   useEffect(() => {
     if (isMobile && open) {
@@ -179,7 +261,6 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
             {links.map(({ to, label, icon }, i) => {
               const isActive = location.pathname === to;
               const isNotification = label === "Notifications";
-              const notificationCount = userDetails?.notification_count || 0;
 
               // 🔹 Check if "Assigned Students" should be disabled
               const isDisabled =
@@ -210,10 +291,9 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
                     <span>{label}</span>
                   </div>
 
-                  {/* 🔔 Notification Badge */}
-                  {isNotification && notificationCount > 0 && (
-                    <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                      {notificationCount}
+                  {isNotification && notifyCount > 0 && (
+                    <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full transition-all duration-300">
+                      {notifyCount}
                     </span>
                   )}
                 </Link>
@@ -223,7 +303,7 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
         </div>
 
         {/* Logout */}
-        <div className="p-4 border-t border-white/20">
+        <div className="p-4 border-t border-white/20 ">
           <button
             onClick={() => setLogoutModalOpen(true)}
             className="flex items-center gap-3 w-full px-4 py-2 rounded-md bg-red-500 hover:bg-red-600 transition font-medium shadow"

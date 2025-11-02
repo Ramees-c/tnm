@@ -1,23 +1,28 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PlatformOverview from "../../../components/common/PlatformOverview/PlatformOverview";
 
-import aboutImg from "../../../assets/images/about-img.jpg";
+import aboutImg from "../../../assets/images/about-2.jpg";
 import CEOSection from "../../../components/common/CEOSection/CEOSection";
 import VisionMission from "../../../components/common/VisionMission/VisionMission";
 import PageHeader from "../../../components/common/PageHeader/PageHeader";
 
+import pageBanner from "../../../assets/images/page_banner/about.png"
+
 function AboutPage() {
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, []);
   return (
     <div>
       <PageHeader
         title="About Us"
-        headerBg="https://plus.unsplash.com/premium_photo-1681842143575-03bf1be4c11c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzN8fGVkdWNhdGlvbnxlbnwwfHwwfHx8MA%3D%3D"
+        headerBg={pageBanner}
       />
       <div className="container">
         <section className="w-full pt-16" data-aos="fade-up">
-          <div className="mx-auto grid grid-cols-1 xl:grid-cols-2 gap-10 items-center lg:px-12">
+          <div className="mx-auto grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-10 items-center lg:px-12">
             {/* Left Image */}
-            <div className="flex justify-center xl:justify-center">
+            <div className="flex justify-center xl:justify-center h-full">
               <img
                 src={aboutImg}
                 alt="Students"
@@ -27,39 +32,40 @@ function AboutPage() {
 
             {/* Right Content */}
             <div className="">
-              <h2 className="text-3xl sm:text-4xl 2xl:text-5xl font-bold text-gray-900 mb-6 leading-snug">
-                Our commitment to{" "}
-                <span className="text-green-600">diversity leadership.</span>
+              <h2 className="text-xl sm:text-4xl 2xl:text-4xl font-bold text-gray-900 mb-6">
+                Our commitment to Connecting
+                <span className="text-green-600"> Learners and Tutors</span>
               </h2>
 
-              <p className="text-gray-600 text-base 2xl:text-lg leading-relaxed mb-8">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Unde,
-                quaerat facere nobis iste porro inventore velit a magni
-                molestias doloribus sapiente, nam delectus? Nostrum inventore
-                cupiditate dignissimos ratione, alias ducimus odit deserunt
-                libero veritatis exercitationem natus, repudiandae quidem veniam
-                minima consequuntur!
+              <p className="text-gray-600 text-xs sm:text-sm lg:text-lg leading-relaxed mb-8">
+                At Tutor-Near Me, we are dedicated to making quality education
+                accessible for every student. Our platform bridges the gap
+                between learners and expert tutors, offering personalized
+                guidance across a wide range of subjects, languages, and exam
+                preparation.
                 <br />
-                Explicabo illo consectetur sed ipsa fuga impedit consequatur
-                beatae, minus quam quibusdam optio ipsum. Sed ad iusto fugiat
-                labore ullam atque soluta fugit, blanditiis exercitationem
-                mollitia totam expedita ab ratione repellendus.
+                We focus on providing a seamless experience where students can
+                find tutors who match their learning style and preferences. By
+                simplifying the process of connecting students with skilled
+                tutors, we empower learners to take control of their academic
+                journey and achieve their goals efficiently.
                 <br />
-                Explicabo illo consectetur sed ipsa fuga impedit consequatur
-                beatae, minus quam quibusdam optio ipsum. Sed ad iusto fugiat
-                labore ullam atque soluta fugit, blanditiis exercitationem
-                mollitia totam expedita ab ratione repellendus.
+                Our approach emphasizes flexibility, convenience, and
+                professionalism, ensuring that every interaction between student
+                and tutor is productive and rewarding. With a commitment to
+                excellence, we strive to create an environment where learning
+                becomes engaging, effective, and tailored to each student’s
+                needs.
                 <br />
-                Explicabo illo consectetur sed ipsa fuga impedit consequatur
-                beatae, minus quam quibusdam optio ipsum. Sed ad iusto fugiat
-                labore ullam atque soluta fugit, blanditiis exercitationem
-                mollitia totam expedita ab ratione repellendus.
+                Through our platform, students gain access to a trusted network
+                of tutors, allowing them to enhance their knowledge, improve
+                skills, and build confidence in their academic pursuits.
               </p>
             </div>
           </div>
         </section>
 
-        <div className="" data-aos="fade-up">
+        <div data-aos="fade-up">
           <PlatformOverview />
         </div>
         <div data-aos="fade-up">

@@ -1,6 +1,7 @@
 // userAuthContext.js
 import axios from "axios";
 import { createContext, useContext, useState, useEffect } from "react";
+import API_BASE from "../API/API";
 
 const AuthContext = createContext(null); // ✅ provide default value
 
@@ -18,7 +19,7 @@ export const AuthProvider = ({ children }) => {
   const refreshUserDetails = async () => {
     if (!token) return;
     try {
-      const res = await axios.get("/api/profile/", {
+      const res = await axios.get(`${API_BASE}/profile/`, {
         headers: { Authorization: `Token ${token}` },
       });
       setUserDetails(res.data);
@@ -58,7 +59,7 @@ export const AuthProvider = ({ children }) => {
       const storedToken = localStorage.getItem("token");
       if (storedToken) {
         await axios.post(
-          "/api/logout/",
+          `${API_BASE}/logout/`,
           {},
           { headers: { Authorization: `Token ${storedToken}` } }
         );
@@ -74,8 +75,6 @@ export const AuthProvider = ({ children }) => {
       window.location.href = "/register";
     }
   };
-
-  console.log(token);
 
   return (
     <AuthContext.Provider

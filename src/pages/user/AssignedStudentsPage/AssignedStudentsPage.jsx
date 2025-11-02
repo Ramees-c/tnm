@@ -18,7 +18,6 @@ function AssignedStudentsPage() {
       setToastOpen(false);
     }
   }, [userDetails]);
-
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
@@ -44,14 +43,11 @@ function AssignedStudentsPage() {
         <div className="max-w-6xl mx-auto">
           {/* ✅ Mobile Menu Button before Title */}
           <div className="flex items-center gap-3 mb-6">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden"
-            >
+            <button onClick={() => setSidebarOpen(true)} className="lg:hidden">
               <Menu size={27} />
             </button>
 
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 flex items-center gap-2">
+            <h1 className="text-xl sm:text-3xl font-bold text-gray-800">
               Assigned Students
             </h1>
           </div>

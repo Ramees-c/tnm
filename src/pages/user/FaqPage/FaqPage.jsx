@@ -1,52 +1,26 @@
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { HiOutlineQuestionMarkCircle } from "react-icons/hi";
 import { HiChevronDown } from "react-icons/hi";
+import { Link } from "react-router-dom";
+import API_BASE from "../../../API/API";
 
 function FaqPage() {
   const [openIndex, setOpenIndex] = useState(0);
+  const [faqs, setFaqs] = useState([]);
 
-  const faqs = [
-    {
-      question: "How do I enroll in a course?",
-      answer:
-        "Enrolling is simple! Just browse our course catalog, select the course you're interested in, and click the 'Enroll Now' button. You'll be guided through a quick registration and payment process.",
-    },
-    {
-      question: "Can I access my courses on mobile devices?",
-      answer:
-        "Yes, you can access all your courses on mobile, tablet, or desktop. Our platform is fully responsive and supports learning on the go with our dedicated mobile app.",
-    },
-    {
-      question: "What benefits does online education offer?",
-      answer:
-        "Online education provides flexibility, accessibility, and the ability to learn at your own pace while accessing resources from anywhere in the world. It's perfect for working professionals and busy students.",
-    },
-    {
-      question: "Are the courses self-paced or scheduled?",
-      answer:
-        "We offer both options! Most courses are self-paced, allowing you to learn on your schedule. Some specialized programs have scheduled live sessions for real-time interaction with instructors.",
-    },
-    {
-      question: "Do you offer certificates upon completion?",
-      answer:
-        "Yes, all our courses offer certificates of completion. Many are also accredited and can be shared directly on LinkedIn to showcase your achievements.",
-    },
-    {
-      question: "What if I need help during my course?",
-      answer:
-        "We provide multiple support channels including instructor messaging, community forums, and dedicated support staff to ensure you have help when you need it.",
-    },
-    {
-      question: "Can I get a refund if I'm not satisfied?",
-      answer:
-        "We offer a 30-day money-back guarantee on all courses. If you're not satisfied with your learning experience, you can request a full refund with no questions asked.",
-    },
-    {
-      question: "Are there any prerequisites for the courses?",
-      answer:
-        "Prerequisites vary by course. Beginner courses typically have no requirements, while advanced courses may recommend prior knowledge. All requirements are clearly listed on each course page.",
-    },
-  ];
+  useEffect(() => {
+    const fetchFaqs = async () => {
+      try {
+        const response = await axios.get(`${API_BASE}/faq/`);
+
+        setFaqs(response.data);
+      } catch (error) {
+        console.error("Error fetching FAQs:", error);
+      }
+    };
+    fetchFaqs();
+  }, []);
 
   const toggleFAQ = (index) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -60,13 +34,13 @@ function FaqPage() {
           <span className="inline-block px-4 py-1.5 text-xs font-semibold text-green-600 bg-green-100 rounded-full mb-4">
             Frequently Asked Questions
           </span>
-          <h2 className="text-2xl md:text-5xl font-bold text-gray-800 mb-6 leading-tight">
+          <h2 className="text-xl md:text-5xl font-bold text-gray-800 mb-6 leading-tight">
             Find Answers to{" "}
             <span className="text-transparent bg-clip-text bg-green-600">
               Common Questions
             </span>
           </h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xs sm:text-sm text-gray-600 max-w-3xl mx-auto">
             Quick answers to questions you may have. Can't find what you're
             looking for? Our team is ready to help you with any inquiries.
           </p>
@@ -75,34 +49,36 @@ function FaqPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           {/* Left Content - Sticky on larger screens */}
           <div className="lg:col-span-4 lg:sticky lg:top-24 h-fit">
-            <div className="bg-gradient-to-br from-green-100 to-green-200 rounded-2xl p-8 shadow-lg">
-              <div className="flex items-center justify-center w-16 h-16 bg-white rounded-xl shadow-md mb-6">
-                <HiOutlineQuestionMarkCircle className="w-8 h-8 text-teal-500" />
+            <div className="bg-gradient-to-br from-green-100 to-green-200 rounded-md p-8 shadow-md">
+              <div className="flex items-center justify-center w-12 h-12 bg-white rounded-md shadow-md mb-4">
+                <HiOutlineQuestionMarkCircle className="w-6 h-6 text-teal-500" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">
                 Need More <br /> Assistance?
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 mb-6 text-xs sm:text-sm">
                 Our support team is available 24/7 to help you with any
                 questions or concerns about our courses and platform.
               </p>
-              <button className="w-full px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center">
-                Contact Support
-                <svg
-                  className="w-5 h-5 ml-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-                  ></path>
-                </svg>
-              </button>
+              <Link to="/contact">
+                <button className="w-full px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-md font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center text-sm sm:text-base">
+                  Contact Support
+                  <svg
+                    className="w-5 h-5 ml-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                    ></path>
+                  </svg>
+                </button>
+              </Link>
             </div>
           </div>
 
@@ -111,7 +87,7 @@ function FaqPage() {
             {faqs.map((faq, index) => (
               <div
                 key={index}
-                className={`bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md ${
+                className={`bg-white border border-gray-100 rounded-md overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md ${
                   openIndex === index ? "ring-1 ring-green-400" : ""
                 }`}
               >
