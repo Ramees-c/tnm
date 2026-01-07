@@ -15,9 +15,12 @@ function TestimonialPage() {
     const fetchTestimonials = async () => {
       try {
         const res = await axios.get(`${API_BASE}/testimonials/`);
-        setTestimonials(res.data); // assuming res.data is an array
+        const sortedRes = res.data.sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        );
+        setTestimonials(sortedRes);
       } catch (err) {
-        console.error("Failed to fetch testimonials:", err);
+        console.error("Failed to fetch testimonials");
       } finally {
         setLoading(false);
       }
@@ -25,8 +28,6 @@ function TestimonialPage() {
 
     fetchTestimonials();
   }, []);
-
-  console.log(testimonials);
 
   if (loading) {
     return (
@@ -40,7 +41,8 @@ function TestimonialPage() {
     <div>
       <PageHeader title="Testimonials" headerBg={pageBanner} />
       <div className="container py-16" data-aos="fade-up">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-8">
+        {/* FIX: Added items-start so cards don't stretch equally */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 items-start">
           {testimonials.map((testimonial) => (
             <TestimonialCard key={testimonial.id} testimonial={testimonial} />
           ))}

@@ -7,16 +7,17 @@ function BlogCard({ post }) {
     window.scrollTo(0, 0);
   };
   return (
+    // Blog card
     <div data-aos="fade-up">
       <div onClick={handleClick}>
         <div className="bg-white rounded-md shadow-md overflow-hidden hover:shadow-lg transition">
           {/* Image */}
           <Link to={`/blogSingle/${post.id}`}>
-          <img
-            src={post.image}
-            alt={post.title}
-            className="w-full h-52 2xl:h-80 object-cover ransform transition-transform duration-500 hover:scale-105"
-          />
+            <img
+              src={post.image}
+              alt={post.title}
+              className="w-full h-52 2xl:h-80 object-cover ransform transition-transform duration-500 hover:scale-105"
+            />
           </Link>
 
           {/* Content */}
@@ -38,7 +39,10 @@ function BlogCard({ post }) {
               {post.title}
             </h3>
 
-            <Link to={`/blogSingle/${post.id}`} className="text-green-600 font-medium text-sm hover:underline">
+            <Link
+              to={`/blogSingle/${post.id}`}
+              className="text-green-600 font-medium text-sm hover:underline"
+            >
               READ MORE →
             </Link>
           </div>

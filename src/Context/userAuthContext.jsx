@@ -1,12 +1,12 @@
 // userAuthContext.js
 import axios from "axios";
 import { createContext, useContext, useState, useEffect } from "react";
-import API_BASE from "../API/API";
+import api from "../API/axios";
 
-const AuthContext = createContext(null); // ✅ provide default value
+const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [token, setToken] = useState(null);
 
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
@@ -16,62 +16,81 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isMailVerified, setIsMailVerified] = useState(false);
 
+  useEffect(() => {
+    const verifySession = async () => {
+      try {
+        const res = await api.get("/profile/", { withCredentials: true });
+        const data = res.data;
+        setUser({
+          role: data.role,
+          is_approved: data.is_approved,
+        });
+        setUserDetails(data);
+        setToken(true);
+      } catch (err) {
+        console.warn("User not logged in or session expired");
+        setToken(null);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    verifySession();
+  }, []);
+
   const refreshUserDetails = async () => {
-    if (!token) return;
     try {
-      const res = await axios.get(`${API_BASE}/profile/`, {
-        headers: { Authorization: `Token ${token}` },
-      });
-      setUserDetails(res.data);
-      if (res.data?.mail_verified === false) {
-        setIsMailVerified(
-          "Your mail is not verified. Please verify.",
-          "warning"
-        );
+      const res = await api.get("/profile/", { withCredentials: true });
+      const data = res.data;
+      setUserDetails(data);
+      if (data?.mail_verified === false) {
+        setIsMailVerified("Your mail is not verified. Please verify.");
       }
     } catch (err) {
-      console.error("Failed to refresh profile:", err);
+      console.error("Failed to refresh profile");
     }
   };
 
+  // Auto refresh user on load
   useEffect(() => {
-    if (token) {
-      setLoading(true);
-      refreshUserDetails().finally(() => setLoading(false));
-    } else {
-      setLoading(false);
+    if (user) {
+      refreshUserDetails();
     }
-  }, [token]);
+  }, [user]);
 
-  const login = (data) => {
-    const userData = {
-      role: data.role,
-      is_approved: data.is_approved ?? false,
-    };
-    setUser(userData);
-    setToken(data.token);
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(userData));
+  const login = async (data) => {
+    try {
+      const userData = {
+        role: data.role,
+        is_approved: data.is_approved ?? false,
+      };
+
+      setUser(userData);
+      setToken(true);
+      localStorage.setItem("user", JSON.stringify(userData));
+
+      // Preload profile before redirect
+      const res = await api.get("/profile/", { withCredentials: true });
+      setUserDetails(res.data);
+    } catch (err) {
+      console.warn("Failed to preload profile after login");
+    }
   };
 
   const handleLogout = async () => {
     try {
-      const storedToken = localStorage.getItem("token");
-      if (storedToken) {
-        await axios.post(
-          `${API_BASE}/logout/`,
-          {},
-          { headers: { Authorization: `Token ${storedToken}` } }
-        );
-      }
+      await api.post("/logout/", {}, { withCredentials: true });
     } catch (err) {
-      console.error("❌ Logout failed:", err.response?.data || err.message);
+      console.error("Logout failed");
     } finally {
-      localStorage.removeItem("token");
+      // Clear local data
       localStorage.removeItem("user");
+
       setUser(null);
       setToken(null);
       setUserDetails({});
+
       window.location.href = "/register";
     }
   };
@@ -95,7 +114,7 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// ✅ Export the hook separately, NOT inline
+// Export the hook separately
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {

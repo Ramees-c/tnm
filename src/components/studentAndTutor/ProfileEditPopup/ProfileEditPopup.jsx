@@ -64,14 +64,13 @@ function ProfileEditPopup({ isOpen, onClose }) {
 
   // const imageKey = formData.role === "tutor" ? "profile_image" : "profile_photo";
 
-  // 🔹 Fetch user details when popup opens
+  // Fetch user details when popup opens
   useEffect(() => {
     const html = document.documentElement;
     const body = document.body;
-    
 
     if (isOpen) {
-      setSubmitError('')
+      setSubmitError("");
       // Prevent background scroll
       html.style.overflow = "hidden";
       body.style.overflow = "hidden";
@@ -87,8 +86,6 @@ function ProfileEditPopup({ isOpen, onClose }) {
       html.style.overflow = "";
       body.style.overflow = "";
     };
-
-    
   }, [isOpen]);
 
   useEffect(() => {
@@ -118,11 +115,12 @@ function ProfileEditPopup({ isOpen, onClose }) {
     };
   }, []);
 
+  // Fetch user details
   const fetchUserDetails = async () => {
     try {
       setLoading(true);
       const res = await axios.get(`${API_BASE}/profile/edit/`, {
-        headers: { Authorization: `Token ${token}` },
+        withCredentials: true,
       });
 
       const data = res.data;
@@ -145,13 +143,13 @@ function ProfileEditPopup({ isOpen, onClose }) {
       setImageKey(key);
       setProfileImage(data[key] ? `${data[key]}` : null);
 
-      // ✅ Fetch all categories from API
+      // Fetch all categories from API
       const categoriesRes = await axios.get(`${API_BASE}/category-list/`);
       const allCategories = categoriesRes.data
         ? flattenCategories(categoriesRes.data)
         : [];
 
-      // ✅ Map selected category IDs to category objects
+      // Map selected category IDs to category objects
       if (data.categories && data.categories.length > 0) {
         const preSelected = allCategories.filter((cat) => {
           // Replace last "(...)" with " in ...", keep other parentheses
@@ -165,19 +163,20 @@ function ProfileEditPopup({ isOpen, onClose }) {
           );
         });
 
-        setSelectedSubjects(preSelected); // keep full objects for chips
+        setSelectedSubjects(preSelected); 
         setFormData((prev) => ({
           ...prev,
-          categories: [...data.categories], // original backend labels
+          categories: [...data.categories], 
         }));
       }
     } catch (error) {
-      console.error("Failed to fetch user details ❌", error);
+      console.error("Failed to fetch user details");
     } finally {
       setLoading(false);
     }
   };
 
+  // onChange
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -210,6 +209,7 @@ function ProfileEditPopup({ isOpen, onClose }) {
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
+  // onChange - pincode
   const handlePincodeChange = async (e) => {
     const value = e.target.value;
     setFormData((prev) => ({ ...prev, pincode: value }));
@@ -220,27 +220,29 @@ function ProfileEditPopup({ isOpen, onClose }) {
       return;
     }
 
-    setIsPincodeLoading(true); // ✅ start loading
+    setIsPincodeLoading(true);
 
     try {
       const res = await axios.get(`${API_BASE}/pincode_search/?q=${value}`);
       setPincodeSuggestions(res.data || []);
       setShowPincodeSuggestions(true);
     } catch (err) {
-      console.error("Pincode search error:", err);
+      console.error("Pincode search error");
       setPincodeSuggestions([]);
       setShowPincodeSuggestions(false);
     } finally {
-      setIsPincodeLoading(false); // ✅ stop loading
+      setIsPincodeLoading(false);
     }
   };
 
+  // Select pincode
   const handleSelectPincode = (pin) => {
     // Update formData with selected pincode
     setFormData((prev) => ({ ...prev, pincode: pin.pincode }));
     setShowPincodeSuggestions(false); // close dropdown
   };
 
+  // Pincode highlight
   const highlightPincodeMatch = (text, query) => {
     if (!query) return text;
     // Escape regex special characters from query
@@ -252,6 +254,7 @@ function ProfileEditPopup({ isOpen, onClose }) {
     );
   };
 
+  // Image upload
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
 
@@ -293,12 +296,14 @@ function ProfileEditPopup({ isOpen, onClose }) {
     };
   };
 
-  const removeImage = () => {
+  // Remove image
+ const removeImage = () => {
     setProfileImage(null);
-    setFormData((prev) => ({ ...prev, [imageKey]: "" }));
+    setFormData((prev) => ({ ...prev, [imageKey]: null }));
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  // Password visibility
   const togglePasswordVisibility = (field) => {
     setShowPasswords((prev) => ({
       ...prev,
@@ -306,7 +311,7 @@ function ProfileEditPopup({ isOpen, onClose }) {
     }));
   };
 
-  // ✅ Recursive function to flatten categories and all nested subcategories
+  // Recursive function to flatten categories and all nested subcategories
   const flattenCategories = (
     categories,
     rootName = "",
@@ -320,10 +325,10 @@ function ProfileEditPopup({ isOpen, onClose }) {
       const isTop = !rootName;
       const currentRootName = rootName || category.name;
 
-      // 🔹 Preserve the very first rootId across recursion
+      // Preserve the very first rootId across recursion
       const baseRootId = rootId ?? category.id;
 
-      // 🔹 Always build path starting from top-most root
+      // Always build path starting from top-most root
       const currentPath = isTop ? [category.id] : [...path, category.id];
 
       const hasChildren =
@@ -331,7 +336,7 @@ function ProfileEditPopup({ isOpen, onClose }) {
       const isLeaf = !hasChildren;
 
       if (isTop) {
-        // ✅ Root-level item
+        // Root-level item
         result.push({
           id: category.id,
           name: category.name,
@@ -339,10 +344,10 @@ function ProfileEditPopup({ isOpen, onClose }) {
           parent: null,
           pathIds: [category.id], // root path starts with itself
           hasChildren,
-          isLeaf, // 🔹 add leaf flag
+          isLeaf, // add leaf flag
         });
       } else {
-        // ✅ Sub-level item with same "in ... (Root)" label format
+        // Sub-level item with same "in ... (Root)" label format
         const cleanChain = [...chain].filter((c) => c !== currentRootName);
 
         const label =
@@ -359,11 +364,11 @@ function ProfileEditPopup({ isOpen, onClose }) {
           parent: currentRootName,
           pathIds: [baseRootId, ...currentPath.slice(1)],
           hasChildren,
-          isLeaf, // 🔹 add leaf flag
+          isLeaf, // add leaf flag
         });
       }
 
-      // 🔹 Recurse deeper if subcategories exist
+      // Recurse deeper if subcategories exist
       if (hasChildren) {
         result = result.concat(
           flattenCategories(
@@ -380,7 +385,7 @@ function ProfileEditPopup({ isOpen, onClose }) {
     return result;
   };
 
-  // ✅ Subject input change
+  // Subject input change
   const handleSubjectChange = async (e) => {
     const value = e.target.value;
     setSubjectInput(value);
@@ -404,12 +409,13 @@ function ProfileEditPopup({ isOpen, onClose }) {
         setShowSuggestions(false);
       }
     } catch (error) {
-      console.error("Error fetching categories:", error);
+      console.error("Error fetching categories");
       setFilteredSubjects([]);
       setShowSuggestions(false);
     }
   };
 
+  // Select subject
   const handleSelectSubject = (subject) => {
     if (selectedSubjects.some((s) => s.id === subject.id)) {
       setShowSuggestions(false);
@@ -419,7 +425,7 @@ function ProfileEditPopup({ isOpen, onClose }) {
     const updatedSubjects = [...selectedSubjects, subject];
     setSelectedSubjects(updatedSubjects);
 
-    // ✅ Only leaf IDs, not full path
+    // Only leaf IDs, not full path
     const leafIds = updatedSubjects.map((s) => s.id);
 
     setFormData((prev) => ({
@@ -433,11 +439,12 @@ function ProfileEditPopup({ isOpen, onClose }) {
     setFilteredSubjects([]);
   };
 
+  // Remove subject
   const removeSubject = (id) => {
     const updatedSubjects = selectedSubjects.filter((s) => s.id !== id);
     setSelectedSubjects(updatedSubjects);
 
-    // ✅ Only leaf IDs
+    // Only leaf IDs
     const leafIds = updatedSubjects.map((s) => s.id);
 
     setFormData((prev) => ({
@@ -446,6 +453,7 @@ function ProfileEditPopup({ isOpen, onClose }) {
     }));
   };
 
+  // Highlight match
   const highlightMatch = (text, query) => {
     if (!query) return text;
     const regex = new RegExp(`(${query})`, "gi");
@@ -455,6 +463,7 @@ function ProfileEditPopup({ isOpen, onClose }) {
     );
   };
 
+  // Email OTP request
   const requestEmailOtp = async () => {
     if (!formData.email) return;
 
@@ -463,18 +472,16 @@ function ProfileEditPopup({ isOpen, onClose }) {
       const res = await axios.post(
         `${API_BASE}/profile/request-change-contact/`,
         { email: formData.email }, // send email
-        { headers: { Authorization: `Token ${token}` } }
+        {
+          withCredentials: true,
+        }
       );
 
-      console.log("OTP sent ✅", res.data);
       setPendingEmail(formData.email);
-      setShowOtpPopup(true); // open OTP modal
+      setShowOtpPopup(true);
       setOtpLoading(false);
     } catch (err) {
-      console.error(
-        err.response?.data?.non_field_errors?.[0] ||
-          "Failed to send OTP. Try again."
-      );
+      console.error("Failed to send OTP. Try again.");
       setOtpLoading(false);
       setErrors((prev) => ({
         ...prev,
@@ -485,6 +492,7 @@ function ProfileEditPopup({ isOpen, onClose }) {
     }
   };
 
+  // Phone OTP request
   const requestPhoneOtp = async () => {
     // If user hasn't selected country code, fallback to 91
     const countryCode = formData.countryCode || "91";
@@ -500,18 +508,16 @@ function ProfileEditPopup({ isOpen, onClose }) {
       const res = await axios.post(
         `${API_BASE}/profile/request-change-contact/`,
         { mobile_number: fullNumber }, // send full number with country code
-        { headers: { Authorization: `Token ${token}` } }
+        {
+          withCredentials: true,
+        }
       );
 
-      console.log("Phone OTP sent ✅", res.data);
       setPendingEmail(fullNumber); // save with country code to show in OTP modal
       setShowOtpPopup(true); // open OTP modal
       setOtpLoading(false);
     } catch (err) {
-      console.error(
-        "Failed to request phone OTP ❌",
-        err.response?.data.non_field_errors
-      );
+      console.error("Failed to request phone OTP");
       setOtpLoading(false);
       setErrors((prev) => ({
         ...prev,
@@ -522,6 +528,7 @@ function ProfileEditPopup({ isOpen, onClose }) {
     }
   };
 
+  // OTP verify
   const handleOtpVerify = async (otp) => {
     try {
       const contactType = /^\+?[0-9]+$/.test(pendingEmail) ? "mobile" : "email";
@@ -532,10 +539,10 @@ function ProfileEditPopup({ isOpen, onClose }) {
           otp,
           contact_type: contactType,
         },
-        { headers: { Authorization: `Token ${token}` } }
+        {
+          withCredentials: true,
+        }
       );
-
-      console.log(`${contactType} verified ✅`, res.data);
 
       // Update formData based on type
       if (contactType === "email") {
@@ -555,14 +562,12 @@ function ProfileEditPopup({ isOpen, onClose }) {
       setOtpError("");
       showSuccess("verified successfully!");
     } catch (err) {
-      console.error(
-        "OTP verification failed ❌",
-        err.response?.data || err.message
-      );
+      console.error("OTP verification failed");
       setOtpError("Invalid OTP. Please try again.");
     }
   };
 
+  // Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
@@ -633,20 +638,23 @@ function ProfileEditPopup({ isOpen, onClose }) {
         JSON.stringify(formData.available_days || [])
       );
 
-      if (formData[imageKey] instanceof File) {
-        // ✅ send actual dynamic key
+       if (formData[imageKey] instanceof File) {
         form.append(imageKey, formData[imageKey]);
-      } else if (formData[imageKey] === "") {
+      } else if (formData[imageKey] === null) {
         form.append(imageKey, "");
       }
-      // else: don't append → keep current image
 
       await axios.put(`${API_BASE}/profile/update/`, form, {
+        withCredentials: true,
         headers: {
-          Authorization: `Token ${token}`,
           "Content-Type": "multipart/form-data",
         },
       });
+
+      await new Promise((r) => setTimeout(r, 200));
+      await refreshUserDetails();
+      showSuccess("Profile updated successfully!");
+      onClose();
 
       // Password update if fields are filled
       if (!allEmpty) {
@@ -656,8 +664,8 @@ function ProfileEditPopup({ isOpen, onClose }) {
         passwordForm.append("confirm_new_password", confirmNewPassword);
 
         await axios.put(`${API_BASE}/change-password/`, passwordForm, {
+          withCredentials: true,
           headers: {
-            Authorization: `Token ${token}`,
             "Content-Type": "multipart/form-data",
           },
         });
@@ -666,14 +674,14 @@ function ProfileEditPopup({ isOpen, onClose }) {
       showSuccess("Profile updated successfully!");
       onClose();
     } catch (error) {
-      console.error("Profile update failed ❌", error);
+      console.error("Profile update failed");
 
       let errorMessage = "Failed to update profile. Please try again.";
 
       if (error.response?.data) {
         const data = error.response.data;
 
-        // ✅ Pick the first field with an error
+        // Pick the first field with an error
         const firstField = Object.keys(data)[0];
         const firstError =
           Array.isArray(data[firstField]) && data[firstField].length > 0
@@ -681,7 +689,7 @@ function ProfileEditPopup({ isOpen, onClose }) {
             : data[firstField];
 
         if (firstField && firstError) {
-          // ✅ Convert snake_case → "Full name"
+          // Convert snake_case → "Full name"
           const readableField = firstField
             .replace(/_/g, " ")
             .replace(/\b\w/g, (char) => char.toUpperCase());
@@ -712,8 +720,7 @@ function ProfileEditPopup({ isOpen, onClose }) {
   max-h-[90vh] 
   overflow-y-auto 
   scrollbar-hide 
-  transform scale-95 sm:scale-100 
-  transition-transform duration-300 ease-out
+  animate-scaleIn
 "
         onClick={(e) => e.stopPropagation()}
       >
@@ -1104,7 +1111,7 @@ function ProfileEditPopup({ isOpen, onClose }) {
                   autoCorrect="off"
                 />
 
-                {/* ✅ Suggestions Dropdown */}
+                {/* Suggestions Dropdown */}
                 {showSuggestions && (
                   <ul className="absolute w-full border rounded-md bg-white shadow-md mt-2 max-h-60 overflow-y-auto z-10">
                     {filteredSubjects.length > 0 ? (
@@ -1126,7 +1133,7 @@ function ProfileEditPopup({ isOpen, onClose }) {
                   </ul>
                 )}
 
-                {/* ✅ Selected Subjects Chips */}
+                {/* Selected Subjects Chips */}
                 {selectedSubjects.length > 0 && (
                   <div className="flex flex-wrap gap-2 border rounded-md p-2 mt-2">
                     {selectedSubjects.map((sub) => (
@@ -1330,9 +1337,9 @@ function ProfileEditPopup({ isOpen, onClose }) {
 
       <OtpModal
         isOpen={showOtpPopup}
-        phoneOrEmail={pendingEmail} // shows email or phone dynamically
+        phoneOrEmail={pendingEmail}
         onClose={() => setShowOtpPopup(false)}
-        onSubmit={handleOtpVerify} // send OTP verify
+        onSubmit={handleOtpVerify}
         onResend={() => {
           // resend OTP based on type
           if (/^[0-9]+$/.test(pendingEmail)) {
@@ -1344,6 +1351,18 @@ function ProfileEditPopup({ isOpen, onClose }) {
         otpError={otpError}
         setOtpError={setOtpError}
       />
+
+       <style jsx>{`
+        .animate-scaleIn {
+          transform: scale(0.8);
+          animation: scaleIn 0.45s forwards;
+        }
+        @keyframes scaleIn {
+          to {
+            transform: scale(1);
+          }
+        }
+      `}</style>
     </div>
   );
 }

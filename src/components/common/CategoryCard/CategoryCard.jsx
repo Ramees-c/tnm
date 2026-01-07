@@ -2,26 +2,31 @@ import React from "react";
 import { MEDIA_URL } from "../../../API/API";
 import { useNavigate } from "react-router-dom";
 
+// Default image
 import categoryDefalultImg from "../../../assets/images/categoryDefault.jpg";
 
 function CategoryCard({ image, title }) {
-
-  console.log(image, "image");
-  
   const navigate = useNavigate();
+
+  // Category click redirect to all tutors page
   const handleCategoryClick = (categoryName) => {
     navigate(`/all-tutors?category=${encodeURIComponent(categoryName)}`, {
       state: { hideHeroSearch: true },
     });
   };
 
+
+  // Category image validating
   const isValidImage =
     image && image !== "null" && image !== null && image !== "";
 
-  // ✅ final image URL logic
-  const finalImage = isValidImage ? `${MEDIA_URL}${image}` : categoryDefalultImg;
+  // final image URL logic
+  const finalImage = isValidImage
+    ? `${MEDIA_URL}${image}`
+    : categoryDefalultImg;
 
   return (
+    // Category card
     <div
       onClick={() => handleCategoryClick(title)}
       className="group relative overflow-hidden rounded-md shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 w-[230px] lg:w-[220px] xl:w-[230px] h-36 lg:h-[140px] cursor-pointer"
@@ -44,4 +49,4 @@ function CategoryCard({ image, title }) {
   );
 }
 
-export default CategoryCard;
+export default React.memo(CategoryCard);

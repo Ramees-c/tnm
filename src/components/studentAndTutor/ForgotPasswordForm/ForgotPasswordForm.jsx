@@ -14,6 +14,8 @@ function ForgotPasswordForm({ onBackToLogin }) {
   const { showSuccess } = useSuccessMessage();
 
   const navigate = useNavigate();
+
+  // States
   const [identifier, setIdentifier] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -76,8 +78,6 @@ function ForgotPasswordForm({ onBackToLogin }) {
       });
       setShowOtpModal(true);
     } catch (err) {
-      console.log(err);
-
       setFieldErrors({
         identifier: err.response?.data?.error || "Something went wrong",
       });
@@ -94,9 +94,8 @@ function ForgotPasswordForm({ onBackToLogin }) {
         step: "request_otp",
         identifier,
       });
-      console.log("Resend response:", response.data);
     } catch (err) {
-      setOtpError(err.response?.data?.error || "Failed to resend OTP");
+      setOtpError("Failed to resend OTP");
     }
   };
 
@@ -126,7 +125,7 @@ function ForgotPasswordForm({ onBackToLogin }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center">
       <div className="w-full max-w-lg bg-white rounded-md shadow-sm overflow-hidden">
         <div className="bg-gradient-to-r from-green-500 to-green-600 py-5 text-center">
           <h1 className="text-2xl font-bold text-white">Reset Password</h1>
@@ -135,7 +134,7 @@ function ForgotPasswordForm({ onBackToLogin }) {
           </p>
         </div>
 
-        <div className="p-6 sm:p-8">
+        <div className="p-4 sm:p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Identifier */}
             <div>

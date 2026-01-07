@@ -10,10 +10,10 @@ function BlogSingle() {
   const { id } = useParams();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); // optional error state
+  const [error, setError] = useState(null); 
 
   useEffect(() => {
-    setLoading(true); // ensure loading state is true before fetching
+    setLoading(true);
     axios
       .get(`${API_BASE}/blogs/${id}/`)
       .then((res) => {
@@ -21,7 +21,7 @@ function BlogSingle() {
         setError(null);
       })
       .catch((err) => {
-        console.error(err);
+        console.error("Failed to load blog");
         setError("Failed to load blog");
         setPost(null);
       })

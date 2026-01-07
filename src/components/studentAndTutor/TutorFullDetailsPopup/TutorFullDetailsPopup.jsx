@@ -2,14 +2,11 @@ import React, { useEffect, useState } from "react";
 import {
   Mail,
   Phone,
-  BookOpen,
   MapPin,
   Award,
-  DollarSign,
   Calendar,
   User,
   Briefcase,
-  FileText,
   X,
   Landmark,
   Building2,
@@ -78,9 +75,7 @@ function TutorFullDetailsPopup({
   useEffect(() => {
     const getStudentPlan = async () => {
       const res = await axios.get(`${API_BASE}/plans/students/`, {
-        headers: {
-          Authorization: `Token ${token}`,
-        },
+        withCredentials: true,
       });
       setStudentPlan(res.data);
     };
@@ -97,10 +92,10 @@ function TutorFullDetailsPopup({
       ? tutor.available_days
       : [];
 
-  // ✅ Razorpay Payment Handler
+  // Razorpay Payment Handler
   const handlePayTutor = async () => {
     try {
-      // 1️⃣ Create order
+      // Create order
       const createOrderRes = await axios.post(
         `${API_BASE}/create-order/`,
         {
@@ -109,15 +104,13 @@ function TutorFullDetailsPopup({
           amount: studentPlan[0]?.price,
         },
         {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
+          withCredentials: true,
         }
       );
 
       const { order_id, amount, currency, key } = createOrderRes.data;
 
-      // 2️⃣ Open Razorpay popup
+      // Open Razorpay popup
       const options = {
         key: key,
         amount: amount.toString(),
@@ -127,7 +120,7 @@ function TutorFullDetailsPopup({
         image: "/logo.png", // optional
         order_id: order_id,
         handler: async function (response) {
-          // 3️⃣ Verify Payment
+          // Verify Payment
           const verifyRes = await axios.post(
             `${API_BASE}/verify-payment/`,
             {
@@ -137,9 +130,7 @@ function TutorFullDetailsPopup({
               plan_id: studentPlan[0]?.id,
             },
             {
-              headers: {
-                Authorization: `Token ${token}`,
-              },
+              withCredentials: true,
             }
           );
 
@@ -164,7 +155,7 @@ function TutorFullDetailsPopup({
         showMessage("Payment Failed: " + response.error.description);
       });
     } catch (error) {
-      console.error("Payment error:", error);
+      console.error("Payment error");
       showMessage(error.response?.data.error || "Failed to process payment.");
     }
   };
@@ -179,7 +170,7 @@ function TutorFullDetailsPopup({
           new_tutor_id: tutor.tutor_id,
         },
         {
-          headers: { Authorization: `Token ${token}` },
+          withCredentials: true,
         }
       );
 
@@ -190,7 +181,7 @@ function TutorFullDetailsPopup({
       onClose();
       showSuccess("Tutor changed successfully!");
     } catch (error) {
-      console.error("Change Tutor Error:", error);
+      console.error("Change Tutor Error");
       showMessage(
         error.response?.data?.detail ||
           error.response?.data?.new_tutor_id ||
@@ -203,7 +194,7 @@ function TutorFullDetailsPopup({
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 p-4">
-      <div className="bg-white rounded-md shadow-2xl w-full max-w-2xl p-3 md:p-6 relative overflow-y-auto max-h-[90vh] scrollbar-hide transform transition-transform duration-300 scale-100">
+      <div className="bg-white rounded-md shadow-2xl w-full max-w-2xl p-3 md:p-6 relative overflow-y-auto max-h-[90vh] scrollbar-hide animate-scaleIn">
         {/* Close Button */}
         <button
           className="absolute top-4 right-4 text-gray-500 hover:text-black transition-colors"
@@ -246,7 +237,7 @@ function TutorFullDetailsPopup({
               </div>
             )}
             <div>
-              {/* ✅ Added Nearby Town and Landmark */}
+              {/* Added Nearby Town and Landmark */}
               {(tutor.near_by_town || tutor.landmark) && (
                 <div className="flex flex-col gap-1 mt-1 text-gray-800 text-xs sm:text-sm">
                   {tutor.near_by_town && (
@@ -474,6 +465,18 @@ function TutorFullDetailsPopup({
           adminPhones={adminPhones}
         />
       </div>
+
+       <style jsx>{`
+        .animate-scaleIn {
+          transform: scale(0.8);
+          animation: scaleIn 0.45s forwards;
+        }
+        @keyframes scaleIn {
+          to {
+            transform: scale(1);
+          }
+        }
+      `}</style>
     </div>
   );
 }

@@ -2,10 +2,8 @@ import React from "react";
 import {
   Mail,
   Phone,
-  BookOpen,
   MapPin,
   Award,
-  DollarSign,
   Calendar,
   User,
   Briefcase,
@@ -37,6 +35,7 @@ function AssignedTutorCard({
 }) {
   const navigate = useNavigate();
 
+  // Change tutor
   const onChangeTutor = () => {
     navigate("/studentDashbordAllTutors", {
       state: { isChangeMode: true, old_tutor_id: tutor_id },

@@ -19,22 +19,22 @@ function TutorDashboardAllStudents() {
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [toastOpen, setToastOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true); // ✅ NEW
+  const [loading, setLoading] = useState(true);
 
-  // ✅ Fetch all students
+  // Fetch all students
   const fetchStudents = async () => {
     setLoading(true);
     try {
       const res = await axios.get(`${API_BASE}/students_list/`, {
-        headers: { Authorization: `Token ${token}` },
+        withCredentials: true,
       });
 
       setStudents(res.data);
       setFilteredStudents(res.data);
     } catch (error) {
-      console.error("Error fetching students:", error);
+      console.error("Error fetching students");
     } finally {
-      setLoading(false); // ✅ stop loader
+      setLoading(false);
     }
   };
 
@@ -46,7 +46,7 @@ function TutorDashboardAllStudents() {
     setToastOpen(userDetails?.mail_verified === false);
   }, [userDetails]);
 
-  // ✅ Search filtering
+  // Search filtering
   useEffect(() => {
     if (!students.length) return;
 
@@ -81,7 +81,7 @@ function TutorDashboardAllStudents() {
     setFilteredStudents(filtered);
   }, [searchTerm, students]);
 
-  // ✅ Skeleton loader
+  // Skeleton loader
   const StudentSkeleton = () => (
     <div className="animate-pulse bg-white rounded-xl shadow p-4 w-full max-w-xs">
       <div className="h-24 bg-gray-200 rounded-md mb-3"></div>
@@ -136,7 +136,7 @@ function TutorDashboardAllStudents() {
           {/* Students Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-2 place-items-center">
             {loading ? (
-              // ✅ Show skeleton loader
+              // Show skeleton loader
               [...Array(8)].map((_, i) => <StudentSkeleton key={i} />)
             ) : filteredStudents.length > 0 ? (
               filteredStudents.map((student) => (

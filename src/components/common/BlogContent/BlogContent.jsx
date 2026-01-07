@@ -3,6 +3,7 @@ import { FaCalendarAlt } from "react-icons/fa";
 
 const BlogContent = ({ post }) => {
   return (
+    // Blog content component
     <article className="bg-white rounded-md shadow-md p-2 md:p-6">
       {/* Featured Image */}
       {post.image && (

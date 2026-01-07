@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CheckCircle2, ChevronDown, ChevronUp } from "lucide-react";
-import DefaultButton from "../../common/DefaultButton/DefaultButton";
 
 function SubscriptionCard({
   title,
@@ -69,7 +68,7 @@ function SubscriptionCard({
       isButtonDisabled = false;
     } else if (planPrice < currentPrice) {
       buttonText = "Subscribe";
-      isButtonDisabled = true; // can’t downgrade
+      isButtonDisabled = true; 
     }
   }
 

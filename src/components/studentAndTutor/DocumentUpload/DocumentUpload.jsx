@@ -16,11 +16,11 @@ function DocumentUpload({ onUpload, uploadError }) {
         onUpload(file);
       } else {
         // Instead of alert, trigger uploadError in parent
-        onUpload(null, "❌ Only PDF and DOC/DOCX files are allowed.");
+        onUpload(null, "Only PDF and DOC/DOCX files are allowed.");
       }
     }
 
-    // 🔹 Reset input so same file can be selected again
+    // Reset input so same file can be selected again
     e.target.value = "";
   };
 

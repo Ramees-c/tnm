@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ProfileEditPopup from "../ProfileEditPopup/ProfileEditPopup";
 import { useAuth } from "../../../Context/userAuthContext";
 
-function ToastMessage({ message, isOpen, onClose, type = "info" }) {
+function ToastMessage({ message, isOpen, type = "info" }) {
   const { user } = useAuth();
   const [showEdit, setShowEdit] = useState(false);
 
@@ -15,9 +15,9 @@ function ToastMessage({ message, isOpen, onClose, type = "info" }) {
 
   return (
     <div>
-      {/* ✅ Only show toast if it's open AND popup is NOT open */}
+      {/* Only show toast if it's open AND popup is NOT open */}
       {isOpen && (
-        <div className="fixed top-5 right-5 z-40">
+        <div className="fixed top-5 right-5 z-10">
           <div
             onClick={() => setShowEdit(true)}
             className={`px-2 py-1 lg:px-4 lg:py-3 rounded-md shadow-lg text-white w-[180px] md:w-[300px] ${colors[type]} transition-transform transform flex justify-between items-center cursor-pointer`}
@@ -27,7 +27,7 @@ function ToastMessage({ message, isOpen, onClose, type = "info" }) {
         </div>
       )}
 
-      {/* ✅ Profile Edit Popup */}
+      {/* Profile Edit Popup */}
       <ProfileEditPopup
         isOpen={showEdit}
         onClose={() => setShowEdit(false)}

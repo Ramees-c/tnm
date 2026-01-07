@@ -3,18 +3,66 @@ import { useLocation } from "react-router-dom";
 import TutorCard from "../../../components/common/TutorCard/TutorCard";
 import { useTutors } from "../../../Context/TutorsContext";
 import Loading from "../../../components/common/Loading/Loading";
-import { Search } from "lucide-react"; // at the top of your file
+import { Search } from "lucide-react";
+
+const getPaginationPages = (current, total) => {
+  const pages = [];
+  const delta = window.innerWidth < 640 ? 1 : 2; // responsive
+
+  const range = [];
+  const rangeWithDots = [];
+
+  let start = Math.max(2, current - delta);
+  let end = Math.min(total - 1, current + delta);
+
+  for (let i = start; i <= end; i++) {
+    range.push(i);
+  }
+
+  if (start > 2) {
+    rangeWithDots.push("...");
+  }
+
+  rangeWithDots.push(...range);
+
+  if (end < total - 1) {
+    rangeWithDots.push("...");
+  }
+
+  return [1, ...rangeWithDots, total].filter(
+    (v, i, a) => a.indexOf(v) === i
+  );
+};
+
 
 function AllTutorsPage() {
   const { tutors, loading } = useTutors();
   const [filteredTutors, setFilteredTutors] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const tutorsPerPage = 20;
 
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const selectedCategory = params.get("category");
 
   const hideHeroSearch = location.state?.hideHeroSearch || false;
+
+  const indexOfLastTutor = currentPage * tutorsPerPage;
+  const indexOfFirstTutor = indexOfLastTutor - tutorsPerPage;
+  const currentTutors = filteredTutors.slice(
+    indexOfFirstTutor,
+    indexOfLastTutor
+  );
+
+  const totalPages = Math.ceil(filteredTutors.length / tutorsPerPage);
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -23,14 +71,7 @@ function AllTutorsPage() {
   useEffect(() => {
     if (!tutors.length) return;
 
-    let filtered = tutors.filter(
-      (tutor) =>
-        tutor.is_approved === true &&
-        tutor.active_inactive === true &&
-        (tutor.is_paid === true ||
-          (Array.isArray(tutor.assigned_students) &&
-            tutor.assigned_students.length > 0))
-    );
+    let filtered = tutors.filter((tutor) => tutor.active_inactive === true);
 
     // Filter by selected category from URL
     if (selectedCategory) {
@@ -72,9 +113,11 @@ function AllTutorsPage() {
         );
       });
     }
-
+    setCurrentPage(1);
     setFilteredTutors(filtered);
   }, [tutors, selectedCategory, searchTerm]);
+
+  
 
   if (loading)
     return (
@@ -116,7 +159,7 @@ function AllTutorsPage() {
       {/* Tutors Grid */}
       {filteredTutors.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6 place-items-center">
-          {filteredTutors.map((tutor) => (
+          {currentTutors.map((tutor) => (
             <TutorCard key={tutor.id} tutor={tutor} />
           ))}
         </div>
@@ -132,6 +175,64 @@ function AllTutorsPage() {
           </h2>
         </div>
       )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+  <div className="flex flex-wrap justify-center items-center mt-12 gap-2 px-2">
+    {/* Previous */}
+    <button
+      disabled={currentPage === 1}
+      onClick={() => handlePageChange(currentPage - 1)}
+      className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border flex items-center justify-center
+        ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-green-100"}
+      `}
+    >
+      «
+    </button>
+
+    {/* Page Numbers */}
+    {getPaginationPages(currentPage, totalPages).map((page, index) =>
+      page === "..." ? (
+        <span
+          key={index}
+          className="px-2 text-gray-400 select-none"
+        >
+          …
+        </span>
+      ) : (
+        <button
+          key={page}
+          onClick={() => handlePageChange(page)}
+          className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border flex items-center justify-center text-sm sm:text-base
+            ${
+              currentPage === page
+                ? "bg-green-600 text-white"
+                : "hover:bg-green-100"
+            }
+          `}
+        >
+          {page}
+        </button>
+      )
+    )}
+
+    {/* Next */}
+    <button
+      disabled={currentPage === totalPages}
+      onClick={() => handlePageChange(currentPage + 1)}
+      className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border flex items-center justify-center
+        ${
+          currentPage === totalPages
+            ? "opacity-50 cursor-not-allowed"
+            : "hover:bg-green-100"
+        }
+      `}
+    >
+      »
+    </button>
+  </div>
+)}
+
     </div>
   );
 }

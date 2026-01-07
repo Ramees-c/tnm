@@ -13,7 +13,7 @@ function SubscriptionPage() {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [planDetails, setPlanDetails] = useState([]);
-  const [loading, setLoading] = useState(true); // ✅ Start loading as true
+  const [loading, setLoading] = useState(true);
   const [showMessagePopup, setShowMessagePopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
   const [loadingPlanId, setLoadingPlanId] = useState(null);
@@ -25,7 +25,12 @@ function SubscriptionPage() {
     setShowMessagePopup(true);
   };
 
-  // ✅ Fetch with caching + instant display
+  const logoUrl =
+    typeof window !== "undefined"
+      ? window.location.origin + "/tnmlogo.png"
+      : "";
+
+  // Fetch with caching + instant display
   useEffect(() => {
     const fetchPlans = async () => {
       setLoading(true);
@@ -36,12 +41,12 @@ function SubscriptionPage() {
 
       try {
         const res = await axios.get(`${API_BASE}/plans/tutors/`, {
-          headers: { Authorization: `Token ${token}` },
+          withCredentials: true,
         });
         setPlanDetails(res.data);
         localStorage.setItem("tutorPlans", JSON.stringify(res.data));
       } catch (err) {
-        console.error("Failed to fetch plans:", err);
+        console.error("Failed to fetch plans");
       } finally {
         setLoading(false);
       }
@@ -49,7 +54,7 @@ function SubscriptionPage() {
     if (token) fetchPlans();
   }, [token]);
 
-  // ✅ Mark active plan
+  // Mark active plan
   useEffect(() => {
     if (userDetails?.payment_history && planDetails.length > 0) {
       const matchedPlan = planDetails.find(
@@ -59,12 +64,12 @@ function SubscriptionPage() {
     }
   }, [userDetails, planDetails]);
 
-  // ✅ Toast for mail verification
+  // Toast for mail verification
   useEffect(() => {
     setToastOpen(userDetails?.mail_verified === false);
   }, [userDetails]);
 
-  // ✅ Handle plan selection + Razorpay
+  // Handle plan selection + Razorpay
   const handleSelect = async (plan) => {
     if (userDetails?.mail_verified === false) {
       showMessage("Please verify your mail");
@@ -77,7 +82,9 @@ function SubscriptionPage() {
       const upgradeRes = await axios.post(
         `${API_BASE}/upgrade-plan/`,
         { plan_id: plan.id },
-        { headers: { Authorization: `Token ${token}` } }
+        {
+          withCredentials: true,
+        }
       );
 
       const upgradeData = upgradeRes.data;
@@ -89,7 +96,9 @@ function SubscriptionPage() {
       const orderRes = await axios.post(
         `${API_BASE}/create-order/`,
         { plan_id: plan.id, amount: upgradeData.amount_to_pay },
-        { headers: { Authorization: `Token ${token}` } }
+        {
+          withCredentials: true,
+        }
       );
 
       const orderData = orderRes.data;
@@ -107,6 +116,7 @@ function SubscriptionPage() {
           upgradeData.status === "calculated"
             ? "Plan Upgrade"
             : "New Subscription",
+        image: logoUrl,
         order_id: orderData.order_id,
         handler: async (response) => {
           try {
@@ -118,7 +128,9 @@ function SubscriptionPage() {
                 signature: response.razorpay_signature,
                 plan_id: plan.id,
               },
-              { headers: { Authorization: `Token ${token}` } }
+              {
+                withCredentials: true,
+              }
             );
 
             const verifyData = verifyRes.data;
@@ -127,11 +139,13 @@ function SubscriptionPage() {
             } else {
               await refreshUserDetails();
               showMessage(
-                `Payment Verified!\nStart: ${verifyData.created_at.split(" ")[0]}\nExpiry: ${verifyData.expiry_date.split(" ")[0]}`
+                `Payment Verified!\nStart: ${
+                  verifyData.created_at.split(" ")[0]
+                }\nExpiry: ${verifyData.expiry_date.split(" ")[0]}`
               );
             }
           } catch (err) {
-            console.error("Verification API error:", err);
+            console.error("Verification API error");
             showMessage("Verification failed.");
           }
         },
@@ -143,13 +157,19 @@ function SubscriptionPage() {
         theme: {
           color: "#046c4e",
         },
+        modal: {
+          backdropclose: false,
+          escape: true,
+          handleback: true,
+          animation: true,
+        },
       };
 
       const rzp = new window.Razorpay(options);
       rzp.on("payment.failed", () => showMessage("Payment failed"));
       rzp.open();
     } catch (err) {
-      console.error("Payment process error:", err);
+      console.error("Payment process error");
       showMessage("Payment process failed.");
     } finally {
       setLoading(false);
@@ -193,7 +213,7 @@ function SubscriptionPage() {
             Select the plan that best fits your teaching journey.
           </p>
 
-          {/* ✅ Show skeleton while loading */}
+          {/* Show skeleton while loading */}
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
               {[...Array(3)].map((_, i) => (

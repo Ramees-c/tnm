@@ -11,14 +11,14 @@ function TermsConditions() {
       try {
         const response = await axios.get(`${API_BASE}/static-pages/`);
 
-        // ✅ Filter only the page where page_type is "terms"
+        // Filter only the page where page_type is "terms"
         const termsPage = response.data.find(
           (page) => page.page_type === "terms"
         );
 
         setTerms(termsPage || null);
       } catch (error) {
-        console.error("Error fetching terms and conditions:", error);
+        console.error("Error fetching terms and conditions");
       } finally {
         setLoading(false);
       }
@@ -30,7 +30,7 @@ function TermsConditions() {
   return (
     <div className="container min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        {/* ✅ Header */}
+        {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
             Terms and Conditions
@@ -45,21 +45,21 @@ function TermsConditions() {
           </p>
         </div>
 
-        {/* ✅ Loading State */}
+        {/* Loading State */}
         {loading && (
           <div className="text-center text-gray-500 py-10">
             Loading Terms and Conditions...
           </div>
         )}
 
-        {/* ✅ No Terms Found */}
+        {/* No Terms Found */}
         {!loading && !terms && (
           <div className="text-center text-red-500 py-10">
             No Terms and Conditions found.
           </div>
         )}
 
-        {/* ✅ Terms Content */}
+        {/* Terms Content */}
         {terms && (
           <div
             className="bg-white rounded-md shadow-md p-6 mb-8 prose max-w-none text-black"

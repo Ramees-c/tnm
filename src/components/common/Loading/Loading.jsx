@@ -1,5 +1,4 @@
 import React from "react";
-import logo from "../../../assets/images/logo/tnmlogo.png";
 
 function Loading() {
   return (
@@ -13,7 +12,7 @@ function Loading() {
 
         {/* Logo fixed in center */}
         <img
-          src={logo}
+          src="/tnmlogo.png"
           alt="TNM"
           className="relative z-10 w-8 h-8 sm:w-10 sm:h-10 md:w-10 md:h-10 lg:w-8 lg:h-8 object-contain"
         />

@@ -19,48 +19,40 @@ function StudentDashboardAllTutorsPage() {
   const [filteredTutors, setFilteredTutors] = useState([]);
   const [toastOpen, setToastOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true); // ✅ for skeleton loading
+  const [loading, setLoading] = useState(true); 
 
-  // ✅ Fetch all tutors
+  // Fetch all tutors
   const fetchTutors = async () => {
     setLoading(true);
     try {
       const res = await axios.get(`${API_BASE}/student/tutors/`, {
-        headers: { Authorization: `Token ${token}` },
+        withCredentials: true,
       });
 
-      console.log(res.data);
-      
-
       const approvedTutors = res.data.filter(
-        (tutor) =>
-          tutor.is_approved === true &&
-          tutor.active_inactive === true &&
-          (tutor.is_paid === true ||
-            (Array.isArray(tutor.assigned_students) &&
-              tutor.assigned_students.length > 0))
+        (tutor) => tutor.active_inactive === true
       );
 
       setTutors(approvedTutors);
       setFilteredTutors(approvedTutors);
     } catch (error) {
-      console.error("Error fetching tutors:", error);
+      console.error("Error fetching tutors");
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
-  // ✅ Fetch tutors on load
+  // Fetch tutors on load
   useEffect(() => {
     if (token) fetchTutors();
   }, [token]);
 
-  // ✅ Email verification toast
+  // Email verification toast
   useEffect(() => {
     setToastOpen(userDetails?.mail_verified === false);
   }, [userDetails]);
 
-  // ✅ Search filtering
+  // Search filtering
   useEffect(() => {
     if (!tutors.length) return;
 
@@ -97,7 +89,7 @@ function StudentDashboardAllTutorsPage() {
     setFilteredTutors(filtered);
   }, [searchTerm, tutors]);
 
-  // ✅ Skeleton loader component
+  // Skeleton loader component
   const TutorSkeleton = () => (
     <div className="animate-pulse bg-white rounded-xl shadow p-4 w-full max-w-xs">
       <div className="h-24 bg-gray-200 rounded-md mb-3"></div>
@@ -138,7 +130,7 @@ function StudentDashboardAllTutorsPage() {
             </h1>
           </div>
 
-          {/* ✅ Search Bar */}
+          {/* Search Bar */}
           <div className="flex justify-center mb-10">
             <input
               type="text"
@@ -149,10 +141,10 @@ function StudentDashboardAllTutorsPage() {
             />
           </div>
 
-          {/* ✅ Tutors Grid */}
+          {/* Tutors Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-2 place-items-center">
             {loading ? (
-              // ✅ Skeleton Loader Shimmer
+              // Skeleton Loader Shimmer
               [...Array(8)].map((_, i) => <TutorSkeleton key={i} />)
             ) : filteredTutors.length > 0 ? (
               filteredTutors.map((tutor) => (
@@ -172,7 +164,7 @@ function StudentDashboardAllTutorsPage() {
           </div>
         </div>
 
-        {/* ✅ Toast Message */}
+        {/* Toast Message */}
         {toastOpen && (
           <ToastMessage
             message={isMailVerified}

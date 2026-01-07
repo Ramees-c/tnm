@@ -44,7 +44,7 @@ function AssignedTutorsPage() {
       {/* Main Content */}
       <main className="flex-1 w-full p-4 sm:p-6 transition-all duration-300">
         <div className="max-w-6xl mx-auto">
-          {/* ✅ Mobile Menu Button before Title */}
+          {/* Mobile Menu Button before Title */}
           <div className="flex items-center gap-3 mb-6">
             <button onClick={() => setSidebarOpen(true)} className="lg:hidden">
               <Menu size={27} />

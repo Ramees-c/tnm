@@ -7,3 +7,5 @@ const API_BASE =
 
 export default API_BASE;
 export const MEDIA_URL = "https://api-tnm.tutor-nearme.com/";
+
+export const WHATSAPP_API  = "640581444794a226016a96c0d7eedd500265a90b4e6af0c9";

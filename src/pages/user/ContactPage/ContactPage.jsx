@@ -6,7 +6,6 @@ import {
   FaPaperPlane,
   FaClock,
   FaLinkedin,
-  FaTwitter,
   FaFacebook,
   FaInstagram,
 } from "react-icons/fa";
@@ -32,6 +31,7 @@ function ContactPage() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Validation
   const validateForm = () => {
     let isValid = true;
     const newErrors = {};
@@ -71,17 +71,21 @@ function ContactPage() {
     return isValid;
   };
 
+  // onChange
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     if (errors[name]) setErrors({ ...errors, [name]: "" });
   };
 
+  // onChange phone
   const handlePhoneChange = (value) => {
     setFormData({ ...formData, phone: value });
     if (errors.phone) setErrors({ ...errors, phone: "" });
   };
 
+
+  // Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -136,7 +140,7 @@ function ContactPage() {
         }
       }
     } catch (err) {
-      console.error("Error submitting form:", err);
+      console.error("Error submitting form");
       alert("Failed to send message. Please try again later.");
     } finally {
       setIsSubmitting(false);

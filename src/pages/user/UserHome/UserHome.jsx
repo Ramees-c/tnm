@@ -1,40 +1,31 @@
-import React, { useEffect, useState } from "react";
-import Userheader from "../../../components/common/Userheader/Userheader";
+import React, { useEffect, useState, lazy, Suspense } from "react";
 import Hero from "../../../components/common/Hero/Hero";
 import TutorCard from "../../../components/common/TutorCard/TutorCard";
 import SubHeader from "../../../components/common/Subheader/SubHeader";
-import Slider from "../../../components/common/Slider/Slider";
-import CategoryCard from "../../../components/common/CategoryCard/CategoryCard";
-import FeatureCard from "../../../components/common/FeatureCard/FeatureCard";
 import TestimonialCard from "../../../components/common/TestimonialCard/TestimonialCard";
 
 import testimonialImg from "../../../assets/images/testimonial-image.jpg";
 import advantageImg from "../../../assets/images/advantage2.jpg";
 
-import {
-  FaGraduationCap,
-  FaChalkboardTeacher,
-  FaCertificate,
-  FaUserFriends,
-  FaMobileAlt,
-  FaClock,
-  FaRocket,
-  FaAward,
-  FaChartLine,
-} from "react-icons/fa";
-
-// import { FaUserGraduate, FaLightbulb, FaRocket, FaAward, FaChartLine } from "react-icons/fa";
+import { FaRocket } from "react-icons/fa";
 
 import { FaUserGraduate, FaLightbulb } from "react-icons/fa";
-import FindTutorMenu from "../../../components/common/FindTutorMenu/FindTutorMenu";
-import Footer from "../../../components/common/Footer/Footer";
-import TopHeader from "../../../components/common/TopHeader/TopHeader";
 import DefaultButton from "../../../components/common/DefaultButton/DefaultButton";
 import Loading from "../../../components/common/Loading/Loading";
 import axios from "axios";
 import API_BASE from "../../../API/API";
 import { Link } from "react-router-dom";
-import CategoryCarousel from "../../../components/common/CategoryCarousel/CategoryCarousel";
+
+const Slider = lazy(() => import("../../../components/common/Slider/Slider"));
+const CategoryCarousel = lazy(() =>
+  import("../../../components/common/CategoryCarousel/CategoryCarousel")
+);
+const CategoryCard = lazy(() =>
+  import("../../../components/common/CategoryCard/CategoryCard")
+);
+const FindTutorMenu = lazy(() =>
+  import("../../../components/common/FindTutorMenu/FindTutorMenu")
+);
 
 function UserHome() {
   const features = [
@@ -69,100 +60,132 @@ function UserHome() {
   const [tutors, setTutors] = useState([]);
   const [categoriesData, setCategoriesData] = useState([]);
 
-  useEffect(() => {
-    // Simulate page loading
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000); // 2 seconds loading time
+ 
 
-    return () => clearTimeout(timer);
-  }, []);
+  // useEffect(() => {
+  //   const fetchCategories = async () => {
+  //     try {
+  //       const res = await axios.get(`${API_BASE}/category-filter/`);
+
+  //       // Filter: only top-level categories that have at least one subcategory with add_to_homepage true
+  //       const filteredCategories = res.data
+  //         .map((mainCat) => {
+  //           // Collect all nested subcategories (recursively)
+  //           const collectHomeSubcategories = (subs) => {
+  //             return subs.flatMap((sub) => {
+  //               if (sub.add_to_homepage) return [sub];
+  //               if (sub.subcategories?.length)
+  //                 return collectHomeSubcategories(sub.subcategories);
+  //               return [];
+  //             });
+  //           };
+
+  //           const homeSubcats = collectHomeSubcategories(
+  //             mainCat.subcategories || []
+  //           );
+
+  //           if (homeSubcats.length > 0) {
+  //             return {
+  //               id: mainCat.id,
+  //               name: mainCat.name,
+  //               subcategories: homeSubcats,
+  //             };
+  //           }
+  //           return null;
+  //         })
+  //         .filter(Boolean);
+
+  //       setCategoriesData(filteredCategories);
+  //     } catch (err) {
+  //       console.error("Error fetching categories");
+  //     }
+  //   };
+
+  //   fetchCategories();
+  // }, []);
+
+  // useEffect(() => {
+  //   const fetchTutors = async () => {
+  //     try {
+  //       const res = await axios.get(`${API_BASE}/home-tutors/`);
+
+  //       setTutors(res.data);
+  //     } catch (error) {
+  //       console.log("Error fetching tutors");
+  //     }
+  //   };
+
+  //   fetchTutors();
+  // }, []);
+
+  // useEffect(() => {
+  //   const fetchTestimonials = async () => {
+  //     try {
+  //       const res = await axios.get(`${API_BASE}/testimonials/`);
+  //       // Filter only those to show on homepage
+  //       const homepageTestimonials = res.data.filter(
+  //         (testimonial) => testimonial.add_to_homepage === true
+  //       );
+  //       setTestimonials(homepageTestimonials);
+  //     } catch (err) {
+  //       console.error("Failed to fetch testimonials");
+  //       setError("Failed to load testimonials");
+  //     }
+  //   };
+
+  //   fetchTestimonials();
+  // }, []);
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    let mounted = true;
+
+    const fetchHomeData = async () => {
       try {
-        const res = await axios.get(`${API_BASE}/category-filter/`);
-        console.log("Category API:", res.data);
+        const [categoriesRes, tutorsRes, testimonialsRes] = await Promise.all([
+          axios.get(`${API_BASE}/category-filter/`),
+          axios.get(`${API_BASE}/home-tutors/`),
+          axios.get(`${API_BASE}/testimonials/`),
+        ]);
 
-        // Filter: only top-level categories that have at least one subcategory with add_to_homepage true
-        const filteredCategories = res.data
+        if (!mounted) return;
+
+        const filteredCategories = categoriesRes.data
           .map((mainCat) => {
-            // Collect all nested subcategories (recursively)
-            const collectHomeSubcategories = (subs) => {
-              return subs.flatMap((sub) => {
-                if (sub.add_to_homepage) return [sub];
-                if (sub.subcategories?.length)
-                  return collectHomeSubcategories(sub.subcategories);
-                return [];
-              });
-            };
+            const collectHomeSubcategories = (subs) =>
+              subs.flatMap((sub) =>
+                sub.add_to_homepage
+                  ? [sub]
+                  : sub.subcategories?.length
+                  ? collectHomeSubcategories(sub.subcategories)
+                  : []
+              );
 
             const homeSubcats = collectHomeSubcategories(
               mainCat.subcategories || []
             );
 
-            if (homeSubcats.length > 0) {
-              return {
-                id: mainCat.id,
-                name: mainCat.name,
-                subcategories: homeSubcats,
-              };
-            }
-            return null;
+            return homeSubcats.length
+              ? {
+                  id: mainCat.id,
+                  name: mainCat.name,
+                  subcategories: homeSubcats,
+                }
+              : null;
           })
           .filter(Boolean);
 
         setCategoriesData(filteredCategories);
+        setTutors(tutorsRes.data);
+        setTestimonials(testimonialsRes.data.filter((t) => t.add_to_homepage));
       } catch (err) {
-        console.error("Error fetching categories:", err);
-      }
+        console.error("Home data fetch error");
+      }finally {
+      if (mounted) setIsLoading(false); 
+    }
     };
 
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    const fetchTutors = async () => {
-      try {
-        const res = await axios.get(`${API_BASE}/tutors_list/`);
-        console.log(res.data, "tutors");
-
-        // Only keep approved tutors and addd to home true
-        const approvedTutors = res.data.filter(
-          (tutor) =>
-            tutor.is_approved === true &&
-            tutor.add_to_home === true &&
-            tutor.active_inactive === true &&
-            (tutor.is_paid === true ||
-              (Array.isArray(tutor.assigned_students) &&
-                tutor.assigned_students.length > 0))
-        );
-
-        setTutors(approvedTutors);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchTutors();
-  }, []);
-
-  useEffect(() => {
-    const fetchTestimonials = async () => {
-      try {
-        const res = await axios.get(`${API_BASE}/testimonials/`);
-        // Filter only those to show on homepage
-        const homepageTestimonials = res.data.filter(
-          (testimonial) => testimonial.add_to_homepage === true
-        );
-        setTestimonials(homepageTestimonials);
-      } catch (err) {
-        console.error("Failed to fetch testimonials:", err);
-        setError("Failed to load testimonials");
-      }
-    };
-
-    fetchTestimonials();
+    fetchHomeData();
+    return () => (mounted = false);
   }, []);
 
   if (isLoading) {
@@ -170,7 +193,7 @@ function UserHome() {
   }
 
   return (
-    <div>
+    <div className="overflow-x-hidden scrollbar-hide">
       <div>
         <Hero />
       </div>
@@ -185,7 +208,7 @@ function UserHome() {
           <Slider slidesToShow={4} autoSlide={true} autoSlideInterval={5000}>
             {tutors.map((tutor, index) => (
               <div
-                key={index}
+                key={tutor.id}
                 className="flex justify-center items-center"
                 data-aos="fade-up"
               >
@@ -195,7 +218,7 @@ function UserHome() {
           </Slider>
           <div className="text-center mt-5">
             <Link to={"/all-tutors"}>
-              <DefaultButton buttonText="View All Tutors" />
+              <DefaultButton buttonText="View All Tutors" buttonMedium={true} />
             </Link>
           </div>
         </div>
@@ -232,22 +255,6 @@ function UserHome() {
             );
           })}
         </div>
-
-        {/* <div className="">
-          <SubHeader
-            tagline="Why Choose Us"
-            title="Benefits of Learning With TNM"
-            description=" Discover the advantages that make our platform the best choice for your educational journey"
-          />
-
-          <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-8">
-            {benefits.map((item) => (
-              <div>
-                <FeatureCard benefits={item} />
-              </div>
-            ))}
-          </div>
-        </div> */}
 
         <section
           className="relative bg-gradient-to-br from-green-500 via-green-600 to-green-700 rounded-md text-white py-16 px-4 md:px-8 lg:px-12 overflow-hidden"
@@ -289,6 +296,8 @@ function UserHome() {
                       {/* Image */}
                       <img
                         src={advantageImg}
+                        loading="lazy"
+                        decoding="async"
                         alt="Students learning online"
                         className="w-full object-cover"
                       />
@@ -326,24 +335,33 @@ function UserHome() {
           </div>
         </section>
 
+        {/* Testimonial section */}
         <SubHeader
           tagline="Testimonials"
-          title="Feedback from Our Students & Parents"
-          description="Discover how students and parents have benefited from personalized tutoring and achieved their academic goals."
+          title="Feedback from Students, Parents & Tutors"
+          description="Discover how students, parents, and tutors have benefited from our personalized tutoring system and achieved meaningful academic growth."
         />
         {/* Testimonial Cards - Grid Layout */}
         <div
-          className="grid grid-cols-1 md:grid-cols-2 items-center gap-5"
+          className="grid grid-cols-1 md:grid-cols-2 items-center gap-8"
           data-aos="fade-up"
         >
+          {/* Left Image */}
           <div>
             <img
               src={testimonialImg}
-              alt=""
+              loading="lazy"
+              decoding="async"
+              alt="testimonial"
               className="w-full h-auto object-cover rounded-md"
             />
           </div>
-          <div>
+
+          {/* Right Slider */}
+          <div
+            className="flex items-center justify-center relative transition-all duration-500 ease-in-out"
+            style={{ overflow: "visible" }}
+          >
             <Slider
               slidesToShow={1}
               autoSlide={true}
@@ -352,7 +370,14 @@ function UserHome() {
               forceSingleSlideBelow1024={true}
             >
               {testimonials.map((testimonial) => (
-                <div key={testimonial.id} className="flex justify-center">
+                <div
+                  key={testimonial.id}
+                  className="flex justify-center items-center !h-auto"
+                  style={{
+                    alignSelf: "center",
+                    transition: "transform 0.4s ease, height 0.4s ease",
+                  }}
+                >
                   <TestimonialCard testimonial={testimonial} />
                 </div>
               ))}
@@ -360,6 +385,7 @@ function UserHome() {
           </div>
         </div>
 
+        {/* Find Tutor menu */}
         <div>
           <SubHeader
             tagline="Find a Tutor"

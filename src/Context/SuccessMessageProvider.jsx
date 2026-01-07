@@ -2,13 +2,13 @@ import React, { createContext, useContext, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle } from "lucide-react";
 
-// 1️⃣ Create context
+// Create context
 const SuccessMessageContext = createContext();
 
-// 2️⃣ Custom hook for usage
+// Custom hook for usage
 export const useSuccessMessage = () => useContext(SuccessMessageContext);
 
-// 3️⃣ Provider component
+// Provider component
 export const SuccessMessageProvider = ({ children }) => {
   const [toast, setToast] = useState({ show: false, message: "" });
 

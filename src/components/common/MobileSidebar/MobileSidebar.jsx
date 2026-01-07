@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { FiHome, FiUser, FiBook, FiStar, FiMail, FiX } from "react-icons/fi";
+
+// Brand logo
 import logo from "../../../assets/images/logo/tnmlogo.png";
 import { FaRegNewspaper } from "react-icons/fa";
 

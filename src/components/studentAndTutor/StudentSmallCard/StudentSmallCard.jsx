@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import DefaultButton from "../../common/DefaultButton/DefaultButton";
-import { Heart } from "lucide-react";
-import TutorFullDetailsPopup from "../TutorFullDetailsPopup/TutorFullDetailsPopup"; // can reuse for student details
 import { useAuth } from "../../../Context/userAuthContext";
 import axios from "axios";
 import API_BASE, { MEDIA_URL } from "../../../API/API";
@@ -12,7 +10,6 @@ function StudentSmallCard({
   media,
   onRefresh,
   isChangeMode,
-  setRefreshFavourites,
   oldStudentId,
 }) {
   const [showAllCategories, setShowAllCategories] = useState(false);

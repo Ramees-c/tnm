@@ -16,7 +16,7 @@ function FaqPage() {
 
         setFaqs(response.data);
       } catch (error) {
-        console.error("Error fetching FAQs:", error);
+        console.error("Error fetching FAQs");
       }
     };
     fetchFaqs();

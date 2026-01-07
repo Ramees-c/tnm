@@ -122,7 +122,7 @@ function OtpModal({
       if (onResend) await onResend(phoneOrEmail);
       else throw new Error("Resend function not provided");
     } catch {
-      setCanResend(true); // allow retry
+      setCanResend(true);
     }
   };
 

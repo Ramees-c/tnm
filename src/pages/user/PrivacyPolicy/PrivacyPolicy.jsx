@@ -11,14 +11,14 @@ function PrivacyPolicy() {
       try {
         const response = await axios.get(`${API_BASE}/static-pages/`);
 
-        // ✅ Filter only the page where page_type is "privacy"
+        // Filter only the page where page_type is "privacy"
         const privacyPage = response.data.find(
           (page) => page.page_type === "privacy"
         );
 
         setPolicy(privacyPage || null);
       } catch (error) {
-        console.error("Error fetching privacy policy:", error);
+        console.error("Error fetching privacy policy");
       } finally {
         setLoading(false);
       }
@@ -30,7 +30,7 @@ function PrivacyPolicy() {
   return (
     <div className="container min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        {/* ✅ Header */}
+        {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
             Privacy Policy
@@ -47,21 +47,21 @@ function PrivacyPolicy() {
           </p>
         </div>
 
-        {/* ✅ Loading State */}
+        {/* Loading State */}
         {loading && (
           <div className="text-center text-gray-500 py-10">
             Loading Privacy Policy...
           </div>
         )}
 
-        {/* ✅ No Policy Found */}
+        {/* No Policy Found */}
         {!loading && !policy && (
           <div className="text-center text-red-500 py-10">
             No Privacy Policy found.
           </div>
         )}
 
-        {/* ✅ Policy Content */}
+        {/* Policy Content */}
         {policy && (
           <div
             className="bg-white rounded-md shadow-md p-6 mb-8 prose max-w-none text-black"

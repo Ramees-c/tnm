@@ -7,42 +7,54 @@ function AllCategoriesPage() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true); // ✅ new
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const { data } = await axios.get(`${API_BASE}/category-list/`);
+  const fetchCategories = async () => {
+    try {
+      const { data } = await axios.get(`${API_BASE}/category-list/`);
 
-        const formatted = data.map((category) => {
-          const allSubs =
-            category.subcategories?.flatMap(
-              (sub) => sub.subcategories?.map((s) => s.name) || []
-            ) || [];
+      const formatted = data.map((category) => {
+        const allSubs =
+          category.subcategories?.flatMap(
+            (sub) => sub.subcategories?.map((s) => s.name.trim()) || []
+          ) || [];
 
-          return {
-            title: category.name,
-            subs: allSubs.filter(Boolean),
-          };
+        // Case-insensitive duplicate removal
+        const seen = new Set();
+        const uniqueSubs = allSubs.filter((name) => {
+          const lower = name.toLowerCase();
+          if (seen.has(lower)) return false;
+          seen.add(lower);
+          return true;
         });
 
-        setCategories(formatted);
-      } catch (error) {
-        console.error("Failed to fetch categories:", error);
-      } finally {
-        setLoading(false); // ✅ end loading
-      }
-    };
+        return {
+          title: category.name,
+          subs: uniqueSubs,
+        };
+      });
 
-    fetchCategories();
-  }, []);
+      setCategories(formatted);
+    } catch (error) {
+      console.error("Failed to fetch categories");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  fetchCategories();
+}, []);
+
+
+  // category click redirect all tutors page
   const handleCategoryClick = (categoryName) => {
     navigate(`/all-tutors?category=${encodeURIComponent(categoryName)}`, {
       state: { hideHeroSearch: true },
     });
   };
 
+  // Highlight match
   const highlightMatch = (text, term) => {
     if (!term) return text;
     const regex = new RegExp(`(${term})`, "gi");
@@ -58,6 +70,7 @@ function AllCategoriesPage() {
     );
   };
 
+  // Category filter
   const filteredCategories = categories
     .map((category) => {
       const matchedSubs = category.subs.filter((sub) =>
@@ -74,7 +87,7 @@ function AllCategoriesPage() {
     })
     .filter(Boolean);
 
-  // ✅ Skeleton loader (modern shimmer style)
+  // Skeleton loader
   const Skeleton = () => (
     <div className="animate-pulse space-y-8">
       {[...Array(5)].map((_, i) => (
@@ -119,7 +132,7 @@ function AllCategoriesPage() {
       {/* Main Box */}
       <div className="bg-white border border-gray-200 rounded-md shadow-md p-3 sm:p-5 md:p-10">
         {loading ? (
-          <Skeleton /> // ✅ show loader while fetching
+          <Skeleton /> // show loader while fetching
         ) : filteredCategories.length === 0 ? (
           <p className="text-center text-gray-500">No categories found.</p>
         ) : (
@@ -129,7 +142,7 @@ function AllCategoriesPage() {
                 {highlightMatch(category.title, searchTerm)}
               </h2>
               {category.subs.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 pl-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 pl-4">
                   {category.subs.map((sub, subIndex) => (
                     <div
                       onClick={() => handleCategoryClick(sub)}

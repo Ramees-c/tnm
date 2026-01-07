@@ -18,6 +18,7 @@ function Footer() {
     window.scrollTo(0, 0);
   };
   return (
+    // Footer component
     <footer className="bg-primary/75 text-white">
       {/* Top Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 md:grid-cols-4 gap-10 border-b border-gray-300">
@@ -37,6 +38,7 @@ function Footer() {
           <div className="flex gap-3">
             <a
               href="https://www.facebook.com/profile.php?id=61578906604625&mibextid=ZbWKwL"
+              target="_blank"
               className="bg-primary text-white p-2 rounded-full hover:bg-secondary transition"
             >
               <FaFacebookF />
@@ -49,12 +51,14 @@ function Footer() {
             </a>
             <a
               href="https://www.instagram.com/tnm_network?igsh=Nmk0dWNobjZwenA3"
+              target="_blank"
               className="bg-primary text-white p-2 rounded-full hover:bg-secondary transition"
             >
               <FaInstagram />
             </a>
             <a
               href="https://www.linkedin.com/in/tnm-network-tutor-near-me-3b2287376?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+              target="_blank"
               className="bg-primary text-white p-2 rounded-full hover:bg-secondary transition"
             >
               <FaLinkedinIn />
@@ -83,22 +87,14 @@ function Footer() {
                 About
               </Link>
             </li>
-            <li>
-              <Link
-                to="/blog"
-                className="hover:text-primary hover:font-bold"
-                onClick={handleClick}
-              >
-                Blogs
-              </Link>
-            </li>
+
             <li>
               <Link
                 to="/allCategories"
                 className="hover:text-primary hover:font-bold"
                 onClick={handleClick}
               >
-                All Subjects
+                Subjects
               </Link>
             </li>
             <li>
@@ -108,6 +104,15 @@ function Footer() {
                 onClick={handleClick}
               >
                 Testimonials
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/blog"
+                className="hover:text-primary hover:font-bold"
+                onClick={handleClick}
+              >
+                Blogs
               </Link>
             </li>
             <li>

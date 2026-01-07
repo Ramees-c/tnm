@@ -43,7 +43,7 @@ function StudentFullDetailsPopup({ isOpen, onClose, student, media }) {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 p-4">
-      <div className="bg-white rounded-md shadow-2xl w-full max-w-2xl p-3 md:p-6 relative overflow-y-auto max-h-[90vh] scrollbar-hide transform transition-transform duration-300 scale-100">
+      <div className="bg-white rounded-md shadow-2xl w-full max-w-2xl p-3 md:p-6 relative overflow-y-auto max-h-[90vh] scrollbar-hide animate-scaleIn">
         {/* Close Button */}
         <button
           className="absolute top-4 right-4 text-gray-500 hover:text-black transition-colors"
@@ -172,7 +172,7 @@ function StudentFullDetailsPopup({ isOpen, onClose, student, media }) {
           </p>
         )}
 
-        {/* ✅ Show contact info only if the student is assigned to the logged-in user */}
+        {/* Show contact info only if the student is assigned to the logged-in user */}
         {userDetails?.assigned_students?.some(
           (s) => s.id === student.student_id
         ) &&
@@ -204,6 +204,17 @@ function StudentFullDetailsPopup({ isOpen, onClose, student, media }) {
             </div>
           )}
       </div>
+      <style jsx>{`
+        .animate-scaleIn {
+          transform: scale(0.8);
+          animation: scaleIn 0.45s forwards;
+        }
+        @keyframes scaleIn {
+          to {
+            transform: scale(1);
+          }
+        }
+      `}</style>
     </div>
   );
 }

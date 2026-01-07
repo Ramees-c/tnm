@@ -3,9 +3,10 @@ import {
   ToggleLeft,
   ToggleRight,
   Bell,
-  BarChart2,
   Menu,
   X,
+  Users,
+  BookOpen,
 } from "lucide-react";
 
 import { CreditCard, Calendar, CheckCircle, ArrowUpCircle } from "lucide-react";
@@ -31,7 +32,7 @@ function TutorDashboardPage() {
   useEffect(() => {
     if (userDetails?.role === "tutor") {
       setLoggedTutorDetails(userDetails);
-      // ✅ take active status from backend
+      // take active status from backend
       if (typeof userDetails.active_inactive !== "undefined") {
         setActive(userDetails.active_inactive);
       }
@@ -41,10 +42,10 @@ function TutorDashboardPage() {
   const fetchNotifications = async () => {
     try {
       const res = await axios.get(`${API_BASE}/latest_notify/`, {
-        headers: { Authorization: `Token ${token}` },
+        withCredentials: true,
       });
 
-      // Update only if data changed (optional)
+      // Update only if data changed 
       setNotifications((prev) => {
         const prevIds = prev
           .map((n) => n.id)
@@ -57,16 +58,16 @@ function TutorDashboardPage() {
         return prevIds === newIds ? prev : res.data;
       });
     } catch (err) {
-      console.error("Failed to load notifications", err);
+      console.error("Failed to load notifications");
     }
   };
 
   useEffect(() => {
     if (!token) return;
 
-    fetchNotifications(); // fetch immediately
+    fetchNotifications();
 
-    const interval = setInterval(fetchNotifications, 10000); // optional polling
+    const interval = setInterval(fetchNotifications, 10000);
     return () => clearInterval(interval);
   }, [token, refreshNotifications]);
 
@@ -78,10 +79,7 @@ function TutorDashboardPage() {
     }
   }, [userDetails]);
 
-  // ✅ Remove subject
-  const handleRemoveSubject = (index) => {
-    setSelectedSubjects((prev) => prev.filter((_, i) => i !== index));
-  };
+  
 
   // Function to calculate months between two dates
   const getDurationInMonths = (created_at, expiry_date) => {
@@ -128,15 +126,13 @@ function TutorDashboardPage() {
   const handleDelete = async (id) => {
     try {
       await axios.delete(`${API_BASE}/notify-delete/${id}/`, {
-        headers: {
-          Authorization: `Token ${token}`,
-        },
+        withCredentials: true,
       });
       // Update UI immediately
       setNotifications((prev) => prev.filter((note) => note.id !== id));
       await refreshUserDetails();
     } catch (err) {
-      console.error("Failed to delete notification", err);
+      console.error("Failed to delete notification");
     }
   };
 
@@ -147,17 +143,19 @@ function TutorDashboardPage() {
       const res = await axios.post(
         `${API_BASE}/tutor_active_inactive/`,
         { active_inactive: newStatus },
-        { headers: { Authorization: `Token ${token}` } }
+        {
+          withCredentials: true,
+        }
       );
 
-      // ✅ update state from backend response
+      // update state from backend response
       setActive(res.data.active_inactive);
       setConfirmActiveModalOpen(false);
 
       // refresh user details in global context
       await refreshUserDetails();
     } catch (err) {
-      console.error("Failed to update active status", err);
+      console.error("Failed to update active status");
     }
   };
 
@@ -184,7 +182,7 @@ function TutorDashboardPage() {
       {/* Main Content */}
       <main className="flex-1 w-full p-4 sm:p-6 transition-all duration-300">
         <div className="max-w-6xl mx-auto">
-          {/* ✅ Mobile Menu Button before Title */}
+          {/*  Mobile Menu Button before Title */}
           <div className="flex items-center gap-3 mb-6">
             <button onClick={() => setSidebarOpen(true)} className="lg:hidden">
               <Menu size={24} />
@@ -195,36 +193,56 @@ function TutorDashboardPage() {
           </div>
 
           {/* Overview Cards */}
-          <div className="bg-white rounded-md shadow-sm p-2 sm:p-6 mb-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="p-4 bg-blue-200 rounded-md shadow-sm text-center">
-                <p className="text-lg font-bold text-blue-700">
-                  {loggedTutorDetails?.assigned_students?.length || 0}
-                </p>
-                <p className="text-sm font-medium text-gray-800">
-                  Assigned Students
-                </p>
+          <div className="bg-white/60 backdrop-blur-md rounded-2xl shadow-sm p-3 sm:p-5 mb-8 transition-all duration-300">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Assigned Students */}
+              <div className="p-6 bg-gradient-to-br from-blue-100 to-blue-200 rounded-md shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-center">
+                <div className="flex flex-col items-center space-y-2">
+                  <div className="w-10 h-10 flex items-center justify-center bg-blue-500/20 rounded-full">
+                   <Users />
+                  </div>
+                  <p className="text-3xl font-extrabold text-blue-700">
+                    {loggedTutorDetails?.assigned_students?.length || 0}
+                  </p>
+                  <p className="text-sm font-medium text-gray-800">
+                    Assigned Students
+                  </p>
+                </div>
               </div>
-              <div className="p-4 bg-yellow-200 rounded-md shadow-sm text-center">
-                <p className="text-lg font-bold text-yellow-700">
-                  {loggedTutorDetails?.categories?.length || 0}
-                </p>
-                <p className="text-sm font-medium text-gray-800">
-                  Selected Subjects
-                </p>
+
+              {/* Selected Subjects */}
+              <div className="p-6 bg-gradient-to-br from-purple-100 to-purple-200 rounded-md shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-center">
+                <div className="flex flex-col items-center space-y-2">
+                  <div className="w-10 h-10 flex items-center justify-center bg-purple-500/20 rounded-full">
+                   <BookOpen />
+                  </div>
+                  <p className="text-3xl font-extrabold text-purple-700">
+                    {loggedTutorDetails?.categories?.length || 0}
+                  </p>
+                  <p className="text-sm font-medium text-gray-800">
+                    Selected Subjects
+                  </p>
+                </div>
               </div>
-              <div className="p-4 bg-green-200 rounded-md shadow-sm text-center">
-                <p className="text-lg font-bold text-green-700">
-                  {notifications.length || 0}
-                </p>
-                <p className="text-sm font-medium text-gray-800">
-                  Notifications
-                </p>
+
+              {/* Notifications */}
+              <div className="p-6 bg-gradient-to-br from-green-100 to-green-200 rounded-md shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-center">
+                <div className="flex flex-col items-center space-y-2">
+                  <div className="w-10 h-10 flex items-center justify-center bg-green-500/20 rounded-full">
+                    <Bell />
+                  </div>
+                  <p className="text-3xl font-extrabold text-green-700">
+                    {notifications?.length || 0}
+                  </p>
+                  <p className="text-sm font-medium text-gray-800">
+                    Notifications
+                  </p>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* ✅ Selected Subjects Section */}
+          {/* Selected Subjects Section */}
           <div className="bg-white rounded-md shadow-sm p-4 sm:p-6 mb-6">
             <h2 className="text-lg sm:text-2xl font-bold mb-4 text-gray-800">
               Selected Subjects
@@ -234,8 +252,8 @@ function TutorDashboardPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {userDetails.categories.map((category, idx) => {
                   const parts = category.split(" in ");
-                  const mainCategory = parts[0]; // Big text
-                  const subCategory = parts[1] || ""; // Only the first "in" after main
+                  const mainCategory = parts[0]; 
+                  const subCategory = parts[1] || ""; 
 
                   return (
                     <div
@@ -353,7 +371,7 @@ function TutorDashboardPage() {
             )}
           </div>
 
-          {/* ✅ Confirm Popup */}
+          {/* Confirm Popup */}
           <ConfirmMessagePopup
             isOpen={confirmActiveModalOpen}
             type="confirm"
@@ -364,28 +382,6 @@ function TutorDashboardPage() {
             onNo={() => setConfirmActiveModalOpen(false)}
           />
 
-          {/* Stats Section */}
-          {/* <div className="bg-white rounded-md shadow-sm p-2 sm:p-6 mb-6">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4 flex items-center gap-2">
-              <BarChart2 size={20} /> Stats
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="p-4 bg-purple-200 rounded-md shadow-sm text-center">
-                <p className="text-lg font-bold text-purple-700">150</p>
-                <p className="text-sm font-medium text-gray-800">
-                  Profile Visits
-                </p>
-              </div>
-              <div className="p-4 bg-pink-200 rounded-md text-center">
-                <p className="text-lg font-bold text-pink-700">20</p>
-                <p className="text-sm font-medium text-gray-800">Enquiries</p>
-              </div>
-              <div className="p-4 bg-indigo-200 rounded-md text-center">
-                <p className="text-lg font-bold text-indigo-700">5</p>
-                <p className="text-sm font-medium text-gray-800">Reviews</p>
-              </div>
-            </div>
-          </div> */}
 
           {/* Notifications Preview */}
           <div className="bg-white rounded-md shadow-sm p-2 sm:p-6">

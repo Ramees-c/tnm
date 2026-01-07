@@ -18,9 +18,12 @@ function BlogPage() {
     const fetchBlogs = async () => {
       try {
         const res = await axios.get(`${API_BASE}/blogs/`);
-        setPosts(res.data);
+        const sortedPosts = res.data.sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        );
+        setPosts(sortedPosts);
       } catch (err) {
-        console.error("Failed to fetch blogs:", err);
+        console.error("Failed to fetch blogs");
       } finally {
         setLoading(false);
       }
@@ -48,26 +51,33 @@ function BlogPage() {
     );
   }
 
+  const getPaginationPages = (current, total) => {
+    const isMobile = window.innerWidth < 640;
+    const delta = isMobile ? 1 : 2;
+
+    const pages = [];
+    const range = [];
+    const rangeWithDots = [];
+
+    let start = Math.max(2, current - delta);
+    let end = Math.min(total - 1, current + delta);
+
+    for (let i = start; i <= end; i++) {
+      range.push(i);
+    }
+
+    if (start > 2) rangeWithDots.push("...");
+    rangeWithDots.push(...range);
+    if (end < total - 1) rangeWithDots.push("...");
+
+    return [1, ...rangeWithDots, total].filter((v, i, a) => a.indexOf(v) === i);
+  };
+
   // Pagination calculations
   const indexOfLastBlog = currentPage * blogsPerPage;
   const indexOfFirstBlog = indexOfLastBlog - blogsPerPage;
   const currentBlogs = posts.slice(indexOfFirstBlog, indexOfLastBlog);
   const totalPages = Math.ceil(posts.length / blogsPerPage);
-
-  // Compute page numbers to display (sliding window)
-  const pageNumbers = [];
-  const maxVisible = 3; // show 3 pages at a time
-
-  let startPage = Math.max(currentPage - 1, 1);
-  let endPage = Math.min(startPage + maxVisible - 1, totalPages);
-
-  if (endPage - startPage < maxVisible - 1) {
-    startPage = Math.max(endPage - maxVisible + 1, 1);
-  }
-
-  for (let i = startPage; i <= endPage; i++) {
-    pageNumbers.push(i);
-  }
 
   return (
     <div>
@@ -83,43 +93,66 @@ function BlogPage() {
               ))}
             </div>
 
-            {/* Pagination */}
-            <div className="flex justify-center mt-12 space-x-2">
-              {/* Previous button */}
-              {currentPage > 1 && (
+            {totalPages > 1 && (
+              <div className="flex flex-wrap justify-center items-center mt-12 gap-2 px-2">
+                {/* Previous */}
                 <button
-                  className="w-10 h-10 flex items-center justify-center rounded-full border hover:bg-green-100"
-                  onClick={() => setCurrentPage((prev) => prev - 1)}
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((p) => p - 1)}
+                  className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border flex items-center justify-center
+        ${
+          currentPage === 1
+            ? "opacity-50 cursor-not-allowed"
+            : "hover:bg-green-100"
+        }
+      `}
                 >
                   «
                 </button>
-              )}
 
-              {/* Page numbers */}
-              {pageNumbers.map((num) => (
-                <button
-                  key={num}
-                  className={`w-10 h-10 flex items-center justify-center rounded-full border ${
-                    currentPage === num
-                      ? "bg-green-600 text-white"
-                      : "hover:bg-green-100"
-                  }`}
-                  onClick={() => setCurrentPage(num)}
-                >
-                  {num}
-                </button>
-              ))}
+                {/* Pages */}
+                {getPaginationPages(currentPage, totalPages).map(
+                  (page, index) =>
+                    page === "..." ? (
+                      <span
+                        key={index}
+                        className="px-2 text-gray-400 select-none"
+                      >
+                        …
+                      </span>
+                    ) : (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border flex items-center justify-center text-sm sm:text-base
+            ${
+              currentPage === page
+                ? "bg-green-600 text-white"
+                : "hover:bg-green-100"
+            }
+          `}
+                      >
+                        {page}
+                      </button>
+                    )
+                )}
 
-              {/* Next button */}
-              {currentPage < totalPages && (
+                {/* Next */}
                 <button
-                  className="w-10 h-10 flex items-center justify-center rounded-full border hover:bg-green-100"
-                  onClick={() => setCurrentPage((prev) => prev + 1)}
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((p) => p + 1)}
+                  className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border flex items-center justify-center
+        ${
+          currentPage === totalPages
+            ? "opacity-50 cursor-not-allowed"
+            : "hover:bg-green-100"
+        }
+      `}
                 >
                   »
                 </button>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </section>
       </div>

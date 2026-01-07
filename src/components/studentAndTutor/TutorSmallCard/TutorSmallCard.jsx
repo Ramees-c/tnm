@@ -13,6 +13,7 @@ function TutorSmallCard({
   isChangeMode,
   setRefreshFavourites,
   oldTutorId,
+  search,
 }) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [showAllCategories, setShowAllCategories] = useState(false);
@@ -25,56 +26,68 @@ function TutorSmallCard({
   const visibleCategoriesCount = 1; // show only first category initially
   const showMoreBtn = tutor.categories.length > visibleCategoriesCount;
 
-  // ✅ Check if this tutor is already in favorites
+  // Check if this tutor is already in favorites
   useEffect(() => {
-    if (
-      userDetails?.favorite_tutors?.some((favTutor) => favTutor.id === tutor.id)
-    ) {
-      setIsFavorite(true);
-    }
-  }, [userDetails, tutor.id]);
+    const isFav = userDetails?.favorite_tutors?.some(
+      (favTutor) => favTutor.id === tutor.id
+    );
+    setIsFavorite(isFav);
+  }, [tutor.id]);
 
-  // ✅ Toggle favorite handler
+  // Toggle favorite handler
   const toggleFavorite = async () => {
-    const action = isFavorite ? "remove" : "add";
-    setIsFavorite((prev) => !prev); // Optimistic UI
+    if (!token) return;
+
+    const newState = !isFavorite;
+    setIsFavorite(newState);
 
     try {
-      const response = await axios.post(
+      const action = newState ? "add" : "remove";
+
+      await axios.post(
         `${API_BASE}/students/favorites/`,
         { action, favorite_tutors: [tutor.id] },
         {
+          withCredentials: true,
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Token ${token}`,
           },
         }
       );
+
+      // update context
       await refreshUserDetails();
-      setRefreshFavourites((prev) => !prev);
-      console.log("Favorite updated:", response.data);
+
+      // if parent refresh prop exists, call it
+      if (setRefreshFavourites) setRefreshFavourites((prev) => !prev);
     } catch (error) {
-      console.error("Failed to update favorite:", error);
-      setIsFavorite(true); // revert UI
+      console.error("Failed to update favorite");
+
+      // revert UI on failure
+      setIsFavorite(!newState);
     }
   };
 
   return (
     <div
-      className={`relative w-full xl:w-[280px] flex flex-col justify-between bg-green-50 rounded-md shadow-sm hover:shadow-md transition-all p-2 lg:p-4 text-center overflow-hidden
+      className={`relative ${
+        search ? "w-full" : "w-full xl:w-[280px]"
+      } flex flex-col justify-between bg-green-50 rounded-md shadow-sm hover:shadow-md transition-all p-2 lg:p-4 text-center overflow-hidden
       ${
         showAllCategories ? "h-auto" : "h-[240px] md:h-[280px] lg:h-[280px]"
       } duration-300`}
       style={{ alignSelf: "start" }}
     >
-      {/* ❤️ Favorite Button */}
+      {/* Favorite Button */}
       <button
         onClick={toggleFavorite}
-        className="absolute top-1 right-1 sm:top-3 sm:right-3 p-1 sm:p-2 rounded-full bg-white shadow-sm hover:bg-gray-100 transition"
+        className="absolute top-2 right-2 p-2 rounded-full bg-white shadow-sm hover:bg-gray-100 transition transform hover:scale-110"
       >
         <Heart
           size={20}
-          className={isFavorite ? "text-red-500 fill-red-500" : "text-gray-400"}
+          className={`transition-all duration-300 ${
+            isFavorite ? "text-red-500 fill-red-500 scale-110" : "text-gray-400"
+          }`}
         />
       </button>
 

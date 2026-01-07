@@ -18,7 +18,7 @@ const Slider = ({
   const intervalRef = useRef(null);
   const totalItems = Children.count(children);
 
-  // ✅ Responsive width tracking
+  // Responsive width tracking
   useEffect(() => {
     const handleResize = () => {
       if (sliderRef.current) {
@@ -30,7 +30,7 @@ const Slider = ({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // ✅ Get slides to show based on viewport
+  // Get slides to show based on viewport
   const getSlidesToShow = () => {
     if (sliderWidth < 640) return 1;
     if (sliderWidth < 1024) return forceSingleSlideBelow1024 ? 1 : 2;
@@ -40,7 +40,7 @@ const Slider = ({
   const visibleSlides = getSlidesToShow();
   const totalSlides = totalItems;
 
-  // ✅ Go to a specific slide safely
+  // Go to a specific slide safely
   const goToSlide = (index) => {
     let newIndex = index;
     if (infinite) {
@@ -52,11 +52,11 @@ const Slider = ({
     setCurrentIndex(newIndex);
   };
 
-  // ✅ Slide controls
+  // Slide controls
   const nextSlide = () => goToSlide(currentIndex + 1);
   const prevSlide = () => goToSlide(currentIndex - 1);
 
-  // ✅ Auto-slide setup
+  // Auto-slide setup
   useEffect(() => {
     if (!autoSlide || isHovered) {
       clearInterval(intervalRef.current);
@@ -66,11 +66,11 @@ const Slider = ({
     return () => clearInterval(intervalRef.current);
   }, [autoSlide, autoSlideInterval, isHovered, currentIndex]);
 
-  // ✅ Handle hover
+  // Handle hover
   const handleMouseEnter = () => setIsHovered(true);
   const handleMouseLeave = () => setIsHovered(false);
 
-  // ✅ Touch swipe handlers
+  // Touch swipe handlers
   const handleTouchStart = (e) => {
     setTouchPosition(e.touches[0].clientX);
     setIsHovered(true);
@@ -93,7 +93,7 @@ const Slider = ({
     setIsHovered(false);
   };
 
-  // ✅ Clone child slides to control width
+  // Clone child slides to control width
   const renderSlides = () =>
     Children.map(children, (child, index) =>
       cloneElement(child, {
@@ -105,7 +105,7 @@ const Slider = ({
       })
     );
 
-  // ✅ Compute transform width based on visible slides
+  // Compute transform width based on visible slides
   const slideWidthPercent = 100 / visibleSlides;
   const offset = currentIndex * slideWidthPercent;
 
@@ -156,7 +156,7 @@ const Slider = ({
 
       {/* Pagination Dots */}
       {totalSlides > visibleSlides && (
-        <div className="flex justify-center mt-6 space-x-2">
+        <div className="hidden justify-center mt-6 space-x-2">
           {Array.from({ length: totalSlides - visibleSlides + 1 }).map(
             (_, index) => (
               <button

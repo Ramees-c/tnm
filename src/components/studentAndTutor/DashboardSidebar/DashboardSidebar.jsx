@@ -6,7 +6,6 @@ import {
   BookOpen,
   Users,
   MessageSquare,
-  Settings,
   LogOut,
   Edit3,
   X,
@@ -82,7 +81,7 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
 
   const navigate = useNavigate();
 
-  // ✅ 1. Main notification count updater
+  // 1. Main notification count updater
   useEffect(() => {
     if (!token) return;
 
@@ -96,7 +95,7 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
     const fetchNotifyCount = async () => {
       try {
         const res = await axios.get(`${API_BASE}/notify_count/`, {
-          headers: { Authorization: `Token ${token}` },
+          withCredentials: true,
         });
 
         if (isMounted) {
@@ -110,7 +109,7 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
           });
         }
       } catch (err) {
-        console.error("Failed to fetch notification count", err);
+        console.error("Failed to fetch notification count");
       }
     };
 
@@ -127,7 +126,7 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
     };
   }, [token, notifyCount]);
 
-  // ✅ 2. Reset when on notification page, and refresh quickly after leaving
+  // 2. Reset when on notification page, and refresh quickly after leaving
   useEffect(() => {
     if (!token) return;
 
@@ -144,13 +143,13 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
       const timeout = setTimeout(async () => {
         try {
           const res = await axios.get(`${API_BASE}/notify_count/`, {
-            headers: { Authorization: `Token ${token}` },
+            withCredentials: true,
           });
           const newCount = res.data.notify_count;
           setNotifyCount(newCount);
           sessionStorage.setItem("notifyCount", newCount);
         } catch (err) {
-          console.error("Failed to refresh notification count", err);
+          console.error("Failed to refresh notification count");
         }
       }, 3000); // refresh 3s after leaving notification page
 
@@ -160,13 +159,13 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
 
   useEffect(() => {
     if (isMobile && open) {
-      document.body.style.overflow = "hidden"; // 🔒 stop background scroll
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "auto"; // 🔓 restore scroll
+      document.body.style.overflow = "auto"; 
     }
 
     return () => {
-      document.body.style.overflow = "auto"; // cleanup on unmount
+      document.body.style.overflow = "auto"; 
     };
   }, [open, isMobile]);
 
@@ -263,26 +262,22 @@ function DashboardSidebar({ role = "student", open, setOpen }) {
               const isNotification = label === "Notifications";
 
               // 🔹 Check if "Assigned Students" should be disabled
-              const isDisabled =
-                role === "tutor" &&
-                label === "Assigned Students" &&
-                userDetails?.payment_history === null;
+              // const isDisabled =
+              //   role === "tutor" &&
+              //   label === "Assigned Students" &&
+              //   userDetails?.payment_history === null;
 
               return (
                 <Link
                   key={i}
-                  to={isDisabled ? "#" : to} // disable navigation
+                  to={to}
                   className={`flex items-center justify-between gap-3 px-4 py-3 rounded-md transition-all text-sm lg:text-base
           ${
             isActive
               ? "bg-white text-green-700 font-semibold shadow-md"
               : "hover:bg-white/20"
           }
-          ${
-            isDisabled
-              ? "opacity-50 cursor-not-allowed pointer-events-none"
-              : ""
-          }
+        
         `}
                   onClick={() => isMobile && setOpen(false)}
                 >

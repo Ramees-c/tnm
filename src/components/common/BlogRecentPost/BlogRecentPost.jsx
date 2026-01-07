@@ -11,17 +11,17 @@ function BlogRecentPost() {
     axios
       .get(`${API_BASE}/blogs/`)
       .then((res) => {
-        // assuming API returns an array of blog objects
         // take the latest 5
         const latest = res.data.slice(0, 5);
         setPosts(latest);
       })
       .catch((err) => {
-        console.error("Error fetching blogs:", err);
+        console.error("Error fetching blogs");
       })
       .finally(() => setLoading(false));
   }, []);
 
+  // Loading
   if (loading) {
     return (
       <div className="bg-white p-4 shadow-md rounded-md">
@@ -32,6 +32,7 @@ function BlogRecentPost() {
   }
 
   return (
+    // Blog recent post 
     <div className="bg-white p-2 shadow-md rounded-md">
       <h3 className="font-bold mb-3">Recent Post</h3>
       <ul className="space-y-4">

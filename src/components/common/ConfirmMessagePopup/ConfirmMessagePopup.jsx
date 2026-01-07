@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
-import { AlertCircle, MessageCircle  } from "lucide-react"; // ✅ Added HelpCircle
+import { AlertCircle, MessageCircle } from "lucide-react";
 
 function ConfirmMessagePopup({
   isOpen,
@@ -8,9 +8,9 @@ function ConfirmMessagePopup({
   onYes,
   onNo,
   onClose,
-  type = "confirm", // "confirm" | "alert"
+  type = "confirm",
 }) {
-  // ✅ Prevent background scroll when popup is open
+  // Prevent background scroll when popup is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -25,6 +25,7 @@ function ConfirmMessagePopup({
   if (!isOpen) return null;
 
   return createPortal(
+    // Confirm message popup
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
@@ -34,7 +35,7 @@ function ConfirmMessagePopup({
         {/* Icon (changes by type) */}
         <div className="flex justify-center mb-4">
           {type === "alert" ? (
-            <MessageCircle  size={48} className="text-green-600 animate-pulse" />
+            <MessageCircle size={48} className="text-green-600 animate-pulse" />
           ) : (
             <AlertCircle size={48} className="text-red-600 animate-pulse" />
           )}

@@ -19,7 +19,7 @@ const RefundPolicy = () => {
 
         setRefund(refundPage || null);
       } catch (error) {
-        console.error("Error fetching refund policy:", error);
+        console.error("Error fetching refund policy");
       } finally {
         setLoading(false);
       }

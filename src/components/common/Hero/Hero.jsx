@@ -1,10 +1,15 @@
 import React from "react";
 
+// small star icon
 import shapeIcon from "../../../assets/images/91.png";
+
+// Hero right side png image
 import bannerImg from "../../../assets/images/2.png";
 
+// Background image
 import herobg from "../../../assets/images/hero.jpg";
 
+// Search bar component
 import HeroSearchForm from "../HeroSearchForm/HeroSearchForm";
 
 function Hero() {
@@ -15,7 +20,7 @@ function Hero() {
       style={{ backgroundImage: `url(${herobg})` }}
     >
       <div className="container">
-        <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+        <div className="flex flex-col lg:flex-row items-center lg:gap-12">
           {/* Left Content - Text Area */}
           <div className="w-full lg:w-7/12 text-center lg:text-left z-10 pt-20 lg:pt-0">
             <div className="animate-fade-in">
@@ -23,10 +28,10 @@ function Hero() {
                 <img
                   src={shapeIcon}
                   alt="Discover"
-                  className="mr-3 w-10 hidden lg:block animate-bounce-slow"
+                  className="mr-3 w-10 hidden lg:block"
                 />
                 <span className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-xs xl:text-sm">
-                 Discover world-class courses for every learner
+                  Discover world-class courses for every learner
                 </span>
               </h4>
 
@@ -46,7 +51,7 @@ function Hero() {
           </div>
 
           {/* Right Content - Image Area */}
-          <div className="w-full lg:w-5/12 relative mt-12 lg:mt-0">
+          <div className="w-full lg:w-5/12 relative mt-5 lg:mt-0">
             <div className="relative w-full max-w-[400px] mx-auto animate-fade-in">
               <img
                 src={bannerImg}

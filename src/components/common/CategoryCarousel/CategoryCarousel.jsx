@@ -5,7 +5,7 @@ const CategoryCarousel = ({ children }) => {
   const scrollRef = useRef(null);
   const [canScroll, setCanScroll] = useState(false);
 
-  // 🔍 Check if scrolling is possible
+  // Check if scrolling is possible
   useEffect(() => {
     const checkScroll = () => {
       if (!scrollRef.current) return;
@@ -19,6 +19,7 @@ const CategoryCarousel = ({ children }) => {
     return () => window.removeEventListener("resize", checkScroll);
   }, [children]);
 
+  
   const handlePrev = () => {
     scrollRef.current?.scrollBy({ left: -300, behavior: "smooth" });
   };
@@ -28,6 +29,7 @@ const CategoryCarousel = ({ children }) => {
   };
 
   return (
+    // Category carousel
     <div className="relative group">
       {/* Scrollable container */}
       <div

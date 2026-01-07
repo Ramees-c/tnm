@@ -1,11 +1,15 @@
 import React, { useEffect } from "react";
 import PlatformOverview from "../../../components/common/PlatformOverview/PlatformOverview";
 
+// About section image
 import aboutImg from "../../../assets/images/about-2.jpg";
+// CEO section
 import CEOSection from "../../../components/common/CEOSection/CEOSection";
+// Vission Mission
 import VisionMission from "../../../components/common/VisionMission/VisionMission";
+// Page header
 import PageHeader from "../../../components/common/PageHeader/PageHeader";
-
+// Page banner
 import pageBanner from "../../../assets/images/page_banner/about.png"
 
 function AboutPage() {
@@ -14,11 +18,13 @@ function AboutPage() {
   }, []);
   return (
     <div>
+      {/* Page header */}
       <PageHeader
         title="About Us"
         headerBg={pageBanner}
       />
       <div className="container">
+        {/* About section */}
         <section className="w-full pt-16" data-aos="fade-up">
           <div className="mx-auto grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-10 items-center lg:px-12">
             {/* Left Image */}
@@ -65,12 +71,18 @@ function AboutPage() {
           </div>
         </section>
 
+
+        {/* Platform overview */}
         <div data-aos="fade-up">
           <PlatformOverview />
         </div>
+
+        {/* Vission Mission */}
         <div data-aos="fade-up">
           <VisionMission />
         </div>
+
+        {/* CEO section */}
         <div className="py-16" data-aos="fade-up">
           <CEOSection />
         </div>

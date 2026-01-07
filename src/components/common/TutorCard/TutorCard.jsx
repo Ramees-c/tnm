@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FaChalkboardTeacher, FaBookOpen } from "react-icons/fa";
 import DefaultButton from "../DefaultButton/DefaultButton";
 import { useAuth } from "../../../Context/userAuthContext";
@@ -17,7 +17,7 @@ function TutorCard({ tutor }) {
 
   const containerRef = useRef(null);
 
-  // ✅ Check if categories overflow the first row
+  // Check if categories overflow the first row
   useEffect(() => {
     const checkOverflow = () => {
       const container = containerRef.current;
@@ -55,6 +55,7 @@ function TutorCard({ tutor }) {
   };
 
   return (
+    // Tutor card
     <div
       className={`relative rounded-md shadow-lg overflow-hidden transition-all duration-300 
       w-[340px] md:w-[300px] lg:w-[350px] xl:w-[290px] 2xl:w-[340px] flex flex-col 
@@ -164,4 +165,4 @@ function TutorCard({ tutor }) {
   );
 }
 
-export default TutorCard;
+export default React.memo(TutorCard);

@@ -111,7 +111,7 @@ function HeroSearchForm() {
         return matches;
       }
     } catch (error) {
-      console.error("Error fetching categories:", error);
+      console.error("Error fetching categories");
       setFilteredSubjects([]);
     }
     return [];
@@ -122,7 +122,7 @@ function HeroSearchForm() {
     const value = e.target.value;
     setSubjectInput(value);
     setErrors((prev) => ({ ...prev, subjects: "" }));
-    // call but don't block typing; it's fine to await but non-blocking is smoother
+   
     fetchAndFilterSubjects(value);
   };
 

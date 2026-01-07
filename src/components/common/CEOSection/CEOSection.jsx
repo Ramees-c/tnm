@@ -1,15 +1,11 @@
 import React from "react";
-import {
-  FaLinkedin,
-  FaTwitter,
-  FaInstagram,
-  FaQuoteLeft,
-} from "react-icons/fa";
+import { FaQuoteLeft } from "react-icons/fa";
 
+// CEO image
 import ceoImg from "../../../assets/images/CEO.jpg";
 
 const CEOSection = () => {
-  // CEO data - you can replace this with actual data
+  // CEO data
   const ceoData = {
     name: "Aysha Zameer",
     position: "Founder & CEO",
@@ -20,6 +16,7 @@ const CEOSection = () => {
   };
 
   return (
+    // CEO section
     <section className="py-5 sm:py-12 px-2 xl:px-0 bg-secondary/20 rounded-md">
       <div className="">
         <div className="text-center mb-10">

@@ -3,10 +3,10 @@ import FormInput from "../FormInput/FormInput";
 import DefaultButton from "../../common/DefaultButton/DefaultButton";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import logo from "../../../assets/images/logo/tnmlogo.png";
-import axios from "axios";
 import { useAuth } from "../../../Context/userAuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
-import API_BASE from "../../../API/API";
+import { Link } from "react-router-dom";
+import api from "../../../API/axios";
 
 function LoginForm({ onCreateAccount, onForgotPassword }) {
   const { login } = useAuth();
@@ -30,7 +30,7 @@ function LoginForm({ onCreateAccount, onForgotPassword }) {
     setServerError("");
   };
 
-  // ✅ Validation
+  // Validation
   const validate = () => {
     let newErrors = {};
 
@@ -56,8 +56,7 @@ function LoginForm({ onCreateAccount, onForgotPassword }) {
     return Object.keys(newErrors).length === 0;
   };
 
-  // ✅ Submit
-  // ✅ Submit
+  // Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
@@ -74,7 +73,9 @@ function LoginForm({ onCreateAccount, onForgotPassword }) {
         payload.mobile_number = formData.identifier;
       }
 
-      const response = await axios.post(`${API_BASE}/login/`, payload);
+      const response = await api.post("/login/", payload, {
+        withCredentials: true,
+      });
 
       if (response.data.role === "admin") {
         setServerError("Admins are not allowed to login from here.");
@@ -82,16 +83,10 @@ function LoginForm({ onCreateAccount, onForgotPassword }) {
         return;
       }
 
-      if (response.data.token) {
-        login(response.data); // save token
-      } else {
-        setServerError("No token received. Please try again.");
-        setIsLoading(false);
-        return;
-      }
+      login(response.data);
 
-      // ✅ Redirect after login
-      const redirectPath = location.state?.redirect; // <--- important
+      // Redirect after login
+      const redirectPath = location.state?.redirect;
 
       if (redirectPath) {
         navigate(redirectPath, { replace: true });
@@ -112,23 +107,21 @@ function LoginForm({ onCreateAccount, onForgotPassword }) {
         }
       }
     } catch (error) {
-      setServerError(
-        error.response?.data?.non_field_errors ||
-          "Something went wrong. Please try again."
-      );
+      setServerError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
+    // Login form
     <div className="min-h-screen flex items-center justify-center">
       <div className="w-full max-w-lg bg-white rounded-md shadow-sm overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-green-500 to-green-600 py-3 text-center">
           <div className="flex items-center justify-center mb-2">
             <div className="bg-white p-2 rounded-full mr-3">
-              <img src={logo} alt="Logo" className="w-7 h-7 object-contain" />
+              <Link to="/"><img src={logo} alt="Logo" className="w-7 h-7 object-contain" /></Link>
             </div>
             <h1 className="text-2xl font-bold text-white">Login</h1>
           </div>

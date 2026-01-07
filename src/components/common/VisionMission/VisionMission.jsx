@@ -2,7 +2,6 @@ import React from "react";
 import {
   FaBullseye,
   FaEye,
-  FaRocket,
   FaUsers,
   FaLightbulb,
   FaHeart,

@@ -9,7 +9,10 @@ import OtpModal from "../../common/OtpModal/OtpModal";
 
 import { useNavigate } from "react-router-dom";
 import ConfirmMessagePopup from "../../common/ConfirmMessagePopup/ConfirmMessagePopup";
-import API_BASE from "../../../API/API";
+import API_BASE, { WHATSAPP_API } from "../../../API/API";
+import { useAuth } from "../../../Context/userAuthContext";
+import api from "../../../API/axios";
+import Loading from "../../common/Loading/Loading";
 
 const initialFormData = {
   full_name: "",
@@ -34,6 +37,7 @@ const initialFormData = {
 
 function TutorRegisterForm() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState(initialFormData);
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({});
@@ -60,6 +64,7 @@ function TutorRegisterForm() {
   const [showPincodeSuggestions, setShowPincodeSuggestions] = useState(false);
   const [pincodeTimeout, setPincodeTimeout] = useState(null);
   const [isPincodeLoading, setIsPincodeLoading] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const errorRefs = {
     full_name: useRef(null),
@@ -85,7 +90,7 @@ function TutorRegisterForm() {
   const subjectRef = useRef(null);
   // Scroll to first error field when errors change
   useEffect(() => {
-    if (!shouldScroll) return; // 🚫 don’t scroll while typing
+    if (!shouldScroll) return;
 
     const firstErrorKey = Object.keys(errors)[0];
     if (
@@ -132,6 +137,7 @@ function TutorRegisterForm() {
     };
   }, []);
 
+  // onChange
   const handleChange = (e) => {
     const { name, value, files, type } = e.target;
     if (type === "file") {
@@ -142,6 +148,7 @@ function TutorRegisterForm() {
     setErrors((prev) => ({ ...prev, [name]: "" })); // clear error
   };
 
+  // onChange profile image
   const handleProfileInputChange = (e) => {
     handleChange(e); // keeps existing formData updates
 
@@ -152,7 +159,7 @@ function TutorRegisterForm() {
     ) {
       const file = e.target.files[0];
 
-      // ✅ Validate file size (max 5MB)
+      // Validate file size (max 5MB)
       const maxSize = 5 * 1024 * 1024;
       if (file.size > maxSize) {
         setErrors((prev) => ({
@@ -169,7 +176,7 @@ function TutorRegisterForm() {
       img.src = URL.createObjectURL(file);
 
       img.onload = () => {
-        // ✅ Check for landscape orientation
+        // Check for landscape orientation
         if (img.width <= img.height) {
           setErrors((prev) => ({
             ...prev,
@@ -187,17 +194,14 @@ function TutorRegisterForm() {
     }
   };
 
-  const handleCountryCodeChange = (value) => {
-    setFormData({ ...formData, countryCode: value });
-    setErrors((prev) => ({ ...prev, countryCode: "" }));
-  };
-
+  // onChange phone
   const handlePhoneChange = (e) => {
     const onlyNums = e.target.value.replace(/\D/g, "");
     setFormData({ ...formData, mobile_number: onlyNums });
     setErrors((prev) => ({ ...prev, phoneNumber: "" }));
   };
 
+  // onChange pincode
   const handlePincodeChange = async (e) => {
     const value = e.target.value;
     setFormData((prev) => ({ ...prev, pincode: value }));
@@ -210,27 +214,29 @@ function TutorRegisterForm() {
       return;
     }
 
-    setIsPincodeLoading(true); // ✅ start loading
+    setIsPincodeLoading(true);
 
     try {
       const res = await axios.get(`${API_BASE}/pincode_search/?q=${value}`);
       setPincodeSuggestions(res.data || []);
       setShowPincodeSuggestions(true);
     } catch (err) {
-      console.error("Pincode search error:", err);
+      console.error("Pincode search error");
       setPincodeSuggestions([]);
       setShowPincodeSuggestions(false);
     } finally {
-      setIsPincodeLoading(false); // ✅ stop loading
+      setIsPincodeLoading(false);
     }
   };
 
+  // Select pincode
   const handleSelectPincode = (pin) => {
     // Update formData with selected pincode
     setFormData((prev) => ({ ...prev, pincode: pin.pincode }));
     setShowPincodeSuggestions(false); // close dropdown
   };
 
+  // Validation
   const validateForm = () => {
     let newErrors = {};
 
@@ -290,6 +296,7 @@ function TutorRegisterForm() {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Validaton password
   const validatePassword = (password) => {
     if (!password) return "Password is required";
     if (password.length < 8)
@@ -300,11 +307,13 @@ function TutorRegisterForm() {
     return "";
   };
 
+  // onBlur password
   const handlePasswordBlur = () => {
     const errorMsg = validatePassword(formData.password);
     setErrors((prev) => ({ ...prev, password: errorMsg }));
   };
 
+  // onBlur confirm password
   const handleConfirmPasswordBlur = () => {
     if (!confirmPassword) {
       setErrors((prev) => ({
@@ -321,7 +330,7 @@ function TutorRegisterForm() {
     }
   };
 
-  // ✅ Recursive function to flatten categories and all nested subcategories
+  // Recursive function to flatten categories and all nested subcategories
   const flattenCategories = (
     categories,
     rootName = "",
@@ -335,10 +344,10 @@ function TutorRegisterForm() {
       const isTop = !rootName;
       const currentRootName = rootName || category.name;
 
-      // 🔹 Preserve the very first rootId across recursion
+      // Preserve the very first rootId across recursion
       const baseRootId = rootId ?? category.id;
 
-      // 🔹 Always build path starting from top-most root
+      // Always build path starting from top-most root
       const currentPath = isTop ? [category.id] : [...path, category.id];
 
       const hasChildren =
@@ -346,18 +355,18 @@ function TutorRegisterForm() {
       const isLeaf = !hasChildren;
 
       if (isTop) {
-        // ✅ Root-level item
+        // Root-level item
         result.push({
           id: category.id,
           name: category.name,
           label: category.name,
           parent: null,
-          pathIds: [category.id], // root path starts with itself
+          pathIds: [category.id],
           hasChildren,
-          isLeaf, // 🔹 add leaf flag
+          isLeaf, // add leaf flag
         });
       } else {
-        // ✅ Sub-level item with same "in ... (Root)" label format
+        // Sub-level item with same "in ... (Root)" label format
         const cleanChain = [...chain].filter((c) => c !== currentRootName);
 
         const label =
@@ -374,11 +383,11 @@ function TutorRegisterForm() {
           parent: currentRootName,
           pathIds: [baseRootId, ...currentPath.slice(1)],
           hasChildren,
-          isLeaf, // 🔹 add leaf flag
+          isLeaf, // add leaf flag
         });
       }
 
-      // 🔹 Recurse deeper if subcategories exist
+      // Recurse deeper if subcategories exist
       if (hasChildren) {
         result = result.concat(
           flattenCategories(
@@ -395,7 +404,7 @@ function TutorRegisterForm() {
     return result;
   };
 
-  // ✅ Subject input change
+  // Subject input change
   const handleSubjectChange = async (e) => {
     const value = e.target.value;
     setSubjectInput(value);
@@ -419,14 +428,13 @@ function TutorRegisterForm() {
         setShowSuggestions(false);
       }
     } catch (error) {
-      console.error("Error fetching categories:", error);
+      console.error("Error fetching categories");
       setFilteredSubjects([]);
       setShowSuggestions(false);
     }
   };
 
-  // ✅ Add subject
-  // ✅ Add subject
+  // Add subject
   const handleSelectSubject = (subject) => {
     if (selectedSubjects.some((s) => s.id === subject.id)) {
       setShowSuggestions(false);
@@ -436,7 +444,7 @@ function TutorRegisterForm() {
     const updatedSubjects = [...selectedSubjects, subject];
     setSelectedSubjects(updatedSubjects);
 
-    // ✅ Only leaf IDs, not full path
+    // Only leaf IDs, not full path
     const leafIds = updatedSubjects.map((s) => s.id);
 
     setFormData((prev) => ({
@@ -450,13 +458,12 @@ function TutorRegisterForm() {
     setFilteredSubjects([]);
   };
 
-  // ✅ Remove subject
-  // ✅ Remove subject
+  // Remove subject
   const removeSubject = (id) => {
     const updatedSubjects = selectedSubjects.filter((s) => s.id !== id);
     setSelectedSubjects(updatedSubjects);
 
-    // ✅ Only leaf IDs
+    // Only leaf IDs
     const leafIds = updatedSubjects.map((s) => s.id);
 
     setFormData((prev) => ({
@@ -465,8 +472,7 @@ function TutorRegisterForm() {
     }));
   };
 
-  // ✅ Highlight typed text
-  // ✅ Highlight typed text inside suggestion
+  // Highlight typed text inside suggestion
   const highlightMatch = (text, query) => {
     if (!query) return text;
     const regex = new RegExp(`(${query})`, "gi");
@@ -476,6 +482,7 @@ function TutorRegisterForm() {
     );
   };
 
+  // Highlignt pincode match
   const highlightPincodeMatch = (text, query) => {
     if (!query) return text;
     // Escape regex special characters from query
@@ -487,6 +494,7 @@ function TutorRegisterForm() {
     );
   };
 
+  // Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -510,13 +518,46 @@ function TutorRegisterForm() {
       const phoneWithCode = `+${countryCode}${mobile_number}`;
 
       // Call send OTP
-      const response = await axios.post(`${API_BASE}/send-otp/`, {
-        email,
-        mobile_number: phoneWithCode,
-      });
+      // const response = await axios.post(`${API_BASE}/send-otp/`, {
+      //   email,
+      //   mobile_number: phoneWithCode,
+      // });
 
-      // ✅ Only proceed if backend says OTP sent
-      if (response.data?.message === "OTP sent successfully.") {
+      try {
+        await axios.post(`${API_BASE}/profile/check/`, {
+          email,
+          mobile_number: phoneWithCode,
+        });
+        // If 200 => OK to send OTP
+      } catch (err) {
+        // Email or phone exists (backend returns 400)
+        const msg = err.response?.data?.error || "Validation failed";
+        console.log(err);
+
+        setFormMessage({ type: "error", text: msg });
+        setIsSubmitting(false);
+        return;
+      }
+
+      // const response = await axios.post(
+      //   "https://api.chatbase.in/api/v1/whatsapp/send-message/authentication/utility",
+      //   {
+      //     to: phoneWithCode,
+      //     templateName: "account_creation",
+      //   },
+      //   {
+      //     headers: {
+      //       "x-api-key": WHATSAPP_API,
+      //     },
+      //   }
+      // );
+
+      const response = await axios.post(`${API_BASE}/whatsapp/send-otp/`, {
+        mobile: phoneWithCode,
+      })
+
+      // Only proceed if backend says OTP sent
+      if (response.data?.message === "OTP sent successfully") {
         const pending = {
           ...rest,
           email,
@@ -526,83 +567,136 @@ function TutorRegisterForm() {
         };
 
         setPendingFormData(pending);
-        setShowOtpPopup(true); // ✅ open popup ONLY if OTP is sent
+        setShowOtpPopup(true); // open popup ONLY if OTP is sent
         setOtpError("");
       } else {
         // Backend responded but no OTP sent
         setFormMessage({
           type: "error",
-          text: response.data?.error || "❌ Failed to send OTP.",
+          text: response.data?.error || "Failed to send OTP.",
         });
       }
     } catch (error) {
-      console.error(
-        "❌ Send OTP Error:",
-        error.response?.data || error.message
-      );
+      console.error("Send OTP Error");
 
       const msg =
         error.response?.data?.error ||
         error.response?.data?.email?.[0] ||
         error.response?.data?.mobile_number?.[0] ||
-        "❌ Failed to send OTP. Try again.";
+        "Failed to send OTP. Try again.";
 
       setFormMessage({ type: "error", text: msg });
 
-      // ❌ Do NOT open popup in error case
+      // Do NOT open popup in error case
       setShowOtpPopup(false);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // 🔹 Resend OTP API
+  // Resend OTP API
   const sendOtp = async () => {
     try {
-      await axios.post(`${API_BASE}/send-otp/`, {
-        email: formData.email,
-        mobile_number: `+${formData.countryCode}${formData.mobile_number}`,
-      });
+      // await axios.post(`${API_BASE}/send-otp/`, {
+      //   email: formData.email,
+      //   mobile_number: `+${formData.countryCode}${formData.mobile_number}`,
+      // });
 
-      setOtpError("✅ OTP resent successfully.");
+      // await axios.post(
+      //   "https://api.chatbase.in/api/v1/whatsapp/send-message/authentication/utility",
+      //   {
+      //     to: `+${formData.countryCode}${formData.mobile_number}`,
+      //     templateName: "account_creation",
+      //   },
+      //   {
+      //     headers: {
+      //       "x-api-key": WHATSAPP_API,
+      //     },
+      //   }
+      // );
+
+      await axios.post(`${API_BASE}/whatsapp/send-otp/`, {
+        mobile: `+${formData.countryCode}${formData.mobile_number}`,
+      })
+
+      setOtpError("OTP resent successfully via WhatsApp.");
     } catch (err) {
-      console.error("❌ OTP resend error:", err.response?.data || err.message);
+      console.error("OTP resend error");
       setOtpError("Failed to resend OTP. Please try again.");
     }
   };
 
+  // Otp verify
   const handleOtpVerify = async (enteredOtp) => {
     try {
       if (!pendingFormData) throw new Error("No form data found.");
 
-      // build FormData fresh from the plain pending object
+      // VERIFY OTP WITH WHATSAPP API
+      // const otpVerifyRes = await axios.post(
+      //   "https://api.chatbase.in/api/v1/whatsapp/verify-otp",
+      //   {
+      //     mobileNumber: pendingFormData.mobile_number,
+      //     otp: enteredOtp,
+      //   },
+      //   {
+      //     headers: {
+      //       "x-api-key": WHATSAPP_API,
+      //       "Content-Type": "application/json",
+      //     },
+      //   }
+      // );
+
+
+      const otpVerifyRes = await axios.post(`${API_BASE}/whatsapp/verify-otp/`, {
+        mobile: pendingFormData.mobile_number,
+        otp: enteredOtp,
+      })
+
+      if (otpVerifyRes.data?.message !== "OTP verified successfully") {
+        setOtpError("Invalid OTP. Please try again.");
+        return;
+      }
+
+      // PREPARE FORM DATA
       const fd = new FormData();
 
       Object.keys(pendingFormData).forEach((key) => {
         const val = pendingFormData[key];
+
         if (key === "categories" && Array.isArray(val)) {
           val.forEach((id) => fd.append("categories", id));
-        } else if (key === "profile_image") {
-          if (val instanceof File) fd.append("profile_image", val);
+        } else if (key === "profile_image" && val instanceof File) {
+          fd.append("profile_image", val);
         } else {
           if (val !== null && val !== undefined) fd.append(key, val);
         }
       });
 
-      // append OTP
+      // Required for backend
       fd.append("otp", enteredOtp);
 
-      // Call register API
+      fd.append("otp_verified", "true");
+
+      // REGISTER
       const res = await axios.post(`${API_BASE}/register/tutor/`, fd, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      if (res.data?.token && res.data?.role === "tutor") {
+      if (res.data?.role === "tutor") {
         setShowOtpPopup(false);
         setOtpError("");
+        setIsRedirecting(true);
 
-        localStorage.setItem("authToken", res.data.token);
+        // LOGIN
+        const loginPayload = {
+          email: pendingFormData.email,
+          password: pendingFormData.password,
+        };
 
+        const loginRes = await api.post("/login/", loginPayload);
+        await login(loginRes.data);
+
+        // Clear form
         setFormData(initialFormData);
         setConfirmPassword("");
         setSelectedSubjects([]);
@@ -611,20 +705,14 @@ function TutorRegisterForm() {
         setErrors({});
         setPendingFormData(null);
 
-        // ✅ Check approval
-        if (res.data?.is_approved === false) {
-          setShowMessagePopup(true);
-        }
+        // REDIRECT
+        navigate("/tutorDashboard", { replace: true });
       }
     } catch (err) {
-      console.error(
-        "❌ Registration Error:",
-        err.response?.data || err.message
-      );
+      console.error("Registration/Login Error");
 
       const apiErrors = err.response?.data;
 
-      // ✅ OTP-specific error (stay inside modal)
       if (apiErrors?.otp) {
         setOtpError(
           Array.isArray(apiErrors.otp) ? apiErrors.otp[0] : apiErrors.otp
@@ -632,658 +720,709 @@ function TutorRegisterForm() {
         return;
       }
 
-      // ✅ fallback for OTP failures (invalid / expired OTP)
-      setOtpError("❌ Invalid or expired OTP. Please try again.");
+      setOtpError("Invalid or expired OTP. Please try again.");
+    } finally {
+      setIsRedirecting(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-8">
-      <div className="w-full max-w-4xl bg-white rounded-md shadow-xl overflow-hidden">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-green-500 to-green-600 p-6 text-center">
-          <h2 className="text-2xl font-bold text-white">Tutor Registration</h2>
-          <p className="text-white mt-2">
-            Share your knowledge and inspire students
-          </p>
+    <>
+      {isRedirecting ? (
+        <div className="flex items-center justify-center h-screen">
+          <Loading />
         </div>
+      ) : (
+        <div className="min-h-screen flex items-center justify-center py-8">
+          <div className="w-full max-w-4xl bg-white rounded-md shadow-xl overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-green-500 to-green-600 p-6 text-center">
+              <h2 className="text-2xl font-bold text-white">
+                Tutor Registration
+              </h2>
+              <p className="text-white mt-2 text-sm md:text-base">
+                Share your knowledge and inspire students
+              </p>
+            </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-2 md:p-8 space-y-6">
-          {/* Personal Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">
-              Personal Information
-            </h3>
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="p-2 md:p-8 space-y-6">
+              {/* Personal Information */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">
+                  Personal Information
+                </h3>
 
-            <div className="flex flex-col items-center pb-6">
-              <label
-                htmlFor="profilePhoto"
-                className="relative w-32 h-32 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
-              >
-                {preview ? (
-                  <img
-                    src={preview}
-                    alt="Preview"
-                    className="w-32 h-32 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="flex flex-col items-center justify-center text-gray-500">
-                    <ImageIcon className="w-10 h-10 mb-1 text-green-600" />
-                    <p className="text-xs">Upload Photo</p>
-                  </div>
-                )}
+                <div className="flex flex-col items-center pb-6">
+                  <label
+                    htmlFor="profilePhoto"
+                    className="relative w-32 h-32 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
+                  >
+                    {preview ? (
+                      <img
+                        src={preview}
+                        alt="Preview"
+                        className="w-32 h-32 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-gray-500">
+                        <ImageIcon className="w-10 h-10 mb-1 text-green-600" />
+                        <p className="text-xs">Upload Photo</p>
+                      </div>
+                    )}
 
-                {/* Upload button overlay */}
-                <div className="absolute bottom-2 right-2 bg-green-600 p-2 rounded-full text-white shadow-md">
-                  <Upload className="w-4 h-4" />
+                    {/* Upload button overlay */}
+                    <div className="absolute bottom-2 right-2 bg-green-600 p-2 rounded-full text-white shadow-md">
+                      <Upload className="w-4 h-4" />
+                    </div>
+
+                    {/* File input */}
+                    <input
+                      id="profilePhoto"
+                      type="file"
+                      name="profile_image"
+                      accept="image/*"
+                      onChange={handleProfileInputChange}
+                      className="hidden"
+                    />
+                  </label>
+
+                  {/* Close / Remove button */}
+                  {preview && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPreview(null);
+                        setFormData((prev) => ({
+                          ...prev,
+                          profile_image: null,
+                        }));
+                        document.getElementById("profilePhoto").value = "";
+                      }}
+                      className="mt-2 flex items-center gap-1 text-sm text-red-600 hover:text-red-700 transition"
+                    >
+                      <X className="w-4 h-4" /> Remove
+                    </button>
+                  )}
+
+                  <p className="text-xs text-gray-500 mt-2">
+                    PNG, JPG up to 5MB
+                  </p>
+                  {errors.profile_image && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.profile_image}
+                    </p>
+                  )}
                 </div>
 
-                {/* File input */}
-                <input
-                  id="profilePhoto"
-                  type="file"
-                  name="profile_image"
-                  accept="image/*"
-                  onChange={handleProfileInputChange}
-                  className="hidden"
-                />
-              </label>
-
-              {/* Close / Remove button */}
-              {preview && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPreview(null);
-                    setFormData((prev) => ({ ...prev, profile_image: null }));
-                    document.getElementById("profilePhoto").value = "";
-                  }}
-                  className="mt-2 flex items-center gap-1 text-sm text-red-600 hover:text-red-700 transition"
-                >
-                  <X className="w-4 h-4" /> Remove
-                </button>
-              )}
-
-              <p className="text-xs text-gray-500 mt-2">PNG, JPG up to 5MB</p>
-              {errors.profile_image && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.profile_image}
-                </p>
-              )}
-            </div>
-
-            {/* Name & Email */}
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1" ref={errorRefs.full_name}>
-                <FormInput
-                  name="full_name"
-                  placeholder="Enter your Full Name"
-                  value={formData.full_name}
-                  onChange={handleChange}
-                  hasError={errors.full_name}
-                  innerRef={errorRefs.full_name}
-                />
-                {errors.full_name && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.full_name}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex-1" ref={errorRefs.email}>
-                <FormInput
-                  type="email"
-                  name="email"
-                  placeholder="Enter your Email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  hasError={errors.email}
-                  innerRef={errorRefs.email}
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Phone + Gender */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div ref={errorRefs.phoneNumber}>
-                <div className="flex gap-3">
-                  <div className="w-28" ref={errorRefs.countryCode}>
-                    <PhoneInput
-                      country={"in"}
-                      value={formData.countryCode}
-                      onChange={(value, country) => {
-                        setFormData({
-                          ...formData,
-                          countryCode: country.dialCode,
-                        });
-                        setErrors((prev) => ({ ...prev, countryCode: "" }));
-                      }}
-                      inputClass={`!w-full !h-11 !text-gray-700 !rounded-md !outline-none !border ${
-                        errors.countryCode
-                          ? "!border-red-500"
-                          : "!border-gray-300"
-                      } focus:!ring-0 focus:!border-green-500`}
-                      buttonClass={`!h-12 !rounded-md !border ${
-                        errors.countryCode
-                          ? "!border-red-500"
-                          : "!border-gray-300"
-                      } !bg-white`}
-                      dropdownClass="!bg-white !text-gray-700 !rounded-md !border-gray-200 !shadow-md"
-                      enableSearch={true}
-                      inputProps={{
-                        name: "countryCode",
-                        ref: errorRefs.countryCode,
-                      }}
+                {/* Name & Email */}
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="flex-1" ref={errorRefs.full_name}>
+                    <FormInput
+                      name="full_name"
+                      placeholder="Enter your Full Name"
+                      value={formData.full_name}
+                      onChange={handleChange}
+                      hasError={errors.full_name}
+                      innerRef={errorRefs.full_name}
                     />
-                    {errors.countryCode && (
+                    {errors.full_name && (
                       <p className="text-red-500 text-xs mt-1">
-                        {errors.countryCode}
+                        {errors.full_name}
                       </p>
                     )}
                   </div>
 
-                  <div className="flex-1">
+                  <div className="flex-1" ref={errorRefs.email}>
+                    <FormInput
+                      type="email"
+                      name="email"
+                      placeholder="Enter your Email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      hasError={errors.email}
+                      innerRef={errorRefs.email}
+                    />
+                    {errors.email && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.email}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Phone + Gender */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div ref={errorRefs.phoneNumber}>
+                    <div className="flex gap-3">
+                      <div className="w-28" ref={errorRefs.countryCode}>
+                        <PhoneInput
+                          country={"in"}
+                          value={formData.countryCode}
+                          onChange={(value, country) => {
+                            setFormData({
+                              ...formData,
+                              countryCode: country.dialCode,
+                            });
+                            setErrors((prev) => ({ ...prev, countryCode: "" }));
+                          }}
+                          inputClass={`!w-full !h-9 !text-gray-700 !rounded-md !outline-none !border ${
+                            errors.countryCode
+                              ? "!border-red-500"
+                              : "!border-gray-300"
+                          } focus:!ring-0 focus:!border-green-500`}
+                          buttonClass={`!h-9 !rounded-md !border ${
+                            errors.countryCode
+                              ? "!border-red-500"
+                              : "!border-gray-300"
+                          } !bg-white`}
+                          dropdownClass="!bg-white !text-gray-700 !rounded-md !border-gray-200 !shadow-md"
+                          enableSearch={true}
+                          inputProps={{
+                            name: "countryCode",
+                            ref: errorRefs.countryCode,
+                          }}
+                        />
+                        {errors.countryCode && (
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.countryCode}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex-1">
+                        <input
+                          type="tel"
+                          name="mobile_number"
+                          value={formData.mobile_number}
+                          onChange={handlePhoneChange}
+                          placeholder="WhatsApp Number *"
+                          ref={errorRefs.phoneNumber}
+                          className={`w-full py-2 px-4 text-xs sm:text-sm border ${
+                            errors.phoneNumber
+                              ? "border-red-500"
+                              : "border-gray-300"
+                          } rounded-md placeholder-gray-400 outline-none focus:ring-0 focus:border-primary`}
+                        />
+                        {errors.phoneNumber && (
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.phoneNumber}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div ref={errorRefs.gender}>
+                    <FormInput
+                      name="gender"
+                      placeholder="Select Gender"
+                      value={formData.gender}
+                      onChange={handleChange}
+                      select
+                      options={[
+                        { label: "Select Gender *", value: "" },
+                        { label: "Male", value: "male" },
+                        { label: "Female", value: "female" },
+                        { label: "Other", value: "other" },
+                      ]}
+                      hasError={errors.gender}
+                      innerRef={errorRefs.gender}
+                    />
+                    {errors.gender && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.gender}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Password + Confirm Password */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="relative" ref={errorRefs.password}>
+                    <FormInput
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      placeholder="Password *"
+                      value={formData.password}
+                      onChange={handleChange}
+                      onBlur={handlePasswordBlur}
+                      hasError={errors.password}
+                      innerRef={errorRefs.password}
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-3.5 text-gray-500"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                    {errors.password && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.password}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="relative" ref={errorRefs.confirmPassword}>
                     <input
-                      type="tel"
-                      name="mobile_number"
-                      value={formData.mobile_number}
-                      onChange={handlePhoneChange}
-                      placeholder="Phone Number *"
-                      ref={errorRefs.phoneNumber}
-                      className={`w-full py-2 px-4 text-xs sm:text-sm border ${
-                        errors.phoneNumber
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      placeholder="Confirm Password *"
+                      value={confirmPassword}
+                      onChange={(e) => {
+                        setConfirmPassword(e.target.value);
+                        setErrors((prev) => ({ ...prev, confirmPassword: "" })); // clear error while typing
+                      }}
+                      onBlur={handleConfirmPasswordBlur}
+                      ref={errorRefs.confirmPassword}
+                      className={`w-full py-2 px-4 pr-10 border text-xs sm:text-sm ${
+                        errors.confirmPassword
                           ? "border-red-500"
                           : "border-gray-300"
                       } rounded-md placeholder-gray-400 outline-none focus:ring-0 focus:border-primary`}
                     />
-                    {errors.phoneNumber && (
+                    <button
+                      type="button"
+                      className="absolute right-3 top-3.5 text-gray-500"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                    >
+                      {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                    {errors.confirmPassword && (
                       <p className="text-red-500 text-xs mt-1">
-                        {errors.phoneNumber}
+                        {errors.confirmPassword}
                       </p>
                     )}
                   </div>
                 </div>
               </div>
 
-              <div ref={errorRefs.gender}>
-                <FormInput
-                  name="gender"
-                  placeholder="Select Gender"
-                  value={formData.gender}
-                  onChange={handleChange}
-                  select
-                  options={[
-                    { label: "Select Gender *", value: "" },
-                    { label: "Male", value: "male" },
-                    { label: "Female", value: "female" },
-                    { label: "Other", value: "other" },
-                  ]}
-                  hasError={errors.gender}
-                  innerRef={errorRefs.gender}
-                />
-                {errors.gender && (
-                  <p className="text-red-500 text-xs mt-1">{errors.gender}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Password + Confirm Password */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="relative" ref={errorRefs.password}>
-                <FormInput
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  placeholder="Password *"
-                  value={formData.password}
-                  onChange={handleChange}
-                  onBlur={handlePasswordBlur}
-                  hasError={errors.password}
-                  innerRef={errorRefs.password}
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-3.5 text-gray-500"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
-                {errors.password && (
-                  <p className="text-red-500 text-xs mt-1">{errors.password}</p>
-                )}
-              </div>
-
-              <div className="relative" ref={errorRefs.confirmPassword}>
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  name="confirmPassword"
-                  placeholder="Confirm Password *"
-                  value={confirmPassword}
-                  onChange={(e) => {
-                    setConfirmPassword(e.target.value);
-                    setErrors((prev) => ({ ...prev, confirmPassword: "" })); // ✅ clear error while typing
-                  }}
-                  onBlur={handleConfirmPasswordBlur}
-                  ref={errorRefs.confirmPassword}
-                  className={`w-full py-2 px-4 pr-10 border text-xs sm:text-sm ${
-                    errors.confirmPassword
-                      ? "border-red-500"
-                      : "border-gray-300"
-                  } rounded-md placeholder-gray-400 outline-none focus:ring-0 focus:border-primary`}
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-3.5 text-gray-500"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
-                {errors.confirmPassword && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.confirmPassword}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Location & Professional Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">
-              Location Information
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div ref={errorRefs.city}>
-                <FormInput
-                  name="city"
-                  placeholder="City *"
-                  value={formData.city}
-                  onChange={handleChange}
-                  hasError={errors.city}
-                  innerRef={errorRefs.city}
-                />
-                {errors.city && (
-                  <p className="text-red-500 text-xs mt-1">{errors.city}</p>
-                )}
-              </div>
-              <div ref={errorRefs.state}>
-                <FormInput
-                  name="state"
-                  placeholder="State *"
-                  value={formData.state}
-                  onChange={handleChange}
-                  hasError={errors.state}
-                  innerRef={errorRefs.state}
-                />
-                {errors.state && (
-                  <p className="text-red-500 text-xs mt-1">{errors.state}</p>
-                )}
-              </div>
-              <div className="relative" ref={errorRefs.pincode}>
-                <input
-                  type="text"
-                  name="pincode"
-                  placeholder="Pincode *"
-                  value={formData.pincode}
-                  onChange={handlePincodeChange}
-                  className={`w-full py-2 px-4 border ${
-                    errors.pincode ? "border-red-500" : "border-gray-300 text-xs sm:text-sm"
-                  } rounded-md placeholder-gray-400 outline-none focus:ring-0 focus:border-primary`}
-                  autoComplete="off"
-                />
-                {errors.pincode && (
-                  <p className="text-red-500 text-xs mt-1">{errors.pincode}</p>
-                )}
-
-                {/* Dropdown suggestions */}
-                {showPincodeSuggestions && (
-                  <ul className="absolute w-full border rounded-md bg-white shadow-md mt-2 max-h-60 overflow-y-auto z-10">
-                    {isPincodeLoading ? (
-                      <li className="px-4 py-2 text-gray-500 text-sm italic">
-                        Loading...
-                      </li>
-                    ) : pincodeSuggestions.length > 0 ? (
-                      pincodeSuggestions.map((pin) => (
-                        <li
-                          key={pin.id}
-                          onMouseDown={(e) => {
-                            e.preventDefault(); // prevent input blur
-                            handleSelectPincode(pin);
-                          }}
-                          className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm"
-                          dangerouslySetInnerHTML={{
-                            __html: `${highlightPincodeMatch(
-                              pin.pincode,
-                              formData.pincode
-                            )} - ${highlightPincodeMatch(
-                              pin.office_name,
-                              formData.pincode
-                            )}`,
-                          }}
-                        />
-                      ))
-                    ) : (
-                      <li className="px-4 py-2 text-gray-400 text-sm italic">
-                        No pincodes found
-                      </li>
+              {/* Location & Professional Information */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">
+                  Location Information
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div ref={errorRefs.city}>
+                    <FormInput
+                      name="city"
+                      placeholder="City *"
+                      value={formData.city}
+                      onChange={handleChange}
+                      hasError={errors.city}
+                      innerRef={errorRefs.city}
+                    />
+                    {errors.city && (
+                      <p className="text-red-500 text-xs mt-1">{errors.city}</p>
                     )}
-                  </ul>
-                )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div ref={errorRefs.landmark}>
-                <FormInput
-                  name="landmark"
-                  placeholder="Landmark *"
-                  value={formData.landmark}
-                  onChange={handleChange}
-                  hasError={errors.landmark}
-                  innerRef={errorRefs.landmark}
-                />
-                {errors.landmark && (
-                  <p className="text-red-500 text-xs mt-1">{errors.landmark}</p>
-                )}
-              </div>
-              <div ref={errorRefs.near_by_town}>
-                <FormInput
-                  name="near_by_town"
-                  placeholder="Near by town *"
-                  value={formData.near_by_town}
-                  onChange={handleChange}
-                  hasError={errors.near_by_town}
-                  innerRef={errorRefs.near_by_town}
-                />
-                {errors.near_by_town && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.near_by_town}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <h3 className="text-lg font-semibold text-gray-700 border-b pb-2 mt-6">
-              Professional Information
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div ref={errorRefs.qualification}>
-                <FormInput
-                  name="qualification"
-                  placeholder="Highest Qualification *"
-                  value={formData.qualification}
-                  onChange={handleChange}
-                  hasError={errors.qualification}
-                  innerRef={errorRefs.qualification}
-                />
-                {errors.qualification && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.qualification}
-                  </p>
-                )}
-              </div>
-              <div ref={errorRefs.experience}>
-                <FormInput
-                  name="experience_years"
-                  placeholder="Teaching Experience (years) *"
-                  value={formData.experience_years}
-                  onChange={(e) => {
-                    const onlyNums = e.target.value.replace(/[^0-9]/g, ""); // ✅ allow digits only
-                    setFormData((prev) => ({
-                      ...prev,
-                      experience_years: onlyNums,
-                    }));
-                    setErrors((prev) => ({ ...prev, experience: "" })); // clear error while typing
-                  }}
-                  hasError={errors.experience}
-                  innerRef={errorRefs.experience}
-                />
-
-                {errors.experience && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.experience}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div ref={errorRefs.hourlyRate}>
-                <FormInput
-                  type="text"
-                  name="hourly_rate"
-                  placeholder="Hourly Rate (₹) *"
-                  value={formData.hourly_rate}
-                  onChange={(e) => {
-                    handleChange(e);
-                    setErrors((prev) => ({ ...prev, hourlyRate: "" }));
-                  }}
-                  hasError={errors.hourlyRate}
-                  innerRef={errorRefs.hourlyRate}
-                />
-                {errors.hourlyRate && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.hourlyRate}
-                  </p>
-                )}
-              </div>
-              <div
-                ref={(el) => {
-                  errorRefs.subjects.current = el;
-                  subjectRef.current = el;
-                }}
-                className="relative"
-              >
-                {/* Input */}
-                <input
-                  type="text"
-                  name="categories"
-                  placeholder="Subjects You Teach *"
-                  value={subjectInput}
-                  onChange={handleSubjectChange}
-                  onFocus={handleSubjectChange}
-                  ref={errorRefs.subjects}
-                  className={`w-full py-2 px-4 border text-xs sm:text-sm ${
-                    errors.subjects ? "border-red-500" : "border-gray-300 text-xs sm:text-sm"
-                  } rounded-md placeholder-gray-400 outline-none focus:ring-0 focus:border-primary`}
-                  autoComplete="off"
-                  autoCorrect="off"
-                />
-                {errors.subjects && (
-                  <p className="text-red-500 text-xs mt-1">{errors.subjects}</p>
-                )}
-
-                {/* ✅ Suggestions Dropdown */}
-                {showSuggestions && (
-                  <ul className="absolute w-full border rounded-md bg-white shadow-md mt-2 max-h-60 overflow-y-auto z-10">
-                    {filteredSubjects.length > 0 ? (
-                      filteredSubjects.map((sub) => (
-                        <li
-                          key={sub.id}
-                          onClick={() => handleSelectSubject(sub)}
-                          className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm"
-                          dangerouslySetInnerHTML={{
-                            __html: highlightMatch(sub.label, subjectInput),
-                          }}
-                        />
-                      ))
-                    ) : (
-                      <li className="px-4 py-2 text-gray-400 text-sm italic">
-                        No subjects found
-                      </li>
+                  </div>
+                  <div ref={errorRefs.state}>
+                    <FormInput
+                      name="state"
+                      placeholder="State *"
+                      value={formData.state}
+                      onChange={handleChange}
+                      hasError={errors.state}
+                      innerRef={errorRefs.state}
+                    />
+                    {errors.state && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.state}
+                      </p>
                     )}
-                  </ul>
-                )}
+                  </div>
+                  <div className="relative" ref={errorRefs.pincode}>
+                    <input
+                      type="text"
+                      name="pincode"
+                      placeholder="Pincode *"
+                      value={formData.pincode}
+                      onChange={handlePincodeChange}
+                      className={`w-full py-2 px-4 border ${
+                        errors.pincode
+                          ? "border-red-500"
+                          : "border-gray-300 text-xs sm:text-sm"
+                      } rounded-md placeholder-gray-400 outline-none focus:ring-0 focus:border-primary`}
+                      autoComplete="off"
+                    />
+                    {errors.pincode && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.pincode}
+                      </p>
+                    )}
 
-                {/* ✅ Selected Subjects Chips */}
-                {selectedSubjects.length > 0 && (
-                  <div className="flex flex-wrap gap-2 border rounded-md p-2 mt-2">
-                    {selectedSubjects.map((sub) => (
-                      <span
-                        key={sub.id}
-                        className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-md text-sm"
-                      >
-                        {sub.label}
-                        <button
-                          type="button"
-                          onClick={() => removeSubject(sub.id)}
-                          className="text-red-500 hover:text-red-700"
+                    {/* Dropdown suggestions */}
+                    {showPincodeSuggestions && (
+                      <ul className="absolute w-full border rounded-md bg-white shadow-md mt-2 max-h-60 overflow-y-auto z-10">
+                        {isPincodeLoading ? (
+                          <li className="px-4 py-2 text-gray-500 text-sm italic">
+                            Loading...
+                          </li>
+                        ) : pincodeSuggestions.length > 0 ? (
+                          pincodeSuggestions.map((pin) => (
+                            <li
+                              key={pin.id}
+                              onMouseDown={(e) => {
+                                e.preventDefault(); // prevent input blur
+                                handleSelectPincode(pin);
+                              }}
+                              className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm"
+                              dangerouslySetInnerHTML={{
+                                __html: `${highlightPincodeMatch(
+                                  pin.pincode,
+                                  formData.pincode
+                                )} - ${highlightPincodeMatch(
+                                  pin.office_name,
+                                  formData.pincode
+                                )}`,
+                              }}
+                            />
+                          ))
+                        ) : (
+                          <li className="px-4 py-2 text-gray-400 text-sm italic">
+                            No pincodes found
+                          </li>
+                        )}
+                      </ul>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div ref={errorRefs.landmark}>
+                    <FormInput
+                      name="landmark"
+                      placeholder="Landmark *"
+                      value={formData.landmark}
+                      onChange={handleChange}
+                      hasError={errors.landmark}
+                      innerRef={errorRefs.landmark}
+                    />
+                    {errors.landmark && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.landmark}
+                      </p>
+                    )}
+                  </div>
+                  <div ref={errorRefs.near_by_town}>
+                    <FormInput
+                      name="near_by_town"
+                      placeholder="Near by town *"
+                      value={formData.near_by_town}
+                      onChange={handleChange}
+                      hasError={errors.near_by_town}
+                      innerRef={errorRefs.near_by_town}
+                    />
+                    {errors.near_by_town && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.near_by_town}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <h3 className="text-lg font-semibold text-gray-700 border-b pb-2 mt-6">
+                  Professional Information
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div ref={errorRefs.qualification}>
+                    <FormInput
+                      name="qualification"
+                      placeholder="Highest Qualification *"
+                      value={formData.qualification}
+                      onChange={handleChange}
+                      hasError={errors.qualification}
+                      innerRef={errorRefs.qualification}
+                    />
+                    {errors.qualification && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.qualification}
+                      </p>
+                    )}
+                  </div>
+                  <div ref={errorRefs.experience}>
+                    <FormInput
+                      name="experience_years"
+                      placeholder="Teaching Experience (years) *"
+                      value={formData.experience_years}
+                      onChange={(e) => {
+                        const onlyNums = e.target.value.replace(/[^0-9]/g, ""); // ✅ allow digits only
+                        setFormData((prev) => ({
+                          ...prev,
+                          experience_years: onlyNums,
+                        }));
+                        setErrors((prev) => ({ ...prev, experience: "" })); // clear error while typing
+                      }}
+                      hasError={errors.experience}
+                      innerRef={errorRefs.experience}
+                    />
+
+                    {errors.experience && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.experience}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div ref={errorRefs.hourlyRate}>
+                    <FormInput
+                      type="text"
+                      name="hourly_rate"
+                      placeholder="Hourly Rate (₹) *"
+                      value={formData.hourly_rate}
+                      onChange={(e) => {
+                        // Allow only numbers
+                        const numericValue = e.target.value.replace(
+                          /[^0-9]/g,
+                          ""
+                        );
+                        handleChange({
+                          target: { name: "hourly_rate", value: numericValue },
+                        });
+
+                        setErrors((prev) => ({ ...prev, hourlyRate: "" }));
+                      }}
+                      hasError={errors.hourlyRate}
+                      innerRef={errorRefs.hourlyRate}
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                    />
+                    {errors.hourlyRate && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.hourlyRate}
+                      </p>
+                    )}
+                  </div>
+                  <div
+                    ref={(el) => {
+                      errorRefs.subjects.current = el;
+                      subjectRef.current = el;
+                    }}
+                    className="relative"
+                  >
+                    {/* Input */}
+                    <input
+                      type="text"
+                      name="categories"
+                      placeholder="Subjects You Teach *"
+                      value={subjectInput}
+                      onChange={handleSubjectChange}
+                      onFocus={handleSubjectChange}
+                      ref={errorRefs.subjects}
+                      className={`w-full py-2 px-4 border text-xs sm:text-sm ${
+                        errors.subjects
+                          ? "border-red-500"
+                          : "border-gray-300 text-xs sm:text-sm"
+                      } rounded-md placeholder-gray-400 outline-none focus:ring-0 focus:border-primary`}
+                      autoComplete="off"
+                      autoCorrect="off"
+                    />
+                    {errors.subjects && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.subjects}
+                      </p>
+                    )}
+
+                    {/* Suggestions Dropdown */}
+                    {showSuggestions && (
+                      <ul className="absolute w-full border rounded-md bg-white shadow-md mt-2 max-h-60 overflow-y-auto z-10">
+                        {filteredSubjects.length > 0 ? (
+                          filteredSubjects.map((sub) => (
+                            <li
+                              key={sub.id}
+                              onClick={() => handleSelectSubject(sub)}
+                              className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm"
+                              dangerouslySetInnerHTML={{
+                                __html: highlightMatch(sub.label, subjectInput),
+                              }}
+                            />
+                          ))
+                        ) : (
+                          <li className="px-4 py-2 text-gray-400 text-sm italic">
+                            No subjects found
+                          </li>
+                        )}
+                      </ul>
+                    )}
+
+                    {/* Selected Subjects Chips */}
+                    {selectedSubjects.length > 0 && (
+                      <div className="flex flex-wrap gap-2 border rounded-md p-2 mt-2">
+                        {selectedSubjects.map((sub) => (
+                          <span
+                            key={sub.id}
+                            className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-md text-sm"
+                          >
+                            {sub.label}
+                            <button
+                              type="button"
+                              onClick={() => removeSubject(sub.id)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div ref={errorRefs.availableDays}>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Available Days *
+                  </label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    {[
+                      "Monday",
+                      "Tuesday",
+                      "Wednesday",
+                      "Thursday",
+                      "Friday",
+                      "Saturday",
+                      "Sunday",
+                    ].map((day) => {
+                      const isChecked = formData.available_days.includes(day);
+                      return (
+                        <label
+                          key={day}
+                          className={`flex items-center space-x-2 border p-2 rounded-md cursor-pointer hover:bg-gray-50 text-xs sm:text-sm`}
                         >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </span>
-                    ))}
+                          <input
+                            type="checkbox"
+                            value={day}
+                            checked={isChecked}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  available_days: [...prev.available_days, day],
+                                }));
+                              } else {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  available_days: prev.available_days.filter(
+                                    (d) => d !== day
+                                  ),
+                                }));
+                              }
+                              setErrors((prev) => ({
+                                ...prev,
+                                availableDays: "",
+                              })); // clear error
+                            }}
+                            className="h-4 w-4 text-green-600 outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 active:ring-0 active:ring-offset-0 appearance-none checked:bg-green-600 checked:border-green-600"
+                          />
+                          <span
+                            className={`${
+                              isChecked
+                                ? "text-black font-medium"
+                                : "text-gray-400"
+                            }`}
+                          >
+                            {day}
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+
+                  {errors.availableDays && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.availableDays}
+                    </p>
+                  )}
+                </div>
+
+                <div ref={errorRefs.description}>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Bio *
+                  </label>
+                  <textarea
+                    name="description"
+                    placeholder="Tell us about yourself, your teaching style, and experience..."
+                    value={formData.description}
+                    onChange={handleChange}
+                    ref={errorRefs.description}
+                    rows="4"
+                    className={`w-full px-4 py-3 text-xs sm:text-sm border ${
+                      errors.description ? "border-red-500" : "border-gray-300"
+                    } rounded-md outline-none focus:ring-0 focus:border-primary transition`}
+                  />
+                  {errors.description && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.description}
+                    </p>
+                  )}
+                </div>
+
+                {formMessage.text && (
+                  <div
+                    className={`mb-4 p-3 rounded ${
+                      formMessage.type === "success"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {formMessage.text}
                   </div>
                 )}
               </div>
-            </div>
 
-            <div ref={errorRefs.availableDays}>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Available Days *
-              </label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                {[
-                  "Monday",
-                  "Tuesday",
-                  "Wednesday",
-                  "Thursday",
-                  "Friday",
-                  "Saturday",
-                  "Sunday",
-                ].map((day) => {
-                  const isChecked = formData.available_days.includes(day);
-                  return (
-                    <label
-                      key={day}
-                      className={`flex items-center space-x-2 border p-2 rounded-md cursor-pointer hover:bg-gray-50`}
-                    >
-                      <input
-                        type="checkbox"
-                        value={day}
-                        checked={isChecked}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setFormData((prev) => ({
-                              ...prev,
-                              available_days: [...prev.available_days, day],
-                            }));
-                          } else {
-                            setFormData((prev) => ({
-                              ...prev,
-                              available_days: prev.available_days.filter(
-                                (d) => d !== day
-                              ),
-                            }));
-                          }
-                          setErrors((prev) => ({ ...prev, availableDays: "" })); // ✅ clear error
-                        }}
-                        className="h-4 w-4 text-green-600 outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 active:ring-0 active:ring-offset-0 appearance-none checked:bg-green-600 checked:border-green-600"
-                      />
-                      <span
-                        className={`${
-                          isChecked ? "text-black font-medium" : "text-gray-400"
-                        }`}
-                      >
-                        {day}
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
-
-              {errors.availableDays && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.availableDays}
-                </p>
-              )}
-            </div>
-
-            <div ref={errorRefs.description}>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Bio *
-              </label>
-              <textarea
-                name="description"
-                placeholder="Tell us about yourself, your teaching style, and experience..."
-                value={formData.description}
-                onChange={handleChange}
-                ref={errorRefs.description}
-                rows="4"
-                className={`w-full px-4 py-3 text-xs sm:text-sm border ${
-                  errors.description ? "border-red-500" : "border-gray-300"
-                } rounded-md outline-none focus:ring-0 focus:border-primary transition`}
-              />
-              {errors.description && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.description}
-                </p>
-              )}
-            </div>
-
-            {formMessage.text && (
-              <div
-                className={`mb-4 p-3 rounded ${
-                  formMessage.type === "success"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700"
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`w-full py-2 px-6 rounded-lg text-sm md:text-base font-medium text-white transition-all flex items-center justify-center ${
+                  isSubmitting
+                    ? "bg-green-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-green-500 to-green-600 shadow-md hover:shadow-lg"
                 }`}
               >
-                {formMessage.text}
-              </div>
+                {isSubmitting ? (
+                  <>
+                    <FaSpinner className="animate-spin h-5 w-5 text-white mr-2" />
+                    Processing...
+                  </>
+                ) : (
+                  "Create Tutor Profile"
+                )}
+              </button>
+            </form>
+
+            {/* OTP Popup */}
+            {showOtpPopup && (
+              <OtpModal
+                isOpen={showOtpPopup}
+                phoneOrEmail={`+${formData.countryCode}${formData.mobile_number}`}
+                onClose={() => setShowOtpPopup(false)}
+                onSubmit={handleOtpVerify}
+                onResend={sendOtp}
+                otpError={otpError}
+                setOtpError={setOtpError}
+              />
+            )}
+
+            {showMessagePopup && (
+              <ConfirmMessagePopup
+                isOpen={true}
+                type="alert"
+                message="Please wait, admin approval is required before accessing the dashboard."
+                onClose={() => {
+                  setShowMessagePopup(false);
+                  navigate("/");
+                }}
+              />
             )}
           </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className={`w-full py-4 px-6 rounded-xl font-medium text-white transition-all flex items-center justify-center ${
-              isSubmitting
-                ? "bg-green-400 cursor-not-allowed"
-                : "bg-gradient-to-r from-green-500 to-green-600 shadow-md hover:shadow-lg"
-            }`}
-          >
-            {isSubmitting ? (
-              <>
-                <FaSpinner className="animate-spin h-5 w-5 text-white mr-2" />
-                Processing...
-              </>
-            ) : (
-              "Create Tutor Profile"
-            )}
-          </button>
-        </form>
-
-        {/* ✅ OTP Popup */}
-        {showOtpPopup && (
-          <OtpModal
-            isOpen={showOtpPopup}
-            phoneOrEmail={`+${formData.countryCode}${formData.mobile_number}`}
-            onClose={() => setShowOtpPopup(false)}
-            onSubmit={handleOtpVerify} // ✅ final registration
-            onResend={sendOtp} // ✅ resend OTP API
-            otpError={otpError}
-            setOtpError={setOtpError}
-          />
-        )}
-
-        {showMessagePopup && (
-          <ConfirmMessagePopup
-            isOpen={true}
-            type="alert"
-            message="Please wait, admin approval is required before accessing the dashboard."
-            onClose={() => {
-              setShowMessagePopup(false);
-              navigate("/");
-            }}
-          />
-        )}
-      </div>
-    </div>
+        </div>
+      )}
+    </>
   );
 }
 

@@ -6,7 +6,7 @@ function HorizontalTutorList({ tutors, setRefreshFavourites }) {
   const scrollRef = useRef(null);
   const [canScroll, setCanScroll] = useState(false);
 
-  // 🔍 Check if scrolling is needed
+  // Check if scrolling is needed
   useEffect(() => {
     const checkScroll = () => {
       if (!scrollRef.current) return;

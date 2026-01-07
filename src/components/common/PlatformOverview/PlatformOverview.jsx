@@ -4,17 +4,15 @@ import {
   FiBookOpen,
   FiMonitor,
   FiAward,
-  FiClock,
-  FiArrowRight,
-  FiChevronRight,
-  FiStar,
   FiCheckCircle,
 } from "react-icons/fi";
 import SubHeader from "../Subheader/SubHeader";
 
 const PlatformOverview = () => {
+  // State
   const [activeTab, setActiveTab] = useState(0);
 
+  // Features content
   const features = [
     {
       icon: <FiUsers className="text-3xl" />,
@@ -50,6 +48,7 @@ const PlatformOverview = () => {
     },
   ];
 
+  // Tabs
   const tabs = [
     {
       title: "For Students",
@@ -78,26 +77,6 @@ const PlatformOverview = () => {
   return (
     <section className=" relative overflow-hidden">
       <div className="px-4 relative z-10">
-        {/* Section Header */}
-        {/* <div className="text-center  mx-auto mb-16">
-          <span className="inline-block px-4 py-1.5 text-xs font-semibold text-green-600 bg-green-100 rounded-full mb-4">
-            Transforming Education
-          </span>
-          <h2 className="text-2xl md:text-5xl font-extrabold text-gray-800 mb-6 leading-tight">
-            Learn from Top
-            <span className="text-transparent bg-clip-text bg-green-600">
-              {" "}
-              Educators{" "}
-            </span>
-            Around the World
-          </h2>
-
-          <p className="text-sm md:text-lg text-gray-600 leading-relaxed">
-            Our platform links motivated learners with skilled tutors for
-            personalized guidance and effective learning outcomes.
-          </p>
-        </div> */}
-
         <SubHeader
           tagline="Transforming Education"
           title="Learn from Top Learn from Top Educators Around the World"
@@ -172,27 +151,6 @@ const PlatformOverview = () => {
             </div>
           ))}
         </div>
-
-        {/* CTA Section */}
-        {/* <div className="bg-gradient-to-br from-green-500 via-green-600 to-green-700 rounded-md shadow-md p-10 text-center text-white relative overflow-hidden">
-          <div className="absolute -top-20 -right-20 w-40 h-40 bg-white/10 rounded-full"></div>
-          <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-white/10 rounded-full"></div>
-
-          <h3 className="text-2xl md:text-4xl font-bold mb-4 relative z-10">
-            Ready to Start Your Learning Journey?
-          </h3>
-          <p className="text-lg mb-8 max-w-2xl mx-auto relative z-10">
-            Join thousands of students achieving their goals with our platform.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4 relative z-10">
-            <button className="bg-white text-gray-800 font-semibold py-4 px-8 rounded-md flex items-center justify-center hover:bg-gray-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-              Find a Tutor <FiArrowRight className="ml-2" />
-            </button>
-            <button className="bg-transparent border-2 border-white text-white font-semibold py-4 px-8 rounded-md hover:bg-white hover:text-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-              Become a Tutor
-            </button>
-          </div>
-        </div> */}
       </div>
     </section>
   );

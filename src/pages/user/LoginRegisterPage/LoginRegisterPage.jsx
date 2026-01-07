@@ -6,7 +6,7 @@ import LoginForm from "../../../components/studentAndTutor/LoginForm/LoginForm";
 import ForgotPasswordForm from "../../../components/studentAndTutor/ForgotPasswordForm/ForgotPasswordForm";
 
 function LoginRegisterPage() {
-  const [step, setStep] = useState("login"); // 👈 always start with login
+  const [step, setStep] = useState("login"); 
 
   // save current step in history
   useEffect(() => {
@@ -45,14 +45,14 @@ function LoginRegisterPage() {
         showBackground ? "bg-cover bg-center bg-no-repeat" : "bg-white"
       }`}
       style={{
-        backgroundImage: showBackground ? "url('/loginbg.png')" : "none",
+        backgroundImage: showBackground ? "url('/loginbg.jpg')" : "none",
       }}
     >
       {/* Dark overlay for better contrast */}
      {showBackground && (
         <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
       )}
-      <div className="relative z-10 w-full">
+      <div className="relative z-10 w-full p-4 sm:p-0">
         {step === "choice" && (
           <RegisterChoice
             onTutorClick={() => setStep("tutor")}

@@ -3,6 +3,7 @@ import teacherImg from "../../../assets/images/icons/tutor.png";
 import studentImg from "../../../assets/images/icons/student.png";
 import ChoiceCard from "../../../pages/user/ChoiceCard/ChoiceCard";
 import { HiAcademicCap, HiBookOpen } from "react-icons/hi";
+import { CheckCircle } from "lucide-react";
 
 function RegisterChoice({ onTutorClick, onStudentClick, onCreateAccount }) {
   return (
@@ -10,10 +11,10 @@ function RegisterChoice({ onTutorClick, onStudentClick, onCreateAccount }) {
       <section className="w-full max-w-5xl flex flex-col items-center justify-center">
         {/* Heading */}
         <div>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center text-gray-800 mb-2">
-            What are you looking for?
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center text-white mb-2">
+            How would you like to get started?
           </h2>
-          <p className="text-center text-gray-600 mb-10 text-sm md:text-md">
+          <p className="text-center text-white mb-10 text-sm md:text-md">
             Join our platform to either share your knowledge or expand your
             skills
           </p>
@@ -25,7 +26,7 @@ function RegisterChoice({ onTutorClick, onStudentClick, onCreateAccount }) {
           <div>
             <ChoiceCard
               image={teacherImg}
-              title="I am looking to Teach"
+              title="I want to teach"
               description="Share your expertise, create courses, and inspire the next generation of learners"
               buttonText="CREATE YOUR PROFILE"
               buttonColor="bg-blue-600 hover:bg-blue-700"
@@ -47,7 +48,7 @@ function RegisterChoice({ onTutorClick, onStudentClick, onCreateAccount }) {
           <div>
             <ChoiceCard
               image={studentImg}
-              title="I am looking to Learn"
+              title="I want to Learn"
               description="Discover expert tutors, personalized lessons, and achieve your learning goals"
               buttonText="CREATE YOUR PROFILE"
               buttonColor="bg-green-500 hover:bg-green-600"
@@ -60,27 +61,27 @@ function RegisterChoice({ onTutorClick, onStudentClick, onCreateAccount }) {
 
         {/* Extra Info */}
         <div className={`mt-16 text-center`}>
-          <p className="text-gray-600 mb-4">
+          <p className="text-white mb-4">
             Already have an account?{" "}
             <span
-              className="text-green-500 font-medium hover:underline cursor-pointer"
+              className="text-green-400 font-bold hover:underline cursor-pointer"
               onClick={onCreateAccount}
             >
               Sign In
             </span>
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-500">
-            <span className="flex items-center gap-2 text-gray-600 font-medium">
-              ✅ Highly Qualified Tutors
+          <div className="flex flex-wrap items-center justify-center gap-2 md:gap-6 text-sm text-gray-500">
+            <span className="flex items-center gap-2 text-green-400 font-medium">
+              <CheckCircle size={16} /> Highly Qualified Tutors
             </span>
-            <span className="flex items-center gap-2 text-gray-600 font-medium">
-              ✅ Wide Range of Subjects
+            <span className="flex items-center gap-2 text-green-400 font-medium">
+              <CheckCircle size={16} /> Wide Range of Subjects
             </span>
-            <span className="flex items-center gap-2 text-gray-600 font-medium">
-              ✅ Safe & Secure Payments
+            <span className="flex items-center gap-2 text-green-400 font-medium">
+              <CheckCircle size={16} /> Safe & Secure Payments
             </span>
-            <span className="flex items-center gap-2 text-gray-600 font-medium">
-              ✅ Personalized Learning Plans
+            <span className="flex items-center gap-2 text-green-400 font-medium">
+              <CheckCircle size={16} /> Personalized Learning Plans
             </span>
           </div>
         </div>

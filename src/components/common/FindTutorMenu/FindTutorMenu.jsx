@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { FiChevronDown, FiChevronRight, FiChevronUp } from "react-icons/fi";
-import DefaultButton from "../DefaultButton/DefaultButton";
 import axios from "axios";
 import API_BASE from "../../../API/API";
 
@@ -9,11 +8,13 @@ import { useNavigate } from "react-router-dom";
 function FindTutorMenu() {
   const navigate = useNavigate();
 
+  // state
   const [menuData, setMenuData] = useState([]);
   const [activeTab, setActiveTab] = useState(null);
   const [hoveredLink, setHoveredLink] = useState(null);
   const [mobileOpenIndex, setMobileOpenIndex] = useState(null);
 
+  // Category fetching
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -34,19 +35,20 @@ function FindTutorMenu() {
     fetchCategories();
   }, []);
 
+  // In mobile toggle
   const toggleMobileMenu = (index) => {
     setMobileOpenIndex(mobileOpenIndex === index ? null : index);
   };
 
+  // Category click redirect to all tutors page
   const handleCategoryClick = (categoryName) => {
     navigate(`/all-tutors?category=${encodeURIComponent(categoryName)}`, {
       state: { hideHeroSearch: true },
     });
   };
 
-  const shouldUseTwoColumns = (links) => links.length >= 8;
-
   return (
+    // Find tutor menu component in home page
     <div className="w-full mx-auto px-4 pb-16">
       {/* Desktop View */}
       <div className="hidden lg:block">
@@ -90,49 +92,57 @@ function FindTutorMenu() {
                     <div className="flex gap-4 flex-wrap sm:flex-nowrap">
                       {/* First Column */}
                       <ul className="space-y-2 w-full sm:w-1/2">
-                        {firstColumn.map((link, i) => (
-                          <li key={i}>
-                            <button
-                              onClick={() => handleCategoryClick(link)}
-                              onMouseEnter={() => setHoveredLink(link)}
-                              onMouseLeave={() => setHoveredLink(null)}
-                              className={`w-full text-left flex items-center gap-2 py-1 rounded-md transition-all duration-200 text-sm sm:text-sm ${
-                                hoveredLink === link
-                                  ? "bg-green-50 text-green-600 font-medium shadow-inner"
-                                  : "text-gray-700 hover:bg-green-50 hover:text-green-600"
-                              }`}
-                            >
-                              {hoveredLink === link && (
-                                <FiChevronRight className="text-green-600" />
-                              )}
-                              <span>{link}</span>
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
+                        {firstColumn.map((link, i) => {
+                          const hoverKey = `${idx}-${i}-${link}`;
 
-                      {/* Second Column */}
-                      {secondColumn.length > 0 && (
-                        <ul className="space-y-2 w-full sm:w-1/2">
-                          {secondColumn.map((link, i) => (
-                            <li key={i}>
+                          return (
+                            <li key={hoverKey}>
                               <button
                                 onClick={() => handleCategoryClick(link)}
-                                onMouseEnter={() => setHoveredLink(link)}
+                                onMouseEnter={() => setHoveredLink(hoverKey)}
                                 onMouseLeave={() => setHoveredLink(null)}
-                                className={`w-full text-left flex items-center gap-2 py-1 rounded-md transition-all duration-200 text-sm sm:text-sm ${
-                                  hoveredLink === link
+                                className={`w-full text-left flex items-center gap-2 py-1 rounded-md transition-all duration-200 text-sm ${
+                                  hoveredLink === hoverKey
                                     ? "bg-green-50 text-green-600 font-medium shadow-inner"
                                     : "text-gray-700 hover:bg-green-50 hover:text-green-600"
                                 }`}
                               >
-                                {hoveredLink === link && (
+                                {hoveredLink === hoverKey && (
                                   <FiChevronRight className="text-green-600" />
                                 )}
                                 <span>{link}</span>
                               </button>
                             </li>
-                          ))}
+                          );
+                        })}
+                      </ul>
+
+                      {/* Second Column */}
+                      {secondColumn.length > 0 && (
+                        <ul className="space-y-2 w-full sm:w-1/2">
+                          {secondColumn.map((link, i) => {
+                            const hoverKey = `${idx}-2-${i}-${link}`;
+
+                            return (
+                              <li key={hoverKey}>
+                                <button
+                                  onClick={() => handleCategoryClick(link)}
+                                  onMouseEnter={() => setHoveredLink(hoverKey)}
+                                  onMouseLeave={() => setHoveredLink(null)}
+                                  className={`w-full text-left flex items-center gap-2 py-1 rounded-md transition-all duration-200 text-sm ${
+                                    hoveredLink === hoverKey
+                                      ? "bg-green-50 text-green-600 font-medium shadow-inner"
+                                      : "text-gray-700 hover:bg-green-50 hover:text-green-600"
+                                  }`}
+                                >
+                                  {hoveredLink === hoverKey && (
+                                    <FiChevronRight className="text-green-600" />
+                                  )}
+                                  <span>{link}</span>
+                                </button>
+                              </li>
+                            );
+                          })}
                         </ul>
                       )}
                     </div>

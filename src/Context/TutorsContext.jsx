@@ -19,7 +19,7 @@ export const TutorsProvider = ({ children }) => {
         );
         setTutors(approved);
       } catch (err) {
-        console.error("Error fetching tutors:", err);
+        console.error("Error fetching tutors");
       } finally {
         setLoading(false);
       }

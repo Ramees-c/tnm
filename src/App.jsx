@@ -10,7 +10,7 @@ import ProtectedRoute from "./components/common/ProtectedRoute/ProtectedRoute";
 import ScrollToTop from "./components/common/ScrollToTop/ScrollToTop,jsx";
 import Loading from "./components/common/Loading/Loading";
 
-// ✅ Lazy load all pages
+// Lazy load all pages
 const UserHome = lazy(() => import("./pages/user/UserHome/UserHome"));
 const AboutPage = lazy(() => import("./pages/user/AboutPage/AboutPage"));
 const TermsConditions = lazy(() => import("./pages/user/TermsConditions/TermsConditions"));
@@ -77,8 +77,9 @@ function App() {
           "/testimonial",
           "/all-tutors",
           "/allCategories",
-        ].includes(location.pathname)
-      : location.pathname.startsWith(path)
+        ].includes(location.pathname) &&
+      !location.pathname.startsWith("/blogSingle") // allow blog single pages
+    : location.pathname.startsWith(path)
   );
 
   return (
@@ -86,7 +87,7 @@ function App() {
       <ScrollToTop />
       {!shouldHideLayout && <Userheader />}
 
-      {/* ✅ Suspense fallback removed (no loader) */}
+      {/* Suspense fallback removed (no loader) */}
       <Suspense fallback={<Loading />}>
         <Routes>
           {/* Public Routes */}
@@ -135,7 +136,7 @@ function App() {
           <Route
             path="/assignedStudentsPage"
             element={
-              <ProtectedRoute allowedRole="tutor" requirePayment={true}>
+              <ProtectedRoute allowedRole="tutor">
                 <AssignedStudentsPage />
               </ProtectedRoute>
             }

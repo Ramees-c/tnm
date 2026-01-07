@@ -22,8 +22,9 @@ function TutorDocumentPage({ role = "tutor" }) {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [fileToDelete, setFileToDelete] = useState(null);
   const [toastOpen, setToastOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
-  // ✅ Normalize uploaded documents
+  // Normalize uploaded documents
   const [uploadedDocuments, setUploadedDocuments] = useState(() => {
     return (userDetails?.documents || []).map((doc, index) => {
       if (typeof doc === "object" && doc.file) {
@@ -52,7 +53,7 @@ function TutorDocumentPage({ role = "tutor" }) {
     }
   }, [userDetails]);
 
-  // 🔹 File select validation
+  // File select validation
   const handleFileSelect = (file) => {
     if (
       file.type === "application/pdf" ||
@@ -63,15 +64,15 @@ function TutorDocumentPage({ role = "tutor" }) {
       setSelectedFile(file);
       setUploadError("");
     } else {
-      setUploadError("❌ Only PDF and DOC/DOCX files are allowed.");
+      setUploadError("Only PDF and DOC/DOCX files are allowed.");
       setSelectedFile(null);
     }
   };
 
-  // 🔹 Upload file to API
+  // Upload file to API
   const handleUpload = async () => {
     if (!selectedFile) {
-      setUploadError("❌ Please select a file first.");
+      setUploadError("Please select a file first.");
       return;
     }
 
@@ -79,14 +80,17 @@ function TutorDocumentPage({ role = "tutor" }) {
     formData.append("files", selectedFile);
 
     try {
-      const res = await axios.post(`${API_BASE}/tutor/documents/upload/`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Token ${token}`,
-        },
-      });
-
-      console.log("Upload response:", res.data);
+      setUploading(true);
+      const res = await axios.post(
+        `${API_BASE}/tutor/documents/upload/`,
+        formData,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       const uploaded = res.data?.uploaded?.[0];
       if (uploaded) {
@@ -105,12 +109,14 @@ function TutorDocumentPage({ role = "tutor" }) {
         );
       }
     } catch (error) {
-      console.error("Upload failed:", error);
-      setUploadError(error.message || "❌ Upload failed. Please try again.");
+      console.error("Upload failed");
+      setUploadError(error.message || "Upload failed. Please try again.");
+    } finally {
+      setUploading(false);
     }
   };
 
-  // 🔹 View file
+  // View file
   const handleView = (file) => {
     const fileURL = file.url || file.file;
     if (fileURL) {
@@ -124,7 +130,7 @@ function TutorDocumentPage({ role = "tutor" }) {
     }
   };
 
-  // 🔹 Delete logic
+  // Delete logic
   const handleDeleteClick = (file) => {
     setFileToDelete(file);
     setDeleteConfirmOpen(true);
@@ -133,9 +139,12 @@ function TutorDocumentPage({ role = "tutor" }) {
   const confirmDelete = async () => {
     if (!fileToDelete) return;
     try {
-      await axios.delete(`${API_BASE}/tutor/documents/${fileToDelete.id}/delete/`, {
-        headers: { Authorization: `Token ${token}` },
-      });
+      await axios.delete(
+        `${API_BASE}/tutor/documents/${fileToDelete.id}/delete/`,
+        {
+          withCredentials: true,
+        }
+      );
 
       setFiles((prev) => prev.filter((f) => f.id !== fileToDelete.id));
       setUploadedDocuments((prev) =>
@@ -145,7 +154,7 @@ function TutorDocumentPage({ role = "tutor" }) {
       setDeleteConfirmOpen(false);
       setFileToDelete(null);
     } catch (err) {
-      console.error("Delete failed:", err);
+      console.error("Delete failed");
     }
   };
 
@@ -154,7 +163,7 @@ function TutorDocumentPage({ role = "tutor" }) {
     setFileToDelete(null);
   };
 
-  // 🔹 File preview
+  // File preview
   const renderFilePreview = (file) => {
     if (!file) return null;
 
@@ -205,10 +214,7 @@ function TutorDocumentPage({ role = "tutor" }) {
         <div className="max-w-6xl mx-auto flex flex-col gap-6">
           {/* Header */}
           <div className="flex items-center gap-3 mb-6">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden"
-            >
+            <button onClick={() => setSidebarOpen(true)} className="lg:hidden">
               <Menu size={27} />
             </button>
             <h1 className="text-xl sm:text-3xl font-bold text-gray-800">
@@ -255,9 +261,43 @@ function TutorDocumentPage({ role = "tutor" }) {
                 <div className="p-4 flex justify-end">
                   <button
                     onClick={handleUpload}
-                    className="flex items-center gap-2 px-2 py-2 sm:px-4 sm:py-2 bg-green-600 text-white rounded-md shadow-sm hover:bg-green-700 transition text-xs sm:text-sm"
+                    disabled={uploading}
+                    className={`flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 rounded-md shadow-sm text-xs sm:text-sm transition-all duration-200
+      ${
+        uploading
+          ? "bg-green-400 cursor-not-allowed opacity-70"
+          : "bg-green-600 hover:bg-green-700 text-white"
+      }`}
                   >
-                    <Upload size={15} /> Upload
+                    {uploading ? (
+                      <>
+                        <svg
+                          className="animate-spin h-4 w-4 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                          ></path>
+                        </svg>
+                        <span className="text-white">Uploading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload size={15} /> Upload
+                      </>
+                    )}
                   </button>
                 </div>
               </div>

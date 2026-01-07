@@ -2,12 +2,10 @@ import { useEffect, useState } from "react";
 import {
   Bell,
   Menu,
-  Search,
-  Star,
-  History,
   Users,
-  Send,
   X,
+  BookOpen,
+  Heart,
 } from "lucide-react";
 
 import FormInput from "../../../components/studentAndTutor/FormInput/FormInput";
@@ -19,152 +17,6 @@ import axios from "axios";
 import ToastMessage from "../../../components/studentAndTutor/ToastMessage/ToastMessage";
 import API_BASE from "../../../API/API";
 import HorizontalTutorList from "../../../components/studentAndTutor/HorizontalTutorList/HorizontalTutorList";
-
-const tutors = [
-  {
-    id: 1,
-    name: "John Doe",
-    subject: "Mathematics",
-    experience: 5,
-    image:
-      "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=600&auto=format&fit=crop&q=60",
-  },
-  {
-    id: 2,
-    name: "Sarah Lee",
-    subject: "Science",
-    experience: 3,
-    image:
-      "https://plus.unsplash.com/premium_photo-1689977927774-401b12d137d6?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjV8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D",
-  },
-  {
-    id: 3,
-    name: "David Smith",
-    subject: "English",
-    experience: 4,
-    image:
-      "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDZ8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D",
-  },
-  {
-    id: 4,
-    name: "Emma Watson",
-    subject: "Coding",
-    experience: 6,
-    image: "https://randomuser.me/api/portraits/women/44.jpg",
-  },
-  {
-    id: 5,
-    name: "Michael Johnson",
-    subject: "Physics",
-    experience: 7,
-    image: "https://randomuser.me/api/portraits/men/32.jpg",
-  },
-  {
-    id: 6,
-    name: "Sophia Brown",
-    subject: "Chemistry",
-    experience: 2,
-    image: "https://randomuser.me/api/portraits/women/50.jpg",
-  },
-  {
-    id: 7,
-    name: "James Wilson",
-    subject: "Biology",
-    experience: 8,
-    image: "https://randomuser.me/api/portraits/men/41.jpg",
-  },
-  {
-    id: 8,
-    name: "Olivia Taylor",
-    subject: "History",
-    experience: 5,
-    image: "https://randomuser.me/api/portraits/women/68.jpg",
-  },
-  {
-    id: 9,
-    name: "William Martinez",
-    subject: "Geography",
-    experience: 3,
-    image: "https://randomuser.me/api/portraits/men/76.jpg",
-  },
-  {
-    id: 10,
-    name: "Ava Garcia",
-    subject: "English",
-    experience: 6,
-    image: "https://randomuser.me/api/portraits/women/12.jpg",
-  },
-  {
-    id: 11,
-    name: "Daniel Rodriguez",
-    subject: "Mathematics",
-    experience: 9,
-    image: "https://randomuser.me/api/portraits/men/21.jpg",
-  },
-  {
-    id: 12,
-    name: "Mia Hernandez",
-    subject: "Science",
-    experience: 4,
-    image: "https://randomuser.me/api/portraits/women/33.jpg",
-  },
-  {
-    id: 13,
-    name: "Benjamin Clark",
-    subject: "Coding",
-    experience: 2,
-    image: "https://randomuser.me/api/portraits/men/55.jpg",
-  },
-  {
-    id: 14,
-    name: "Charlotte Lewis",
-    subject: "Chemistry",
-    experience: 5,
-    image: "https://randomuser.me/api/portraits/women/25.jpg",
-  },
-  {
-    id: 15,
-    name: "Henry Walker",
-    subject: "Physics",
-    experience: 7,
-    image: "https://randomuser.me/api/portraits/men/66.jpg",
-  },
-  {
-    id: 16,
-    name: "Amelia Hall",
-    subject: "Biology",
-    experience: 3,
-    image: "https://randomuser.me/api/portraits/women/88.jpg",
-  },
-  {
-    id: 17,
-    name: "Elijah Allen",
-    subject: "History",
-    experience: 6,
-    image: "https://randomuser.me/api/portraits/men/80.jpg",
-  },
-  {
-    id: 18,
-    name: "Harper Young",
-    subject: "Geography",
-    experience: 2,
-    image: "https://randomuser.me/api/portraits/women/60.jpg",
-  },
-  {
-    id: 19,
-    name: "Lucas King",
-    subject: "Mathematics",
-    experience: 4,
-    image: "https://randomuser.me/api/portraits/men/70.jpg",
-  },
-  {
-    id: 20,
-    name: "Isabella Scott",
-    subject: "English",
-    experience: 5,
-    image: "https://randomuser.me/api/portraits/women/90.jpg",
-  },
-];
 
 function StudentDashboardPage() {
   const { userDetails, token, refreshUserDetails, isMailVerified } = useAuth();
@@ -182,58 +34,13 @@ function StudentDashboardPage() {
   const [refreshFavourites, setRefreshFavourites] = useState(false);
   const [refreshNotifications, setRefreshNotifications] = useState(false);
 
-  // const recommendedTutorsList = [
-  //   {
-  //     id: 1,
-  //     full_name: "Ananya Sharma",
-  //     email: "ananya.sharma@example.com",
-  //     mobile_number: "+91 9876543210",
-  //     gender: "Female",
-  //     city: "Bengaluru",
-  //     state: "Karnataka",
-  //     qualification: "M.Sc. Mathematics",
-  //     categories: ["Mathematics", "Physics"],
-  //     profile_image: "https://randomuser.me/api/portraits/women/44.jpg",
-  //     is_approved: true,
-  //     mail_verified: true,
-  //   },
-  //   {
-  //     id: 2,
-  //     full_name: "Rahul Verma",
-  //     email: "rahul.verma@example.com",
-  //     mobile_number: "+91 9123456789",
-  //     gender: "Male",
-  //     city: "Mumbai",
-  //     state: "Maharashtra",
-  //     qualification: "B.Tech Computer Science",
-  //     categories: ["Programming", "Data Structures", "Web Development"],
-  //     profile_image: "https://randomuser.me/api/portraits/men/32.jpg",
-  //     is_approved: true,
-  //     mail_verified: false,
-  //   },
-  //   {
-  //     id: 3,
-  //     full_name: "Priya Nair",
-  //     email: "priya.nair@example.com",
-  //     mobile_number: "+91 9988776655",
-  //     gender: "Female",
-  //     city: "Kochi",
-  //     state: "Kerala",
-  //     qualification: "Ph.D. English Literature",
-  //     categories: ["English", "Creative Writing"],
-  //     profile_image: "https://randomuser.me/api/portraits/women/68.jpg",
-  //     is_approved: false,
-  //     mail_verified: true,
-  //   },
-  // ];
-
   const fetchNotifications = async () => {
     try {
       const res = await axios.get(`${API_BASE}/latest_notify/`, {
-        headers: { Authorization: `Token ${token}` },
+        withCredentials: true,
       });
 
-      // Update only if data changed (optional)
+      // Update only if data changed
       setNotifications((prev) => {
         const prevIds = prev
           .map((n) => n.id)
@@ -246,26 +53,22 @@ function StudentDashboardPage() {
         return prevIds === newIds ? prev : res.data;
       });
     } catch (err) {
-      console.error("Failed to load notifications", err);
+      console.error("Failed to load notifications");
     }
   };
-
-  console.log(userDetails.categories);
 
   useEffect(() => {
     if (!token) return;
 
-    fetchNotifications(); // fetch immediately
+    fetchNotifications();
 
-    const interval = setInterval(fetchNotifications, 10000); // optional polling
+    const interval = setInterval(fetchNotifications, 10000);
     return () => clearInterval(interval);
   }, [token, refreshNotifications]);
 
   const getFavouriteTutors = async () => {
     const res = await axios.get(`${API_BASE}/student/favorite-tutors/`, {
-      headers: {
-        Authorization: `Token ${token}`,
-      },
+      withCredentials: true,
     });
     setFavouriteTutors(res.data);
   };
@@ -285,14 +88,12 @@ function StudentDashboardPage() {
   const fetchRecommentedStudents = async () => {
     try {
       const res = await axios.get(`${API_BASE}/recommendations/`, {
-        headers: {
-          Authorization: `Token ${token}`,
-        },
+        withCredentials: true,
       });
 
       setRecommentedTutors(res.data.recommendations);
     } catch (err) {
-      console.error("Failed to load recommented tutors", err);
+      console.error("Failed to load recommented tutors");
     }
   };
 
@@ -300,12 +101,11 @@ function StudentDashboardPage() {
     fetchRecommentedStudents();
   }, [token]);
 
-  // ✅ Fetch all approved tutors on mount
   // Filter tutors based on multiple fields
   useEffect(() => {
     if (!searchQuery.trim()) {
       setFilteredTutors([]);
-      setHasSearched(false); // no query typed
+      setHasSearched(false);
       return;
     }
 
@@ -317,33 +117,31 @@ function StudentDashboardPage() {
         const res = await axios.get(
           `${API_BASE}/tutors/search/?q=${searchQuery.trim()}`,
           {
-            headers: {
-              Authorization: `Token ${token}`,
-            },
+            withCredentials: true,
           }
         );
         setFilteredTutors(res.data);
       } catch (err) {
-        console.error("Search failed", err);
+        console.error("Search failed");
         setFilteredTutors([]);
       } finally {
         setLoading(false);
       }
     };
 
-    // Optional: debounce typing (300ms delay)
+    // debounce typing (300ms delay)
     const debounce = setTimeout(fetchTutors, 300);
     return () => clearTimeout(debounce);
   }, [searchQuery, token]);
 
-  // 🔹 Filter tutors based on multiple fields
+  // Filter tutors based on multiple fields
   const handleSearch = async (e) => {
     e.preventDefault();
 
     const query = searchQuery.trim();
     if (!query) {
-      setFilteredTutors([]); // do not show all tutors
-      setHasSearched(true); // still show "Search result"
+      setFilteredTutors([]); 
+      setHasSearched(true); 
       return;
     }
 
@@ -352,14 +150,12 @@ function StudentDashboardPage() {
 
     try {
       const res = await axios.get(`${API_BASE}/tutors/search/?q=${query}`, {
-        headers: {
-          Authorization: `Token ${token}`,
-        },
+        withCredentials: true,
       });
 
       setFilteredTutors(res.data);
     } catch (err) {
-      console.error("Search failed", err);
+      console.error("Search failed");
       setFilteredTutors([]);
     } finally {
       setLoading(false);
@@ -387,15 +183,13 @@ function StudentDashboardPage() {
   const handleDelete = async (id) => {
     try {
       await axios.delete(`${API_BASE}/notify-delete/${id}/`, {
-        headers: {
-          Authorization: `Token ${token}`,
-        },
+        withCredentials: true,
       });
       // Update UI immediately
       setNotifications((prev) => prev.filter((note) => note.id !== id));
       await refreshUserDetails();
     } catch (err) {
-      console.error("Failed to delete notification", err);
+      console.error("Failed to delete notification");
     }
   };
 
@@ -414,7 +208,7 @@ function StudentDashboardPage() {
       {/* Main Content */}
       <main className="flex-1 w-full lg:w-[calc(100%-18rem)] p-4 sm:p-6 transition-all duration-300 min-h-screen">
         <div className="max-w-6xl mx-auto">
-          {/* ✅ Mobile Menu Button + Title */}
+          {/* Mobile Menu Button + Title */}
           <div className="flex items-center gap-3 mb-6">
             <button onClick={() => setSidebarOpen(true)} className="lg:hidden">
               <Menu size={27} />
@@ -426,36 +220,56 @@ function StudentDashboardPage() {
           </div>
 
           {/* Quick Stats */}
-          <div className="bg-white rounded-md shadow-sm p-2 sm:p-6 mb-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="p-4 bg-green-200 rounded-md shadow-sm text-center">
-                <p className="text-lg font-bold text-green-700">
-                  {userDetails?.tutors?.length || 0}
-                </p>
-                <p className="text-sm font-medium text-gray-800">
-                  Assigned Tutors
-                </p>
+          <div className="bg-white/60 backdrop-blur-md rounded-2xl shadow-sm p-3 sm:p-5 mb-8 transition-all duration-300">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Assigned Tutors */}
+              <div className="p-3 sm:p-4 bg-gradient-to-br from-green-100 to-green-200 rounded-md shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-center">
+                <div className="flex flex-col items-center space-y-2">
+                  <div className="w-10 h-10 flex items-center justify-center bg-green-500/20 rounded-full">
+                    <Users />
+                  </div>
+                  <p className="text-3xl font-extrabold text-green-700">
+                    {userDetails?.tutors?.length || 0}
+                  </p>
+                  <p className="text-sm font-medium text-gray-800">
+                    Assigned Tutors
+                  </p>
+                </div>
               </div>
-              <div className="p-4 bg-purple-200 rounded-md shadow-sm text-center">
-                <p className="text-lg font-bold text-purple-700">
-                  {userDetails?.categories?.length || 0}
-                </p>
-                <p className="text-sm font-medium text-gray-800">
-                  Selected Subjects
-                </p>
+
+              {/* Selected Subjects */}
+              <div className="p-6 bg-gradient-to-br from-purple-100 to-purple-200 rounded-md shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-center">
+                <div className="flex flex-col items-center space-y-2">
+                  <div className="w-10 h-10 flex items-center justify-center bg-purple-500/20 rounded-full">
+                    <BookOpen />
+                  </div>
+                  <p className="text-3xl font-extrabold text-purple-700">
+                    {userDetails?.categories?.length || 0}
+                  </p>
+                  <p className="text-sm font-medium text-gray-800">
+                    Selected Subjects
+                  </p>
+                </div>
               </div>
-              <div className="p-4 bg-yellow-200 rounded-md shadow-sm text-center">
-                <p className="text-lg font-bold text-yellow-700">
-                  {FavouriteTutors?.length || 0}
-                </p>
-                <p className="text-sm font-medium text-gray-800">
-                  Favourite Tutors
-                </p>
+
+              {/* Favourite Tutors */}
+              <div className="p-6 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-md shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-center">
+                <div className="flex flex-col items-center space-y-2">
+                  <div className="w-10 h-10 flex items-center justify-center bg-yellow-500/20 rounded-full">
+                    <Heart />
+                  </div>
+                  <p className="text-3xl font-extrabold text-yellow-700">
+                    {FavouriteTutors?.length || 0}
+                  </p>
+                  <p className="text-sm font-medium text-gray-800">
+                    Favourite Tutors
+                  </p>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* ✅ Selected Subjects Section */}
+          {/* Selected Subjects Section */}
           <div className="bg-white rounded-md shadow-sm p-4 sm:p-6 mb-6">
             <h2 className="text-lg sm:text-2xl font-bold mb-4 text-gray-800">
               Selected Subjects
@@ -523,7 +337,7 @@ function StudentDashboardPage() {
                 </p>
               ) : filteredTutors.length > 0 ? (
                 filteredTutors.map((tutor) => (
-                  <TutorSmallCard key={tutor.id} tutor={tutor} />
+                  <TutorSmallCard key={tutor.id} tutor={tutor} search={true} />
                 ))
               ) : (
                 <p className="col-span-full text-gray-500 text-center">

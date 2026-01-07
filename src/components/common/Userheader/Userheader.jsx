@@ -2,10 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { Link, NavLink } from "react-router-dom";
 import logo from "../../../assets/images/logo/tnmlogo.png";
 import { FaBars } from "react-icons/fa";
-import { FiChevronDown } from "react-icons/fi";
 import DefaultButton from "../DefaultButton/DefaultButton";
 import MobileSidebar from "../MobileSidebar/MobileSidebar";
-import axios from "axios";
 import { useAuth } from "../../../Context/userAuthContext";
 
 function Userheader() {
