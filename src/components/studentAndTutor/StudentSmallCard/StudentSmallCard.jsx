@@ -48,11 +48,14 @@ function StudentSmallCard({
         </h3>
 
         {/* Categories */}
+        {/* Categories */}
         <div className="mb-1 mt-2 w-full">
           <div
             ref={containerRef}
-            className={`flex flex-col gap-1 overflow-hidden transition-all duration-500 ${
-              showAllCategories ? "max-h-[1000px]" : "max-h-14"
+            className={`flex flex-col gap-1 transition-all duration-500 ${
+              showAllCategories
+                ? "max-h-32 overflow-y-auto" // expanded height with scroll if needed
+                : "max-h-5 overflow-hidden" // show only first category
             }`}
           >
             {student.categories.map((category, index) => {
@@ -69,9 +72,9 @@ function StudentSmallCard({
                   className="bg-green-100 w-full rounded-md p-1 flex flex-col"
                 >
                   <span className="text-[7px] sm:text-[11px] font-semibold text-green-800">
-                    {mainCategory} - 
+                    {mainCategory} -
                     <span className="text-[7px] sm:text-[11px] text-green-600 mt-1">
-                       {subCategory}
+                      {subCategory}
                     </span>
                   </span>
                 </div>
@@ -79,6 +82,7 @@ function StudentSmallCard({
             })}
           </div>
 
+          {/* Show More / Less Button */}
           {showMoreBtn && (
             <div className="mt-1">
               <button

@@ -89,8 +89,10 @@ function TutorCard({ tutor }) {
           <div className="mb-2 mt-2">
             <div
               ref={containerRef}
-              className={`flex flex-wrap gap-2 overflow-hidden transition-all duration-500 ${
-                showAllCategories ? "max-h-[1000px]" : "max-h-14"
+              className={`flex flex-wrap gap-2 transition-all duration-500 scroll-smooth ${
+                showAllCategories
+                  ? "max-h-52 overflow-y-auto" 
+                  : "max-h-14 overflow-hidden" 
               }`}
             >
               {tutor.categories.map((category, index) => {

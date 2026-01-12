@@ -116,8 +116,10 @@ function TutorSmallCard({
         <div className="mb-1 mt-2 w-full">
           <div
             ref={containerRef}
-            className={`flex flex-col gap-1 overflow-hidden transition-all duration-500 ${
-              showAllCategories ? "max-h-[1000px]" : "max-h-14"
+            className={`flex flex-col gap-1 transition-all duration-500 ${
+              showAllCategories
+                ? "max-h-32 overflow-y-auto" // expand with scroll if needed
+                : "max-h-5 overflow-hidden" // show only first category
             }`}
           >
             {tutor.categories.map((category, index) => {
@@ -144,6 +146,7 @@ function TutorSmallCard({
             })}
           </div>
 
+          {/* Show More / Less Button */}
           {showMoreBtn && (
             <div className="mt-1">
               <button

@@ -136,20 +136,28 @@ function UserHome() {
   //   fetchTestimonials();
   // }, []);
 
-  useEffect(() => {
-    let mounted = true;
+ useEffect(() => {
+  let mounted = true;
 
-    const fetchHomeData = async () => {
-      try {
-        const [categoriesRes, tutorsRes, testimonialsRes] = await Promise.all([
-          axios.get(`${API_BASE}/category-filter/`),
-          axios.get(`${API_BASE}/home-tutors/`),
-          axios.get(`${API_BASE}/testimonials/`),
-        ]);
+  const fetchHomeData = async () => {
+    try {
+      const results = await Promise.allSettled([
+        axios.get(`${API_BASE}/category-filter/`),
+        axios.get(`${API_BASE}/home-tutors/`),
+        axios.get(`${API_BASE}/testimonials/`),
+      ]);
 
-        if (!mounted) return;
+      if (!mounted) return;
 
-        const filteredCategories = categoriesRes.data
+      const [
+        categoriesResult,
+        tutorsResult,
+        testimonialsResult,
+      ] = results;
+
+      /* ---------- CATEGORY API ---------- */
+      if (categoriesResult.status === "fulfilled") {
+        const filteredCategories = categoriesResult.value.data
           .map((mainCat) => {
             const collectHomeSubcategories = (subs) =>
               subs.flatMap((sub) =>
@@ -175,18 +183,43 @@ function UserHome() {
           .filter(Boolean);
 
         setCategoriesData(filteredCategories);
-        setTutors(tutorsRes.data);
-        setTestimonials(testimonialsRes.data.filter((t) => t.add_to_homepage));
-      } catch (err) {
-        console.error("Home data fetch error");
-      }finally {
-      if (mounted) setIsLoading(false); 
-    }
-    };
+      } else {
+        console.error(
+          "Category API Error"
+        );
+      }
 
-    fetchHomeData();
-    return () => (mounted = false);
-  }, []);
+      /* ---------- TUTORS API ---------- */
+      if (tutorsResult.status === "fulfilled") {
+        setTutors(tutorsResult.value.data);
+      } else {
+        console.error(
+          "Tutors API Error"
+        );
+      }
+
+      /* ---------- TESTIMONIALS API ---------- */
+      if (testimonialsResult.status === "fulfilled") {
+        setTestimonials(
+          testimonialsResult.value.data.filter(
+            (t) => t.add_to_homepage
+          )
+        );
+      } else {
+        console.error(
+          "Testimonials API Error"
+        );
+      }
+    } catch (error) {
+      console.error("Unexpected error");
+    } finally {
+      if (mounted) setIsLoading(false);
+    }
+  };
+
+  fetchHomeData();
+  return () => (mounted = false);
+}, []);
 
   if (isLoading) {
     return <Loading />;
@@ -260,9 +293,10 @@ function UserHome() {
           className="relative bg-gradient-to-br from-green-500 via-green-600 to-green-700 rounded-md text-white py-16 px-4 md:px-8 lg:px-12 overflow-hidden"
           data-aos="fade-up"
         >
-          {/* Background Elements */}
+           {/* Background Elements */}
           <div className="absolute inset-0 bg-black/10 mix-blend-overlay"></div>
-          <div className="absolute top-0 left-0 w-72 h-72 bg-white/5 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+          <div className="absolute top-0 left-0 w-48 h-48 sm:w-72 sm:h-72 bg-white/5 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+          <div className="absolute bottom-0 right-0 w-48 h-48 sm:w-72 sm:h-72 bg-white/5 rounded-full translate-x-1/2 translate-y-1/2"></div>
 
           <div className="max-w-7xl mx-auto relative z-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-0 items-center">
