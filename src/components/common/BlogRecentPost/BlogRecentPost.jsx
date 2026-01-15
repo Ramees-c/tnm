@@ -8,12 +8,11 @@ function BlogRecentPost() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     axios
-      .get(`${API_BASE}/blogs/`)
+      .get(`${API_BASE}/blogs/?page=1&page_size=5`)
       .then((res) => {
-        // take the latest 5
-        const latest = res.data.slice(0, 5);
-        setPosts(latest);
+        setPosts(res.data.results);
       })
       .catch((err) => {
         console.error("Error fetching blogs");
@@ -32,7 +31,7 @@ function BlogRecentPost() {
   }
 
   return (
-    // Blog recent post 
+    // Blog recent post
     <div className="bg-white p-2 shadow-md rounded-md">
       <h3 className="font-bold mb-3">Recent Post</h3>
       <ul className="space-y-4">
@@ -49,7 +48,10 @@ function BlogRecentPost() {
             />
             {/* Text Content */}
             <div className="flex flex-col gap-2">
-              <Link to={`/blogSingle/${post.id}`} className="text-sm text-gray-700 font-medium hover:text-green-600 cursor-pointer">
+              <Link
+                to={`/blogSingle/${post.id}`}
+                className="text-sm text-gray-700 font-medium hover:text-green-600 cursor-pointer"
+              >
                 {post.title}
               </Link>
               <span className="text-xs text-gray-500">

@@ -12,16 +12,15 @@ function BlogPage() {
   const [loading, setLoading] = useState(true);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const blogsPerPage = 6;
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     const fetchBlogs = async () => {
+      setLoading(true);
       try {
-        const res = await axios.get(`${API_BASE}/blogs/`);
-        const sortedPosts = res.data.sort(
-          (a, b) => new Date(b.created_at) - new Date(a.created_at)
-        );
-        setPosts(sortedPosts);
+        const res = await axios.get(`${API_BASE}/blogs/?page=${currentPage}`);
+        setPosts(res.data.results); // backend returns only current page
+        setTotalPages(Math.ceil(res.data.count / res.data.page_size)); // get total pages
       } catch (err) {
         console.error("Failed to fetch blogs");
       } finally {
@@ -30,7 +29,7 @@ function BlogPage() {
     };
 
     fetchBlogs();
-  }, []);
+  }, [currentPage]);
 
   useEffect(() => {
     const scrollToTop = () => {
@@ -73,12 +72,6 @@ function BlogPage() {
     return [1, ...rangeWithDots, total].filter((v, i, a) => a.indexOf(v) === i);
   };
 
-  // Pagination calculations
-  const indexOfLastBlog = currentPage * blogsPerPage;
-  const indexOfFirstBlog = indexOfLastBlog - blogsPerPage;
-  const currentBlogs = posts.slice(indexOfFirstBlog, indexOfLastBlog);
-  const totalPages = Math.ceil(posts.length / blogsPerPage);
-
   return (
     <div>
       <PageHeader title="Blogs" headerBg={pageBanner} />
@@ -88,7 +81,7 @@ function BlogPage() {
           <div className="mx-auto lg:px-12">
             {/* Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-              {currentBlogs.map((post) => (
+              {posts.map((post) => (
                 <BlogCard key={post.id} post={post} />
               ))}
             </div>
