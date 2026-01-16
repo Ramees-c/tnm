@@ -5,16 +5,18 @@ import { useNavigate } from "react-router-dom";
 // Default image
 import categoryDefalultImg from "../../../assets/images/categoryDefault.jpg";
 
-function CategoryCard({ image, title }) {
+function CategoryCard({ image, title, mainCategory }) {
   const navigate = useNavigate();
 
   // Category click redirect to all tutors page
-  const handleCategoryClick = (categoryName) => {
-    navigate(`/all-tutors?category=${encodeURIComponent(categoryName)}`, {
-      state: { hideHeroSearch: true },
-    });
+  const handleCategoryClick = () => {
+    navigate(
+      `/all-tutors?category=${encodeURIComponent(
+        mainCategory
+      )}&subcategory=${encodeURIComponent(title)}`,
+      { state: { hideHeroSearch: true } }
+    );
   };
-
 
   // Category image validating
   const isValidImage =
@@ -28,7 +30,7 @@ function CategoryCard({ image, title }) {
   return (
     // Category card
     <div
-      onClick={() => handleCategoryClick(title)}
+      onClick={handleCategoryClick}
       className="group relative overflow-hidden rounded-md shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 w-[230px] lg:w-[220px] xl:w-[230px] h-36 lg:h-[140px] cursor-pointer"
     >
       {/* Image Container with Gradient Overlay */}

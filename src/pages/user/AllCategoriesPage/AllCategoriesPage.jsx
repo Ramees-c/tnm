@@ -7,45 +7,44 @@ function AllCategoriesPage() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-  const fetchCategories = async () => {
-    try {
-      const { data } = await axios.get(`${API_BASE}/category-list/`);
+    const fetchCategories = async () => {
+      try {
+        const { data } = await axios.get(`${API_BASE}/category-list/`);
 
-      const formatted = data.map((category) => {
-        const allSubs =
-          category.subcategories?.flatMap(
-            (sub) => sub.subcategories?.map((s) => s.name.trim()) || []
-          ) || [];
+        const formatted = data.map((category) => {
+          const allSubs =
+            category.subcategories?.flatMap(
+              (sub) => sub.subcategories?.map((s) => s.name.trim()) || []
+            ) || [];
 
-        // Case-insensitive duplicate removal
-        const seen = new Set();
-        const uniqueSubs = allSubs.filter((name) => {
-          const lower = name.toLowerCase();
-          if (seen.has(lower)) return false;
-          seen.add(lower);
-          return true;
+          // Case-insensitive duplicate removal
+          const seen = new Set();
+          const uniqueSubs = allSubs.filter((name) => {
+            const lower = name.toLowerCase();
+            if (seen.has(lower)) return false;
+            seen.add(lower);
+            return true;
+          });
+
+          return {
+            title: category.name,
+            subs: uniqueSubs,
+          };
         });
 
-        return {
-          title: category.name,
-          subs: uniqueSubs,
-        };
-      });
+        setCategories(formatted);
+      } catch (error) {
+        console.error("Failed to fetch categories");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      setCategories(formatted);
-    } catch (error) {
-      console.error("Failed to fetch categories");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchCategories();
-}, []);
-
+    fetchCategories();
+  }, []);
 
   // category click redirect all tutors page
   const handleCategoryClick = (categoryName) => {
@@ -95,10 +94,7 @@ function AllCategoriesPage() {
           <div className="h-5 bg-gray-300 rounded w-1/4 mb-4"></div>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             {[...Array(5)].map((_, j) => (
-              <div
-                key={j}
-                className="h-4 bg-gray-200 rounded w-3/4"
-              ></div>
+              <div key={j} className="h-4 bg-gray-200 rounded w-3/4"></div>
             ))}
           </div>
         </div>
@@ -145,7 +141,14 @@ function AllCategoriesPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 pl-4">
                   {category.subs.map((sub, subIndex) => (
                     <div
-                      onClick={() => handleCategoryClick(sub)}
+                      onClick={() =>
+                        navigate(
+                          `/all-tutors?category=${encodeURIComponent(
+                            category.title
+                          )}&subcategory=${encodeURIComponent(sub)}`,
+                          { state: { hideHeroSearch: true } }
+                        )
+                      }
                       key={subIndex}
                       className="hover:text-green-600 transition-colors duration-200 cursor-pointer text-gray-700 text-sm"
                     >

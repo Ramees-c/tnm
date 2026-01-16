@@ -41,6 +41,10 @@ function AllTutorsPage() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const selectedCategory = params.get("category");
+  const selectedSubCategory = params.get("subcategory");
+
+  const selectedCategoryId = params.get("categoryId");
+  const selectedSubCategoryId = params.get("subcategoryId");
 
   const hideHeroSearch = location.state?.hideHeroSearch || false;
 
@@ -53,10 +57,27 @@ function AllTutorsPage() {
     }
   };
 
+  const categoryId = selectedCategoryId ? Number(selectedCategoryId) : null;
+
+  const subCategoryId = selectedSubCategoryId
+    ? Number(selectedSubCategoryId)
+    : null;
+
+
+    
+
   // Fetch backend page when currentPage changes
   useEffect(() => {
-    fetchTutors(currentPage, selectedCategory || "", appliedSearch);
-  }, [currentPage, selectedCategory, appliedSearch]);
+    const category = categoryId
+      ? { id: categoryId, name: selectedCategory }
+      : { id: undefined, name: selectedCategory || "" };
+
+    const subCategory = subCategoryId
+      ? { id: subCategoryId, name: selectedSubCategory }
+      : { id: undefined, name: selectedSubCategory || "" };
+
+    fetchTutors(currentPage, category, subCategory, appliedSearch);
+  }, [currentPage, categoryId, subCategoryId, appliedSearch]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -64,7 +85,7 @@ function AllTutorsPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategory]);
+  }, [categoryId, subCategoryId]);
 
   const handleSearch = () => {
     setCurrentPage(1);

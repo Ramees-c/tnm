@@ -10,9 +10,9 @@ function BlogRecentPost() {
   useEffect(() => {
     setLoading(true);
     axios
-      .get(`${API_BASE}/blogs/?page=1&page_size=5`)
+      .get(`${API_BASE}/recent-blog/`)
       .then((res) => {
-        setPosts(res.data.results);
+        setPosts(res.data);
       })
       .catch((err) => {
         console.error("Error fetching blogs");

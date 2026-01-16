@@ -42,11 +42,15 @@ function HeroSearchForm() {
           ? category.name
           : `${category.name} (${currentRootName})`;
 
+      const urlCategory =
+        chain.length > 0 ? chain[chain.length - 1] : category.name;
+
       result.push({
         id: category.id,
         name: category.name,
         label,
         parent: isTop ? null : currentRootName,
+        urlCategory,
         pathIds: [baseRootId, ...currentPath.slice(1)],
         hasChildren,
         isLeaf,
@@ -122,7 +126,7 @@ function HeroSearchForm() {
     const value = e.target.value;
     setSubjectInput(value);
     setErrors((prev) => ({ ...prev, subjects: "" }));
-   
+    // call but don't block typing; it's fine to await but non-blocking is smoother
     fetchAndFilterSubjects(value);
   };
 
@@ -132,9 +136,14 @@ function HeroSearchForm() {
     const matches = await fetchAndFilterSubjects(subjectInput);
 
     if (matches.length > 0) {
-      navigate(`/all-tutors?category=${encodeURIComponent(matches[0].name)}`, {
-        state: { hideHeroSearch: true },
-      });
+      navigate(
+        `/all-tutors?category=${encodeURIComponent(
+          matches[0].urlCategory
+        )}&subcategory=${encodeURIComponent(matches[0].name)}`,
+        {
+          state: { hideHeroSearch: true },
+        }
+      );
       setShowSuggestions(false);
     } else {
       // Keep dropdown open to show "No subjects found"
@@ -186,7 +195,9 @@ function HeroSearchForm() {
                   setSubjectInput(sub.label);
                   setShowSuggestions(false);
                   navigate(
-                    `/all-tutors?category=${encodeURIComponent(sub.name)}`,
+                    `/all-tutors?category=${encodeURIComponent(
+                      sub.urlCategory
+                    )}&subcategory=${encodeURIComponent(sub.name)}`,
                     {
                       state: { hideHeroSearch: true },
                     }

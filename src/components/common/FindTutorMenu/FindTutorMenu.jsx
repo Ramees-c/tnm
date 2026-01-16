@@ -19,17 +19,23 @@ function FindTutorMenu() {
     const fetchCategories = async () => {
       try {
         const { data } = await axios.get(`${API_BASE}/category-list/`);
-        const mappedData = data.map((category) => {
-          const columns = category.subcategories.map((subcat) => ({
+        const mappedData = data.map((category) => ({
+          title: category.name,
+          categoryId: category.id,
+          columns: category.subcategories.map((subcat) => ({
             heading: subcat.name,
-            links: subcat.subcategories.map((sub) => sub.name),
-          }));
-          return { title: category.name, columns };
-        });
+            subCategoryId: subcat.id,
+            links: subcat.subcategories.map((sub) => ({
+              name: sub.name,
+              id: sub.id,
+            })),
+          })),
+        }));
+
         setMenuData(mappedData);
         if (mappedData.length) setActiveTab(mappedData[0]);
       } catch (error) {
-        console.error("Failed to fetch categories:", error);
+        console.error("Failed to fetch categories");
       }
     };
     fetchCategories();
@@ -41,10 +47,20 @@ function FindTutorMenu() {
   };
 
   // Category click redirect to all tutors page
-  const handleCategoryClick = (categoryName) => {
-    navigate(`/all-tutors?category=${encodeURIComponent(categoryName)}`, {
-      state: { hideHeroSearch: true },
-    });
+  const handleCategoryClick = (
+    categoryName,
+    categoryId,
+    subCategoryName,
+    subCategoryId
+  ) => {
+    navigate(
+      `/all-tutors?category=${encodeURIComponent(
+        categoryName
+      )}&categoryId=${categoryId}&subcategory=${encodeURIComponent(
+        subCategoryName
+      )}&subcategoryId=${subCategoryId}`,
+      { state: { hideHeroSearch: true } }
+    );
   };
 
   return (
@@ -98,7 +114,14 @@ function FindTutorMenu() {
                           return (
                             <li key={hoverKey}>
                               <button
-                                onClick={() => handleCategoryClick(link)}
+                                onClick={() =>
+                                  handleCategoryClick(
+                                    col.heading,
+                                    col.subCategoryId,
+                                    link.name,
+                                    link.id
+                                  )
+                                }
                                 onMouseEnter={() => setHoveredLink(hoverKey)}
                                 onMouseLeave={() => setHoveredLink(null)}
                                 className={`w-full text-left flex items-center gap-2 py-1 rounded-md transition-all duration-200 text-sm ${
@@ -110,7 +133,7 @@ function FindTutorMenu() {
                                 {hoveredLink === hoverKey && (
                                   <FiChevronRight className="text-green-600" />
                                 )}
-                                <span>{link}</span>
+                               <span>{link.name}</span>
                               </button>
                             </li>
                           );
@@ -126,7 +149,14 @@ function FindTutorMenu() {
                             return (
                               <li key={hoverKey}>
                                 <button
-                                  onClick={() => handleCategoryClick(link)}
+                                  onClick={() =>
+                                    handleCategoryClick(
+                                      col.heading,
+                                      col.subCategoryId,
+                                      link.name,
+                                      link.id
+                                    )
+                                  }
                                   onMouseEnter={() => setHoveredLink(hoverKey)}
                                   onMouseLeave={() => setHoveredLink(null)}
                                   className={`w-full text-left flex items-center gap-2 py-1 rounded-md transition-all duration-200 text-sm ${
@@ -138,7 +168,7 @@ function FindTutorMenu() {
                                   {hoveredLink === hoverKey && (
                                     <FiChevronRight className="text-green-600" />
                                   )}
-                                  <span>{link}</span>
+                                 <span>{link.name}</span>
                                 </button>
                               </li>
                             );
@@ -183,11 +213,18 @@ function FindTutorMenu() {
                       {col.links.map((link, linkIndex) => (
                         <li key={linkIndex}>
                           <button
-                            onClick={() => handleCategoryClick(link)}
+                            onClick={() =>
+                              handleCategoryClick(
+                                col.heading,
+                                col.subCategoryId,
+                                link.name,
+                                link.id
+                              )
+                            }
                             className="flex items-center py-1.5 text-gray-600 hover:text-primary transition-colors"
                           >
                             <FiChevronRight className="mr-2 text-primary text-xs" />
-                            <span className="truncate">{link}</span>
+                          <span className="truncate">{link.name}</span>
                           </button>
                         </li>
                       ))}
