@@ -14,9 +14,13 @@ function BlogPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
+  const [initialLoad, setInitialLoad] = useState(true);
+
   useEffect(() => {
     const fetchBlogs = async () => {
-      setLoading(true);
+      if (initialLoad) {
+        setLoading(true);
+      }
       try {
         const res = await axios.get(`${API_BASE}/blogs/?page=${currentPage}`);
         setPosts(res.data.results); // backend returns only current page
@@ -25,6 +29,7 @@ function BlogPage() {
         console.error("Failed to fetch blogs");
       } finally {
         setLoading(false);
+        setInitialLoad(false);
       }
     };
 
@@ -42,13 +47,13 @@ function BlogPage() {
     return () => clearTimeout(timeout);
   }, [currentPage]);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loading />
-      </div>
-    );
-  }
+  if (loading && initialLoad) {
+  return (
+    <div className="flex items-center justify-center h-screen">
+      <Loading />
+    </div>
+  );
+}
 
   const getPaginationPages = (current, total) => {
     const isMobile = window.innerWidth < 640;

@@ -63,8 +63,15 @@ function AllTutorsPage() {
     ? Number(selectedSubCategoryId)
     : null;
 
+  // Live search with debounce (typing → auto fetch)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAppliedSearch(searchTerm.trim());
+      setCurrentPage(1);
+    }, 500);
 
-    
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   // Fetch backend page when currentPage changes
   useEffect(() => {
@@ -92,12 +99,7 @@ function AllTutorsPage() {
     setAppliedSearch(searchTerm.trim());
   };
 
-  if (loading)
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loading />
-      </div>
-    );
+  const showLoader = loading && tutors.length === 0;
 
   return (
     <div className="container py-10">
@@ -117,15 +119,21 @@ function AllTutorsPage() {
       )}
 
       {/* Search */}
+      {/* Search */}
       {!hideHeroSearch && (
         <div className="flex justify-center mb-10 gap-2">
-          <input
-            type="text"
-            placeholder="Search by name, subject, city, state, or pincode..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full max-w-lg px-4 py-2 border rounded-md outline-none focus:ring-0 focus:border-primary text-xs sm:text-sm"
-          />
+          <div className="w-full max-w-lg">
+            <input
+              type="text"
+              placeholder="Search by name, subject, city, state, or pincode..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              // 🔥 Important to keep focus
+              autoFocus
+              spellCheck="false"
+              className="w-full px-4 py-2 border rounded-md outline-none focus:ring-0 focus:border-primary text-xs sm:text-sm"
+            />
+          </div>
 
           <button
             onClick={handleSearch}
@@ -137,7 +145,11 @@ function AllTutorsPage() {
       )}
 
       {/* Tutors Grid */}
-      {tutors.length > 0 ? (
+      {showLoader ? (
+        <div className="flex items-center justify-center py-20">
+          <Loading />
+        </div>
+      ) : tutors.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6 place-items-center">
           {tutors.map((tutor) => (
             <TutorCard key={tutor.id} tutor={tutor} />
